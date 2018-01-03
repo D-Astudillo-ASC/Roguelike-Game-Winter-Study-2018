@@ -1,3 +1,4 @@
-export function utilAlert() {
-  document.write("this is a util function<br/>");
+
+export function first() {
+  console.log("Example function, testing.....");
 }
