@@ -5,6 +5,7 @@ import {StartupMode} from './ui_mode.js';
 import {WinMode} from './ui_mode.js';
 import {PlayMode} from './ui_mode.js';
 import {LoseMode} from'./ui_mode.js';
+import {Message} from './message.js';
 export let Game = {
   display: {
       SPACING: 1.1,
@@ -62,7 +63,7 @@ export let Game = {
 
 
      this.setupModes();
-
+     Message.send("Welcome!");
      this.switchModes('startup');
      console.log("game: ");
      console.dir(this);
@@ -156,10 +157,7 @@ export let Game = {
      },
      renderMessage: function() {
        let d = this.display.message.o;
-       for (let i = 0; i < 10; i++) {
-        d.drawText(5,i+5,"hello world");
-
-      }
+       Message.render(d);
 
       console.log("renderMessage");
       // this.curMode.render(this.display.main.o);

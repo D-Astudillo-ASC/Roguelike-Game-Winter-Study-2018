@@ -50,6 +50,13 @@ export class PlayMode extends UIMode {
         this.game.switchModes('win');
         return true;
       }
+
+      if (evt.key == 'l')
+      {
+        this.game.switchModes('lose');
+        return true;
+      }
+
     }
   }
 }
@@ -62,6 +69,7 @@ export class WinMode extends UIMode {
 }
 export class LoseMode extends UIMode {
   render(display){
+    display.clear();
     display.drawText(2,2,"You lose!");
   }
 }
