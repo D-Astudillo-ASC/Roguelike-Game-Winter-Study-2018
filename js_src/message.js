@@ -1,21 +1,23 @@
 class Messager {
   constructor(){
-    this.message = '';
+    this.message = ' ';
   }
 
   render(targetDisplay){
     targetDisplay.clear();
-    targetDisplay.drawText(1,1, this.message());
+    targetDisplay.drawText(2,2,(this.message));
   }
 
   send(msg){
     this.message = msg;
   }
 
-  /*
-  clear(msg){
-    this.message = '';
-  }*/
+
+  clear(){
+    this.message = ' ';
+  }
+
+
 }
 
 export let Message = new Messager();

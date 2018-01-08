@@ -6,6 +6,7 @@ import {WinMode} from './ui_mode.js';
 import {PlayMode} from './ui_mode.js';
 import {LoseMode} from'./ui_mode.js';
 import {Message} from './message.js';
+import {PersistenceMode} from './ui_mode.js';
 export let Game = {
   display: {
       SPACING: 1.1,
@@ -31,6 +32,7 @@ export let Game = {
 
    modes: {
     startup: '',
+    persistence: '',
     play: '',
     win: '',
     lose: '',
@@ -41,10 +43,6 @@ export let Game = {
 
    //this. refers to game object
    init: function() {
-     this._randomSeed = 5 + Math.floor(Math.random()*100000);
-     //this._randomSeed = 76250;
-     console.log("using random seed "+this._randomSeed);
-     ROT.RNG.setSeed(this._randomSeed);
 
      this.display.main.o = new ROT.Display({
        width: this.display.main.w,
@@ -81,7 +79,15 @@ export let Game = {
      this.modes.play = new PlayMode(this);
      this.modes.win = new WinMode(this);
      this.modes.lose = new LoseMode(this);
-   },
+     this.modes.persistence = new PersistenceMode(this);
+  },
+
+  setupNewGame: function(){
+    this._randomSeed = 5 + Math.floor(Math.random()*100000);
+    //this._randomSeed = 76250;
+    console.log("using random seed "+this._randomSeed);
+    ROT.RNG.setSeed(this._randomSeed);
+  },
 
    bindEvent: function(eventType) {
     window.addEventListener(eventType, (evt) => {
@@ -95,6 +101,7 @@ export let Game = {
       if (this.curMode.handleInput(eventType, evt)) {
         this.render();
         //Message.ageMessages();
+
       }
     }
   },
@@ -111,7 +118,18 @@ export let Game = {
      }
    },
 
+   toJSON: function (){
+    let json = '';
+    json = JSON.stringify({rseed: this._randomSeed});
+    return json;
+   },
 
+   fromJSON: function (json){
+      console.log(json);
+      let state = JSON.parse(json);
+      this._randomSeed = state.rseed;
+      ROT.RNG.setSeed(this._randomSeed);
+   },
 
    getDisplay: function (displayId) {
      if (this.display.hasOwnProperty(displayId)) {
@@ -127,11 +145,6 @@ export let Game = {
    },
 
    renderMain: function() {
-    //  let d = this.display.main.o;
-    //  for (let i = 0; i < 10; i++) {
-    //    d.drawText(5,i+5,"hello world");
-    //  }
-
     console.log("renderMain");
     this.curMode.render(this.display.main.o);
     //if(this.curMode.hasOwnProperty('render')){
