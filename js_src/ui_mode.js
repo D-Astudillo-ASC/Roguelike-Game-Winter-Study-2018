@@ -1,3 +1,8 @@
+import {Message} from './message.js'
+import {Map} from './map.js'
+import {init2DArray} from './util.js'
+import {DisplaySymbol} from './display_symbol.js'
+import {TILES} from './tile.js'
 class UIMode {
   constructor(thegame){
     console.log("created" +this.constructor.name);
@@ -37,9 +42,19 @@ export class StartupMode extends UIMode {
 
 
 export class PlayMode extends UIMode {
+  enter(){
+    if(! this.map)
+    {
+      this.map = new Map(300,160);
+    }
+    this.camerax = 5;
+    this.cameray = 8;
+    this.cameraSymbol = new DisplaySymbol('@','#eb4');
+  }
   render(display){
     display.clear();
-    display.drawText(2,3," w to win, l to lose, p for persistence");
+    this.map.render(display, this.camerax,this.cameray);
+    this.cameraSymbol.render(display,display.getOptions().width/2,display.getOptions().height/2);
   }
 
     handleInput(eventType, evt){
@@ -63,9 +78,39 @@ export class PlayMode extends UIMode {
         this.game.switchModes('persistence');
         return true;
       }
+
+      if(evt.key === '1'){
+        console.log('move left');
+        this.moveCamera(-1,0);
+        return true;
+      }
+
+      if(evt.key === '3'){
+        this.moveCamera(1,0);
+        return true;
+      }
+
+      if(evt.key === '5'){
+        this.moveCamera(0,-1);
+        return true;
+      }
+
+      if(evt.key === '2'){
+        this.moveCamera(0,1);
+        return true;
+      }
     }
+
   }
+
+  moveCamera(dx,dy){
+    this.camerax += dx;
+    this.cameray += dy;
+  }
+
 }
+
+
 export class WinMode extends UIMode {
 
   render(display){

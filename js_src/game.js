@@ -61,9 +61,8 @@ export let Game = {
 
 
      this.setupModes();
-     Message.send("Welcome!");
      this.switchModes('startup');
-     console.log("game: ");
+     Message.send("Greetings!");
      console.dir(this);
    },
 
@@ -110,7 +109,7 @@ export let Game = {
     if(this.curMode){
       this.curMode.exit();
      }
-     console.log("Switching modes....");
+     Message.send("Switching modes....");
      this.curMode = this.modes[newNodeName];
 
      if(this.curMode){
@@ -156,9 +155,7 @@ export let Game = {
 
     renderAvatar: function() {
       let d = this.display.avatar.o;
-      for (let i = 0; i < 10; i++) {
-      d.drawText(5,i+5,"avatar");
-      }
+      d.drawText(5,5,"avatar");
 
      console.log("renderAvatar");
      //  this.curMode.render(this.display.main.o);
@@ -179,9 +176,6 @@ export let Game = {
         //}
 
 
-      },
-   first: function(){
-     U.first();
-   }
+      }
 
 };

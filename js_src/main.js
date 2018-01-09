@@ -25,5 +25,4 @@ console.log("starting WSRL - window loaded");
 
 
  Game.render();
- Game.first();
 };
