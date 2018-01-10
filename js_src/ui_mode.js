@@ -1,8 +1,9 @@
-import {Message} from './message.js'
-import {Map} from './map.js'
-import {init2DArray} from './util.js'
-import {DisplaySymbol} from './display_symbol.js'
-import {TILES} from './tile.js'
+import {Message} from './message.js';
+import {MapMaker} from './map.js';
+import {init2DArray} from './util.js';
+import {DisplaySymbol} from './display_symbol.js';
+import {TILES} from './tile.js';
+import {DATASTORE,clearDataStore} from './datastore.js';
 class UIMode {
   constructor(thegame){
     console.log("created" +this.constructor.name);
@@ -42,18 +43,51 @@ export class StartupMode extends UIMode {
 
 
 export class PlayMode extends UIMode {
+  constructor(thegame){
+    super(thegame);
+    this.state = {
+      mapId : '',
+      cameramapx : '',
+      cameramapy : ''
+    };
+  }
+
+
+
   enter(){
-    if(! this.map)
+    if(!this.state.mapId)
     {
-      this.map = new Map(300,160);
+      let m = MapMaker({xdim:300, ydim:160, mapType:'basic caves'});
+      this.state.mapId = m.getId();
+      m.build();
+      this.state.cameramapx = 5;
+      this.state.cameramapy = 8;
     }
-    this.camerax = 5;
-    this.cameray = 8;
+
+    this.cameraSymbol = new DisplaySymbol('@','#eb4');
+  }
+
+  toJSON(){
+    return JSON.stringify(this.state);
+  }
+
+  restoreFromState(stateData){
+    this.state = JSON.parse(stateData);
+  }
+
+  setupNewGame(){
+    let m = MapMaker({xdim:300, ydim:160});
+    this.state.mapId = m.getId();
+    m.build();
+    this.state.cameramapx = 5;
+    this.state.cameramapy = 8;
     this.cameraSymbol = new DisplaySymbol('@','#eb4');
   }
   render(display){
+    console.dir(DATASTORE);
+    console.dir(this);
     display.clear();
-    this.map.render(display, this.camerax,this.cameray);
+    DATASTORE.MAPS[this.state.mapId].render(display, this.state.cameramapx,this.state.cameramapy);
     this.cameraSymbol.render(display,display.getOptions().width/2,display.getOptions().height/2);
   }
 
@@ -104,8 +138,10 @@ export class PlayMode extends UIMode {
   }
 
   moveCamera(dx,dy){
-    this.camerax += dx;
-    this.cameray += dy;
+    this.state.cameramapx += dx;
+    this.state.cameramapy += dy;
+    // DATASTORE.CAMERA_X = this.state.cameramapx;
+    // DATASTORE.CAMERA_Y = this.state.cameramapy;
   }
 
 }
@@ -157,6 +193,7 @@ export class PersistenceMode extends UIMode {
     {
       console.log("new game");
       this.game.setupNewGame();
+      this.game.switchModes('play');
       return true;
     }
 
@@ -172,7 +209,6 @@ export class PersistenceMode extends UIMode {
     {
       this.handleRestore();
       this.game.switchModes('play');
-      console.log("load game");
       return true;
     }
 
@@ -191,7 +227,8 @@ export class PersistenceMode extends UIMode {
   {
     return false;
   }
-  window.localStorage.setItem('roguelikegame', this.game.toJSON());
+  window.localStorage.setItem('roguelikegame', JSON.stringify(DATASTORE));
+
  }
 
  handleRestore() {
@@ -202,7 +239,22 @@ export class PersistenceMode extends UIMode {
   }
 
   let restorationString = window.localStorage.getItem('roguelikegame');
-  this.game.fromJSON(restorationString);
+  let state = JSON.parse(restorationString);
+
+  clearDataStore();
+
+  DATASTORE.GAME = this.game;
+  DATASTORE.ID_SEQ = state.ID_SEQ;
+  this.game.fromJSON(state.GAME);
+
+  for (let mapId in state.MAPS){
+    let mapData = JSON.parse(state.MAPS[mapId]);
+    DATASTORE.MAPS[mapId]= MapMaker(mapData);
+    DATASTORE.MAPS[mapId].build();
+  }
+
+  console.log('post-save data store: ');
+  console.dir(DATASTORE);
  }
 
  localStorageAvailable(){

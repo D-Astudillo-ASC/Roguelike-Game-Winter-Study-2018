@@ -7,6 +7,7 @@ import {PlayMode} from './ui_mode.js';
 import {LoseMode} from'./ui_mode.js';
 import {Message} from './message.js';
 import {PersistenceMode} from './ui_mode.js';
+import {DATASTORE} from './datastore.js';
 export let Game = {
   display: {
       SPACING: 1.1,
@@ -61,9 +62,12 @@ export let Game = {
 
 
      this.setupModes();
+     DATASTORE.GAME = this;
      this.switchModes('startup');
      Message.send("Greetings!");
      console.dir(this);
+     console.log('datastore');
+     console.dir(DATASTORE);
    },
 
    bindEvent: function(eventType) {
@@ -86,6 +90,7 @@ export let Game = {
     //this._randomSeed = 76250;
     console.log("using random seed "+this._randomSeed);
     ROT.RNG.setSeed(this._randomSeed);
+    this.modes.play.setupNewGame();
   },
 
    bindEvent: function(eventType) {
@@ -105,12 +110,12 @@ export let Game = {
     }
   },
 
-  switchModes: function(newNodeName){
+  switchModes: function(newModeName){
     if(this.curMode){
       this.curMode.exit();
      }
-     Message.send("Switching modes....");
-     this.curMode = this.modes[newNodeName];
+     Message.send(newModeName + " " + "mode");
+     this.curMode = this.modes[newModeName];
 
      if(this.curMode){
        this.curMode.enter();
@@ -119,7 +124,10 @@ export let Game = {
 
    toJSON: function (){
     let json = '';
-    json = JSON.stringify({rseed: this._randomSeed});
+    json = JSON.stringify({
+      rseed: this._randomSeed,
+      playModeState: this.modes.play
+    });
     return json;
    },
 
@@ -128,6 +136,8 @@ export let Game = {
       let state = JSON.parse(json);
       this._randomSeed = state.rseed;
       ROT.RNG.setSeed(this._randomSeed);
+
+      this.modes.play.restoreFromState(state.playModeState);
    },
 
    getDisplay: function (displayId) {
