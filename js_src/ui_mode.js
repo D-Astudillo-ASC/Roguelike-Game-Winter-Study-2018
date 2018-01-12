@@ -4,6 +4,9 @@ import {init2DArray} from './util.js';
 import {DisplaySymbol} from './display_symbol.js';
 import {TILES} from './tile.js';
 import {DATASTORE,clearDataStore} from './datastore.js';
+import {EntityFactory} from './entity_templates.js';
+import {Entity} from './entity.js';
+import {ENTITY_TEMPLATES} from './entity_templates.js';
 class UIMode {
   constructor(thegame){
     console.log("created" +this.constructor.name);
@@ -35,7 +38,7 @@ export class StartupMode extends UIMode {
   handleInput(eventType, evt){
     if(eventType == 'keyup'){
     console.dir(evt);
-    this.game.switchModes('play');
+    this.game.switchModes('persistence');
     return true;
     }
   }
@@ -48,7 +51,7 @@ export class PlayMode extends UIMode {
     this.state = {
       mapId : '',
       cameramapx : '',
-      cameramapy : ''
+      cameramapy : '',
     };
   }
 
@@ -62,6 +65,7 @@ export class PlayMode extends UIMode {
       m.build();
       this.state.cameramapx = 5;
       this.state.cameramapy = 8;
+
     }
 
     this.cameraSymbol = new DisplaySymbol('@','#eb4');
@@ -76,19 +80,24 @@ export class PlayMode extends UIMode {
   }
 
   setupNewGame(){
-    let m = MapMaker({xdim:300, ydim:160});
+    let m = MapMaker({xdim:30, ydim:20});
     this.state.mapId = m.getId();
     m.build();
-    this.state.cameramapx = 5;
-    this.state.cameramapy = 8;
-    this.cameraSymbol = new DisplaySymbol('@','#eb4');
+    this.state.cameramapx = 0;
+    this.state.cameramapy = 0;
+    let a = EntityFactory.create('avatar');
+    this.state.avatarId = a.getId();
+    console.log('about to call add entity');
+    m.addEntityAtRandomPosition(a);
+    this.moveCameraToAvatar();
   }
   render(display){
     console.dir(DATASTORE);
     console.dir(this);
     display.clear();
     DATASTORE.MAPS[this.state.mapId].render(display, this.state.cameramapx,this.state.cameramapy);
-    this.cameraSymbol.render(display,display.getOptions().width/2,display.getOptions().height/2);
+    // DATASTORE.MAPS[this.state.mapId].render(display, 15, 10);
+    // this.cameraSymbol.render(display,display.getOptions().width/2,display.getOptions().height/2);
   }
 
     handleInput(eventType, evt){
@@ -115,33 +124,52 @@ export class PlayMode extends UIMode {
 
       if(evt.key === '1'){
         console.log('move left');
-        this.moveCamera(-1,0);
+        this.moveAvatar(-1,0);
         return true;
       }
 
       if(evt.key === '3'){
-        this.moveCamera(1,0);
+        this.moveAvatar(1,0);
         return true;
       }
 
       if(evt.key === '5'){
-        this.moveCamera(0,-1);
+        this.moveAvatar(0,-1);
         return true;
       }
 
       if(evt.key === '2'){
-        this.moveCamera(0,1);
+        this.moveAvatar(0,1);
         return true;
       }
     }
 
   }
 
-  moveCamera(dx,dy){
-    this.state.cameramapx += dx;
-    this.state.cameramapy += dy;
+  getAvatar(){
+    console.log('avatar created');
+    return DATASTORE.ENTITIES[this.state.avatarId];
+  }
+
+  moveAvatar(dx,dy){
+
+    if(this.getAvatar().moveBy(dx,dy))
+    {
+      this.moveCameraToAvatar();
+      return true;
+    }
+
+    return false;
+    //this.state.cameramapx += dx;
+    //this.state.cameramapy += dy;
     // DATASTORE.CAMERA_X = this.state.cameramapx;
     // DATASTORE.CAMERA_Y = this.state.cameramapy;
+  }
+
+  moveCameraToAvatar(){
+    this.state.cameramapx = this.getAvatar().getX();
+    this.state.cameramapy = this.getAvatar().getY();
+
   }
 
 }

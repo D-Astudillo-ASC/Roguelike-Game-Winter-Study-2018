@@ -13,8 +13,12 @@ class Map {
     this.state.mapType = mapType || 'basic caves';
     this.state.setupRngState = ROT.RNG.getState();
     this.state.id = uniqueId('map- '+this.state.mapType);
+    this.state.entityIdToMapPos = {};
+    this.state.mapPosToEntityId = {};
     console.dir(this);
   }
+
+
 
   build(){
       this.tileGrid = TILE_GRID_GENERATOR[this.state.mapType](this.state.xdim,this.state.ydim,this.state.setupRngState);
@@ -62,6 +66,57 @@ class Map {
   setRngState(newId){
     this.state.setupRngState = newId;
   }
+
+  updateEntityPosition(ent,newMapX,newMapY){
+    let oldPos = this.state.entityIdToMapPos[ent.getId()];
+
+    delete this.mapPosToEntityId[oldPos];
+
+    this.state.mapPosToEntityId[`${newMapX},${newMapY}`] = ent.getId();
+
+    this.state.entityIdToMapPos[ent.getId()] = `${newMapX},${newMapY}`;
+
+  }
+  addEntityAt(ent,mapx,mapy){
+    let pos = `${mapx},${mapy}`;
+    this.state.entityIdToMapPos[ent.getId()] = pos;
+    this.state.mapPosToEntityId[pos] = ent.getId();
+    ent.setMapId(this.getId());
+    ent.setX(mapx);
+    ent.setY(mapy);
+  }
+
+  addEntityAtRandomPosition(ent){
+
+    let openPos = this.getRandomOpenPosition();
+    let p = openPos.split(',');
+    this.addEntityAt(ent, p[0],p[1]);
+
+  }
+
+  getRandomOpenPosition(){
+
+    let x = Math.trunc(ROT.RNG.getUniform()*this.state.xdim);
+    let y = Math.trunc(ROT.RNG.getUniform()*this.state.ydim);
+    console.log(x);
+    console.log(y);
+    if(this.isPositionOpen(x,y)){
+      return `${x},${y}`;
+    }
+
+    return this.getRandomOpenPosition();
+  }
+
+
+
+  isPositionOpen(x,y){
+    if (this.tileGrid[x][y].isA('floor')){
+      return true;
+    }
+
+    return false;
+  }
+
   render(display,camera_map_x,camera_map_y){
     let cx = 0;
     let cy = 0;
@@ -73,7 +128,20 @@ class Map {
     {
        for( let y1 = ystart; y1 < yend; y1++)
        {
-            this.getTile(x1,y1).render(display,cx,cy);
+            let pos = `${x1},${y1}`;
+            // console.log(pos);
+            if(this.state.mapPosToEntityId[pos]){
+              console.log('found entity:');
+              console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);
+              console.dir(display);
+              console.log(cx);
+              console.log(cy);
+              DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]].render(display,cx,cy);
+            }
+            else {
+               this.getTile(x1,y1).render(display,cx,cy);
+            }
+
             cy++;
        }
 

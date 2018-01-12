@@ -85,7 +85,9 @@ export let Game = {
      this.modes.persistence = new PersistenceMode(this);
   },
 
+
   setupNewGame: function(){
+    console.log('game.setupNewGame has been called');
     this._randomSeed = 5 + Math.floor(Math.random()*100000);
     //this._randomSeed = 76250;
     console.log("using random seed "+this._randomSeed);
