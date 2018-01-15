@@ -19,7 +19,6 @@ export class Factory {
 
     DATASTORE[this.datastoreNamespace][product.getId()] = product;
 
-
     return product;
   }
 

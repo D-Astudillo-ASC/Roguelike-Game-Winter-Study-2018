@@ -14,29 +14,46 @@ export class Entity extends DisplaySymbol{
       this.state.id = uniqueId();
     }
 
-    getName(){
+    getId()
+    {
+      return this.state.id;
+    }
+
+    setId(newId)
+    {
+      this.state.id = newId;
+    }
+
+    getName()
+    {
       return this.state.name;
     }
 
-    setName(newInfo){
-      this.state.name = newInfo;
+    setName(newName)
+    {
+      this.state.name = newName;
     }
 
     getX(){
       return this.state.x;
     }
 
-    setX(newInfo){
-      this.state.x = newInfo;
+    setX(newX){
+      this.state.x = newX;
     }
 
 
-    getY(newInfo){
+    getY(){
       return this.state.y;
     }
 
-    setY(newInfo){
-      this.state.y = newInfo;
+    setY(newY){
+      this.state.y = newY;
+    }
+
+    getPos()
+    {
+        return `${this.state.x},${this.state.y}`;
     }
 
     getMapId(){
@@ -50,15 +67,6 @@ export class Entity extends DisplaySymbol{
       return DATASTORE.MAPS[this.state.mapId];
     }
 
-    getId()
-    {
-      return this.state.id;
-    }
-
-    setId(newInfo)
-    {
-      this.state.id = newInfo;
-    }
     moveBy(dx,dy){
       let newX = this.state.x*1 + dx*1;
       let newY = this.state.y*1 + dy*1;
@@ -67,12 +75,18 @@ export class Entity extends DisplaySymbol{
 
         this.state.x = newX;
         this.state.y = newY;
-        this.getMap().updateEntityPosition(this,this.state.x,this.state.y);
+        this.getMap().updateEntityPosition(this, this.state.x,this.state.y);
         return true;
       }
       return false;
 
     }
 
+    toJSON(){
+      return JSON.stringify(this.state);
+    }
 
+    fromJSON(s){
+      this.state = JSON.parse(s);
+    }
 }

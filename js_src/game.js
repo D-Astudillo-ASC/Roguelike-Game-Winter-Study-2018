@@ -70,13 +70,6 @@ export let Game = {
      console.dir(DATASTORE);
    },
 
-   bindEvent: function(eventType) {
-    window.addEventListener(eventType, (evt) => {
-      this.eventHandler(eventType, evt);
-    });
-   },
-
-
    setupModes: function() {
      this.modes.startup = new StartupMode(this);
      this.modes.play = new PlayMode(this);
@@ -84,7 +77,6 @@ export let Game = {
      this.modes.lose = new LoseMode(this);
      this.modes.persistence = new PersistenceMode(this);
   },
-
 
   setupNewGame: function(){
     console.log('game.setupNewGame has been called');
@@ -127,17 +119,21 @@ export let Game = {
    toJSON: function (){
     let json = '';
     json = JSON.stringify({
-      rseed: this._randomSeed,
+      rseed: this.randomSeed,
       playModeState: this.modes.play
     });
     return json;
+   },
+
+   restoreFromState(stateData){
+     this.state = stateData;
    },
 
    fromJSON: function (json){
       console.log(json);
       let state = JSON.parse(json);
       this._randomSeed = state.rseed;
-      ROT.RNG.setSeed(this._randomSeed);
+      ROT.RNG.setSeed(this.randomSeed);
 
       this.modes.play.restoreFromState(state.playModeState);
    },

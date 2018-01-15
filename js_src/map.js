@@ -39,32 +39,32 @@ class Map {
     return this.state.xdim;
   }
 
-  setXDim(newId){
-    this.state.xdim = newX;
+  setXDim(newXdim){
+    this.state.xdim = newXdim;
   }
   getYDim()
   {
     return this.state.ydim;
   }
 
-  setYDim(newId){
-    this.state.ydim = newId;
+  setYDim(newYdim{
+    this.state.ydim = newYdim;
   }
   getMapType()
   {
     return this.state.mapType;
   }
 
-  setMapType(newId){
-    this.state.mapType = newId;
+  setMapType(newMapType){
+    this.state.mapType = newMapType;
   }
   getRngState()
   {
     return this.state.setupRngState;
   }
 
-  setRngState(newId){
-    this.state.setupRngState = newId;
+  setRngState(newRngState){
+    this.state.setupRngState = newRngState;
   }
 
   updateEntityPosition(ent,newMapX,newMapY){
@@ -185,12 +185,12 @@ let TILE_GRID_GENERATOR = {
 
 export function MapMaker(mapData){
   let m = new Map(mapData.xdim,mapData.ydim,mapData.mapType);
-  if(mapData.Id){
+  if(mapData.id){
     m.setId(mapData.id);
   }
 
   if(mapData.setupRngState){
-    m.setRngState(mapData.setupRngState);
+    m.setId(mapData.setupRngState);
   }
 
   DATASTORE.MAPS[m.getId()] = m;
