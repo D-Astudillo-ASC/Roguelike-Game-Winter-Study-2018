@@ -8,5 +8,8 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
   EntityFactory.learn({
     'name': 'avatar',
     'chr': '@',
-    'fg': '#eb4'
+    'fg': '#eb4',
+    'maxHp': 10,
+    'mixInNames':['PlayerMessages','TimeTracker','WalkerCorporeal']//,'HitPoints']
+
   });

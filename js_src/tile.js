@@ -7,7 +7,7 @@ export class Tile extends DisplaySymbol {
     this.name = template.name;
   }
   isA(name){
-    return this.name = name;
+    return this.name == name;
   }
 
 }

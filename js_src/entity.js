@@ -1,13 +1,15 @@
 import {uniqueId} from './util.js';
-import {DisplaySymbol} from './display_symbol.js';
+import {MixableSymbol} from './mixable_symbol.js';
 import {DATASTORE} from './datastore.js';
 
 
-export class Entity extends DisplaySymbol{
+export class Entity extends MixableSymbol{
     constructor(template){
       super(template);
       this.name = template.name;
-      this.state = {};
+      if(!this.state){
+        this.state = {};
+      }
       this.state.x = 0;
       this.state.y= 0;
       this.state.mapId = 0;
@@ -65,21 +67,6 @@ export class Entity extends DisplaySymbol{
     }
     getMap(){
       return DATASTORE.MAPS[this.state.mapId];
-    }
-
-    moveBy(dx,dy){
-      let newX = this.state.x*1 + dx*1;
-      let newY = this.state.y*1 + dy*1;
-
-      if(this.getMap().isPositionOpen(newX,newY)){
-
-        this.state.x = newX;
-        this.state.y = newY;
-        this.getMap().updateEntityPosition(this, this.state.x,this.state.y);
-        return true;
-      }
-      return false;
-
     }
 
     toJSON(){

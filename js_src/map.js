@@ -47,7 +47,7 @@ class Map {
     return this.state.ydim;
   }
 
-  setYDim(newYdim{
+  setYDim(newYdim){
     this.state.ydim = newYdim;
   }
   getMapType()
@@ -69,8 +69,8 @@ class Map {
 
   updateEntityPosition(ent,newMapX,newMapY){
     let oldPos = this.state.entityIdToMapPos[ent.getId()];
-
-    delete this.mapPosToEntityId[oldPos];
+    console.log(this.state.mapPosToEntityId);
+    delete this.state.mapPosToEntityId[oldPos];
 
     this.state.mapPosToEntityId[`${newMapX},${newMapY}`] = ent.getId();
 
@@ -86,6 +86,13 @@ class Map {
     ent.setY(mapy);
   }
 
+  isPositionOpen(x,y){
+    if (this.tileGrid[x][y].isA('floor')){
+      return true;
+    }
+
+    return false;
+  }
   addEntityAtRandomPosition(ent){
 
     let openPos = this.getRandomOpenPosition();
@@ -107,15 +114,6 @@ class Map {
     return this.getRandomOpenPosition();
   }
 
-
-
-  isPositionOpen(x,y){
-    if (this.tileGrid[x][y].isA('floor')){
-      return true;
-    }
-
-    return false;
-  }
 
   render(display,camera_map_x,camera_map_y){
     let cx = 0;

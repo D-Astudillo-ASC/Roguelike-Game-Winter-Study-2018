@@ -6,7 +6,7 @@ import {TILES} from './tile.js';
 import {DATASTORE,clearDataStore} from './datastore.js';
 import {EntityFactory} from './entity_templates.js';
 import {Entity} from './entity.js';
-import {ENTITY_TEMPLATES} from './entity_templates.js';
+
 class UIMode {
   constructor(thegame){
     console.log("created" +this.constructor.name);
@@ -26,7 +26,6 @@ class UIMode {
     console.log("rendering" + this.constructor.name);
     display.drawText(2,2,"rendering" + this.constructor.name);
   }
-
 }
 
 export class StartupMode extends UIMode {
@@ -100,6 +99,14 @@ export class PlayMode extends UIMode {
     // this.cameraSymbol.render(display,display.getOptions().width/2,display.getOptions().height/2);
   }
 
+  renderAvatar(display){
+    display.clear();
+    let a = this.getAvatar();
+    display.drawText(0,0,"avatar");
+    display.drawText(0,2,"time: "+ a.getTime());
+    display.drawText(0,3,"location: "+ a.getPos());
+    display.drawText(0,4,"hp: "+ a.getHp());
+  }
     handleInput(eventType, evt){
     if(eventType == 'keyup'){
       console.dir(evt);
@@ -147,15 +154,18 @@ export class PlayMode extends UIMode {
   }
 
   getAvatar(){
-    console.log('avatar created');
+    //console.log('avatar created');
+    console.dir(this);
     return DATASTORE.ENTITIES[this.state.avatarId];
+
   }
 
   moveAvatar(dx,dy){
 
-    if(this.getAvatar().moveBy(dx,dy))
+    if(this.getAvatar().tryWalk(dx,dy))
     {
       this.moveCameraToAvatar();
+      //this.getAvatar().addTime(1);
       return true;
     }
 
