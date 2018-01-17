@@ -69,6 +69,13 @@ export class Entity extends MixableSymbol{
       return DATASTORE.MAPS[this.state.mapId];
     }
 
+    destroy()
+    {
+      this.getMap().extractEntity(this);
+
+      delete DATASTORE[this.getId()];
+    }
+
     toJSON(){
       return JSON.stringify(this.state);
     }

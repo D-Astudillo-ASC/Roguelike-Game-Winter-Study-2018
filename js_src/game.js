@@ -8,6 +8,7 @@ import {LoseMode} from'./ui_mode.js';
 import {Message} from './message.js';
 import {PersistenceMode} from './ui_mode.js';
 import {DATASTORE} from './datastore.js';
+import {initTiming} from './timing.js';
 export let Game = {
   display: {
       SPACING: 1.1,
@@ -165,7 +166,9 @@ export let Game = {
 
     renderAvatar: function() {
     let a = this.display.avatar.o;
-    a.drawText(0,2,"Avatar Space");
+    //a.drawText(0,2,"Avatar Space");
+    this.curMode.renderAvatar(a);
+
     //this.curMode.render(a);
     //a.drawText(0,2,"Avatar Space");
 

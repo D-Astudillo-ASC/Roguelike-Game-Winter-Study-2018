@@ -77,6 +77,16 @@ class Map {
     this.state.entityIdToMapPos[ent.getId()] = `${newMapX},${newMapY}`;
 
   }
+
+  extractEntity(ent){
+
+    delete this.state.mapPosToEntityId[this.state.entityIdToMapPos[ent.getId()]];
+
+    delete this.state.entityIdToMapPos[ent.getId()];
+
+    return ent;
+
+  }
   addEntityAt(ent,mapx,mapy){
     let pos = `${mapx},${mapy}`;
     this.state.entityIdToMapPos[ent.getId()] = pos;
@@ -93,6 +103,19 @@ class Map {
 
     return false;
   }
+
+  getTargetPositionInfo(x,y){
+    let info = {
+      entity: '',
+      tile: this.getTile(x,y)
+    };
+    let entId = this.state.mapPosToEntityId[`${x},${y}`];
+    if(entId){
+      info.entity = DATASTORE.ENTITIES[entId];
+    }
+    return info;
+  }
+
   addEntityAtRandomPosition(ent){
 
     let openPos = this.getRandomOpenPosition();

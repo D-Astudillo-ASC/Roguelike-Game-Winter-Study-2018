@@ -1,4 +1,8 @@
+
+import ROT from 'rot-js';
+
 import {DATASTORE} from './datastore.js';
+
 
 export function init2DArray(xdim,ydim,initialValue){
   let a =[];
@@ -11,6 +15,12 @@ export function init2DArray(xdim,ydim,initialValue){
     }
   }
   return a;
+}
+
+export function randomInt(min,max) {
+    let range = max - min;
+    let offset = Math.floor(ROT.RNG.getUniform()*(range+1));
+    return offset+min;
 }
 
 let randCharSource = '1234567890abcdefghijklmnopqrstuvwxyz'.split('');

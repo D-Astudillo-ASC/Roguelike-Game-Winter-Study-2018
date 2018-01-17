@@ -1,5 +1,6 @@
 import {Color} from './colors.js';
-export class DisplaySymbol {
+
+export class DisplaySymbol{
   constructor(template){
     this.chr = template.chr || ' ';
     this.fg = template.fg || Color.FG;

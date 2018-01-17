@@ -6,6 +6,7 @@ import {TILES} from './tile.js';
 import {DATASTORE,clearDataStore} from './datastore.js';
 import {EntityFactory} from './entity_templates.js';
 import {Entity} from './entity.js';
+import {SCHEDULER,TIME_ENGINE,initTiming} from './timing.js';
 
 class UIMode {
   constructor(thegame){
@@ -25,6 +26,10 @@ class UIMode {
   render(display) {
     console.log("rendering" + this.constructor.name);
     display.drawText(2,2,"rendering" + this.constructor.name);
+  }
+
+  renderAvatar(display){
+    display.clear();
   }
 }
 
@@ -64,9 +69,8 @@ export class PlayMode extends UIMode {
       m.build();
       this.state.cameramapx = 5;
       this.state.cameramapy = 8;
-
     }
-
+    TIME_ENGINE.unlock();
     this.cameraSymbol = new DisplaySymbol('@','#eb4');
   }
 
@@ -79,8 +83,11 @@ export class PlayMode extends UIMode {
   }
 
   setupNewGame(){
+    initTiming();
     let m = MapMaker({xdim:30, ydim:20});
     this.state.mapId = m.getId();
+    Message.send("Building map....");
+    this.game.renderMessage();
     m.build();
     this.state.cameramapx = 0;
     this.state.cameramapy = 0;
@@ -89,6 +96,15 @@ export class PlayMode extends UIMode {
     console.log('about to call add entity');
     m.addEntityAtRandomPosition(a);
     this.moveCameraToAvatar();
+
+    for (let mossCount = 0; mossCount < 10; mossCount++){
+      m.addEntityAtRandomPosition(EntityFactory.create('moss'));
+    }
+
+    for(let monsterCount = 0; monsterCount < 1;monsterCount++){
+      m.addEntityAtRandomPosition(EntityFactory.create('monster'));
+    }
+
   }
   render(display){
     console.dir(DATASTORE);
@@ -209,6 +225,7 @@ export class LoseMode extends UIMode {
     display.clear();
     display.drawText(2,2,"You lose!");
   }
+
   handleInput(eventType,evt)
   {
     if(evt.key == 'Escape')
