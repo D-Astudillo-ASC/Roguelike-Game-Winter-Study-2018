@@ -114,6 +114,7 @@ export let Game = {
      if(this.curMode){
        this.curMode.enter();
      }
+     this.render();
    },
 
    toJSON: function (){
@@ -126,6 +127,7 @@ export let Game = {
    },
 
    restoreFromState(stateData){
+     console.log(stateData);
      this.state = stateData;
    },
 
@@ -162,10 +164,11 @@ export let Game = {
     },
 
     renderAvatar: function() {
-      let d = this.display.avatar.o;
-      d.drawText(5,5,"avatar");
+    let a = this.display.avatar.o;
+    a.drawText(0,2,"Avatar Space");
+    //this.curMode.render(a);
+    //a.drawText(0,2,"Avatar Space");
 
-     console.log("renderAvatar");
      //  this.curMode.render(this.display.main.o);
      //if(this.curMode.hasOwnProperty('render')){
          //this.curMode.render(this.display.main.o);

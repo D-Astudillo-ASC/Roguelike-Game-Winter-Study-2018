@@ -102,10 +102,12 @@ export class PlayMode extends UIMode {
   renderAvatar(display){
     display.clear();
     let a = this.getAvatar();
-    display.drawText(0,0,"avatar");
-    display.drawText(0,2,"time: "+ a.getTime());
-    display.drawText(0,3,"location: "+ a.getPos());
-    display.drawText(0,4,"hp: "+ a.getHp());
+    console.log(a.getTime());
+    console.log(a.getHp());
+    display.drawText(1,0,"AVATAR");
+    display.drawText(1,2,"time: "+ a.getTime());
+    display.drawText(1,3,"location: "+ a.getX() + "," + a.getY());
+    display.drawText(1,4,"hp: "+ a.getHp());
   }
     handleInput(eventType, evt){
     if(eventType == 'keyup'){
@@ -129,6 +131,7 @@ export class PlayMode extends UIMode {
         return true;
       }
 
+
       if(evt.key === '1'){
         console.log('move left');
         this.moveAvatar(-1,0);
@@ -150,18 +153,9 @@ export class PlayMode extends UIMode {
         return true;
       }
     }
-
   }
-
-  getAvatar(){
-    //console.log('avatar created');
-    console.dir(this);
-    return DATASTORE.ENTITIES[this.state.avatarId];
-
-  }
-
   moveAvatar(dx,dy){
-
+    console.log(this.getAvatar());
     if(this.getAvatar().tryWalk(dx,dy))
     {
       this.moveCameraToAvatar();
@@ -179,6 +173,14 @@ export class PlayMode extends UIMode {
   moveCameraToAvatar(){
     this.state.cameramapx = this.getAvatar().getX();
     this.state.cameramapy = this.getAvatar().getY();
+
+  }
+
+  getAvatar(){
+    //console.log('avatar created');
+    console.dir(this);
+    console.log(DATASTORE.ENTITIES[this.state.avatarId]);
+    return DATASTORE.ENTITIES[this.state.avatarId];
 
   }
 
@@ -280,15 +282,25 @@ export class PersistenceMode extends UIMode {
   let state = JSON.parse(restorationString);
 
   clearDataStore();
-
-  DATASTORE.GAME = this.game;
   DATASTORE.ID_SEQ = state.ID_SEQ;
+  DATASTORE.GAME = this.game;
+
   this.game.fromJSON(state.GAME);
 
   for (let mapId in state.MAPS){
     let mapData = JSON.parse(state.MAPS[mapId]);
     DATASTORE.MAPS[mapId]= MapMaker(mapData);
     DATASTORE.MAPS[mapId].build();
+  }
+
+  for (let entId in state.ENTITIES){
+      DATASTORE.ENTITIES[entId] = JSON.parse(state.ENTITIES[entId]);
+      let ent = EntityFactory.create(DATASTORE.ENTITIES[entId].name);
+      if (DATASTORE.ENTITIES[entId].name == 'avatar') {
+        this.game.modes.play.state.avatarId = ent.getId();
+      }
+      DATASTORE.MAPS[Object.keys(DATASTORE.MAPS)[0]].addEntityAt(ent, DATASTORE.ENTITIES[entId].x, DATASTORE.ENTITIES[entId].y)
+      delete DATASTORE.ENTITIES[entId];
   }
 
   console.log('post-save data store: ');

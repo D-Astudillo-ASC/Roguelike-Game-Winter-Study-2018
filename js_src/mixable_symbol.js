@@ -35,8 +35,9 @@ export class MixableSymbol extends DisplaySymbol{
       }
     }
 
-    if(m.METHODS){
-      for (let method in m.METHODS){
+
+    for (let method in m.METHODS){
+      if(m.METHODS){
         this[method] = m.METHODS[method];
       }
     }
@@ -53,12 +54,12 @@ export class MixableSymbol extends DisplaySymbol{
 
         }
 
-        raiseMixinEvent(evtLabel,evtData){
-          for(let mi=0;mi<this.mixins.length;mi++){
-            let m = this.mixins[mi];
-            if(m.LISTENERS && m.LISTENERS[evtLabel]){
-              m.LISTENERS[evtLabel].call(this,evtData);
-            }
-          }
+    raiseMixinEvent(evtLabel,evtData){
+      for(let mi=0;mi<this.mixins.length;mi++){
+        let m = this.mixins[mi];
+        if(m.LISTENERS && m.LISTENERS[evtLabel]){
+          m.LISTENERS[evtLabel].call(this,evtData);
         }
+      }
+    }
 }

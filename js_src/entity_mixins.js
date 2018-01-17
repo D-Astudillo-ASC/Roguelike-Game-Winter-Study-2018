@@ -1,5 +1,5 @@
 //defines mixins that can be added to ENTITIES
-
+import {Message} from './message.js';
 export let TimeTracker = {
     META:{
 
