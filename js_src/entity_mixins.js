@@ -86,8 +86,9 @@ export let WalkerCorporeal = {
         this.state.y = newY;
         this.getMap().updateEntityPosition(this, this.state.x,this.state.y);
 
-        this.raiseMixinEvent('walkClear',{status:"all clear"});
+        this.raiseMixinEvent('walkClear',{status:"clear"});
         this.raiseMixinEvent('turnTaken',{timeUsed: 1});
+        this.raiseMixinEvent('actionDone');
         return true;
 
         }
@@ -104,45 +105,6 @@ export let WalkerCorporeal = {
   }
 };
 
-export let PlayerMessages = {
-    META:{
-
-      mixInName:'PlayerMessages',
-      mixInGroupName:'Messager'
-
-      },
-
-    LISTENERS: {
-      'walkBlocked': function(evtData){
-        Message.send("can't walk there because " +evtData.reason);
-      },
-
-      'bumpEntity': function(evtData){
-
-        Message.send("Entity detected, type: " + " "+ evtData.target.getName());
-      },
-
-      'walkClear': function(evtData){
-        Message.send("Keep walking, it's"+ " " + evtData.status);
-      },
-      'attacks': function(evtData){
-        Message.send("You've attacked" +evtData.target.getName());
-      },
-
-      'damages': function(evtData){
-        Message.send(this.getName()+ "deals" + evtData.damageAmount + "damage to" + evtData.target.getName());
-      },
-
-      'kills': function(evtData){
-        Message.send(this.getName()+ "kills the" + evtData.target.getName());
-      },
-
-      'killedBy':function(evtData){
-        Message.send(this.getName()+ "killed by" + evtData.target.getName());
-      }
-
-    }
-}
 export let HitPoints = {
        META:{
 
@@ -191,17 +153,63 @@ export let HitPoints = {
        },
        LISTENERS: {
          'damaged': function(evtData){
-              this.loseHp(evtData.damageAmount);
-              evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: evtData.damageAmount});
+              let amount = evtData.damageAmount;
+              this.loseHp(amt);
+              evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: amount});
 
               if(this.getHp() == 0){
                 this.raiseMixinEvent('killedBy',{src:evtData.src});
                 evtData.src.raiseMixinEvent('kills',{target:this});
-                console.log("trying to destroy");
+                console.log("destroying");
                 this.destroy();
               }
 
           }
+    }
+};
+
+export let PlayerMessages = {
+    META:{
+
+      mixInName:'PlayerMessages',
+      mixInGroupName:'Messager'
+
+      },
+
+    LISTENERS: {
+      'walkBlocked': function(evtData){
+        Message.send("Can't walk there because " +evtData.reason+ ", path is obstructed.");
+      },
+
+      'bumpEntity': function(evtData){
+
+        Message.send("Entity detected, Type: " + " " + evtData.target.name.toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+
+
+        //if(evtData.target.getMaxHp() <= 5){
+        //  setTimeout(Message.send("Very Low Threat Level Detected, this shouldn't be challenging at all!"),100000);
+        //}
+      },
+
+      'walkClear': function(evtData){
+        Message.send("Keep walking, it's"+ " " + evtData.status);
+      },
+      'attacks': function(evtData){
+        Message.send("You've attacked" +evtData.target.getName());
+      },
+
+      'damages': function(evtData){
+        Message.send(this.getName()+ "deals" + evtData.damageAmount + "damage to" + evtData.target.getName());
+      },
+
+      'kills': function(evtData){
+        Message.send(this.getName()+ "kills the" + evtData.target.getName());
+      },
+
+      'killedBy':function(evtData){
+        Message.send(this.getName()+ "killed by" + evtData.target.getName());
+      }
+
     }
 };
 
@@ -211,7 +219,7 @@ export let MeleeAttacker = {
     mixInGroupName: 'MeleeAttacker',
     stateNamespace: '_MeleeAttacker',
     stateModel: {
-      meleeDamage: 10
+      meleeDamage: 5
     },
 
     initialize: function (template){
@@ -225,8 +233,8 @@ export let MeleeAttacker = {
   LISTENERS:{
     'bumpEntity': function(evtData){
       console.log("bumping entity");
-      this.raiseMixinEvent('attacks',{actor:this,target:evtData.target});
-      evtData.target.raiseMixinEvent('damaged', {src: this,damageAmount: this.getMeleeDamage()});
+      this.raiseMixinEvent('attacks',{src:this,target:evtData.target});
+      evtData.target.raiseMixinEvent('damaged', {src:this,damageAmount:this.getMeleeDamage()});
     }
   }
 }
@@ -277,6 +285,7 @@ export let ActorPlayer = {
       }
       this.isActing(true);
       TIME_ENGINE.lock();
+      DATASTORE.GAME.render();
       this.isActing(false);
       console.log("Player is Acting");
     }

@@ -3,6 +3,8 @@ class Messager {
     this.message = ' ';
   }
 
+
+
   render(targetDisplay){
     targetDisplay.clear();
     targetDisplay.drawText(2,2,(this.message));
@@ -12,6 +14,10 @@ class Messager {
     this.message = msg;
   }
 
+  delayedSend(msg){
+    this.message = msg;
+    setTimeout(msg,2000);
+  }
 
   clear(){
     this.message = ' ';

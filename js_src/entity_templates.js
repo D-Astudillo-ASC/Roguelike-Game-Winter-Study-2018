@@ -24,7 +24,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
 
   EntityFactory.learn({
     'name': 'monster',
-    'chr': '|-.&.-|',
+    'chr': '&',
     'fg': '#d63',
     'maxHp': 50,
     'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints']

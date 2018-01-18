@@ -120,15 +120,15 @@ export class PlayMode extends UIMode {
     let a = this.getAvatar();
     console.log(a.getTime());
     console.log(a.getHp());
-    display.drawText(1,0,"AVATAR");
-    display.drawText(1,2,"time: "+ a.getTime());
-    display.drawText(1,3,"location: "+ a.getX() + "," + a.getY());
-    display.drawText(1,4,"hp: "+ a.getHp());
+    display.drawText(1,0,"AVATAR: "+ a.chr);
+    display.drawText(1,2,"Time: "+ a.getTime());
+    display.drawText(1,3,"Location: "+ a.getX() + "," + a.getY());
+    display.drawText(1,4,"HP: "+ a.getHp() + "/" + a.getMaxHp());
   }
     handleInput(eventType, evt){
     if(eventType == 'keyup'){
       console.dir(evt);
-      if(evt.key == 'w')
+      if(evt.key == 'v')
       {
 
         this.game.switchModes('win');
@@ -148,23 +148,23 @@ export class PlayMode extends UIMode {
       }
 
 
-      if(evt.key === '1'){
+      if(evt.key === 'a'){
         console.log('move left');
         this.moveAvatar(-1,0);
         return true;
       }
 
-      if(evt.key === '3'){
+      if(evt.key === 'd'){
         this.moveAvatar(1,0);
         return true;
       }
 
-      if(evt.key === '5'){
+      if(evt.key === 'w'){
         this.moveAvatar(0,-1);
         return true;
       }
 
-      if(evt.key === '2'){
+      if(evt.key === 's'){
         this.moveAvatar(0,1);
         return true;
       }
