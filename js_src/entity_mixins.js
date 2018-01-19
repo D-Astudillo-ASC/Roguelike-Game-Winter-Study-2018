@@ -183,7 +183,7 @@ export let PlayerMessages = {
 
       'bumpEntity': function(evtData){
 
-        Message.send("Entity detected, Type: " + " " + evtData.target.name.toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+        Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
 
 
         //if(evtData.target.getMaxHp() <= 5){
@@ -200,15 +200,15 @@ export let PlayerMessages = {
 
       'damages': function(evtData){
         Message.send(this.getName()+ "deals" + evtData.damageAmount + "damage to" + evtData.target.name);
-        Message.send("Entity detected, Type: " + " " + evtData.target.name.toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+        Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
       },
 
       'kills': function(evtData){
-        Message.send(this.name.toUpperCase() + " " + "kills the" + " " + evtData.target.name.toUpperCase());
+        Message.send(this.getName().toUpperCase() + " " + "kills the" + " " + evtData.target.getName().toUpperCase());
       },
 
       'killedBy':function(evtData){
-        Message.send(this.name().toUpperCase+ "killed by" + evtData.target.name);
+        Message.send(this.getName().toUpperCase+ "killed by" + evtData.target.getName());
       }
 
     }

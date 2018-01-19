@@ -16209,12 +16209,13 @@ var PersistenceMode = exports.PersistenceMode = function (_UIMode5) {
       (0, _datastore.initDataStore)();
       _datastore.DATASTORE.ID_SEQ = state.ID_SEQ;
       _datastore.DATASTORE.GAME = this.game;
-
+      this.game.fromJSON(state.GAME);
       for (var mapId in state.MAPS) {
         console.log("pre-restore map");
         var mapData = JSON.parse(state.MAPS[mapId]);
         _datastore.DATASTORE.MAPS[mapId] = (0, _map.MapMaker)(mapData);
         _datastore.DATASTORE.MAPS[mapId].build();
+        console.log(JSON.stringify(_datastore.DATASTORE.MAPS[mapId].tileGrid));
         console.log("post-restore map");
       }
 
@@ -16227,7 +16228,7 @@ var PersistenceMode = exports.PersistenceMode = function (_UIMode5) {
         console.log("post-restore entities");
       }
 
-      this.game.fromJSON(state.GAME);
+      //this.game.fromJSON(state.GAME);
       console.log('post-save data store: ');
       console.dir(_datastore.DATASTORE);
       this.game.switchModes('play');
@@ -16652,7 +16653,7 @@ var PlayerMessages = exports.PlayerMessages = {
 
     'bumpEntity': function bumpEntity(evtData) {
 
-      _message.Message.send("Entity detected, Type: " + " " + evtData.target.name.toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+      _message.Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
 
       //if(evtData.target.getMaxHp() <= 5){
       //  setTimeout(Message.send("Very Low Threat Level Detected, this shouldn't be challenging at all!"),100000);
@@ -16668,15 +16669,15 @@ var PlayerMessages = exports.PlayerMessages = {
 
     'damages': function damages(evtData) {
       _message.Message.send(this.getName() + "deals" + evtData.damageAmount + "damage to" + evtData.target.name);
-      _message.Message.send("Entity detected, Type: " + " " + evtData.target.name.toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+      _message.Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
     },
 
     'kills': function kills(evtData) {
-      _message.Message.send(this.name.toUpperCase() + " " + "kills the" + " " + evtData.target.name.toUpperCase());
+      _message.Message.send(this.getName().toUpperCase() + " " + "kills the" + " " + evtData.target.getName().toUpperCase());
     },
 
     'killedBy': function killedBy(evtData) {
-      _message.Message.send(this.name().toUpperCase + "killed by" + evtData.target.name);
+      _message.Message.send(this.getName().toUpperCase + "killed by" + evtData.target.getName());
     }
 
   }

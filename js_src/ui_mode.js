@@ -343,12 +343,13 @@ export class PersistenceMode extends UIMode {
   initDataStore();
   DATASTORE.ID_SEQ = state.ID_SEQ;
   DATASTORE.GAME = this.game;
-
+  this.game.fromJSON(state.GAME);
   for (let mapId in state.MAPS){
     console.log("pre-restore map");
     let mapData = JSON.parse(state.MAPS[mapId]);
     DATASTORE.MAPS[mapId]= MapMaker(mapData);
     DATASTORE.MAPS[mapId].build();
+    console.log(JSON.stringify(DATASTORE.MAPS[mapId].tileGrid));
     console.log("post-restore map");
   }
 
@@ -361,7 +362,7 @@ export class PersistenceMode extends UIMode {
       console.log("post-restore entities");
   }
 
-  this.game.fromJSON(state.GAME);
+  //this.game.fromJSON(state.GAME);
   console.log('post-save data store: ');
   console.dir(DATASTORE);
   this.game.switchModes('play');
