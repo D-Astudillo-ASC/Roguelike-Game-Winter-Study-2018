@@ -3,15 +3,17 @@ import {MapMaker} from './map.js';
 import {init2DArray} from './util.js';
 import {DisplaySymbol} from './display_symbol.js';
 import {TILES} from './tile.js';
-import {DATASTORE,clearDataStore} from './datastore.js';
+import {DATASTORE,initDataStore} from './datastore.js';
 import {EntityFactory} from './entity_templates.js';
 import {Entity} from './entity.js';
 import {SCHEDULER,TIME_ENGINE,initTiming} from './timing.js';
+import {COMMAND,getCommandFromInput,setKeyBinding} from './commands.js';
 
 class UIMode {
   constructor(thegame){
     console.log("created" +this.constructor.name);
     this.game = thegame;
+    this.display = this.game.getDisplay("main");
   }
 
   enter(){
@@ -22,6 +24,8 @@ class UIMode {
   }
   handleInput(eventType, evt){
     console.log("handling input for" +this.constructor.name);
+    UIMode.dumpInput(inputType,inputData);
+    return false;
   }
   render(display) {
     console.log("rendering" + this.constructor.name);
@@ -31,20 +35,38 @@ class UIMode {
   renderAvatar(display){
     display.clear();
   }
+
+  static dumpInput(inputType, inputData){
+    console.log(`inputType: ${inputType}`);
+    console.log('inputData: ');
+    console.dir(inputData);
+  }
+
+  toJSON(){}
+  fromJSON(){}
 }
 
 export class StartupMode extends UIMode {
-  render(display){
-  display.drawText(2,2, "Welcome");
-  display.drawText(2,3,"Press any key to continue");
+  enter(){
+    super.enter();
+    Message.send("Welcome! Bienvenido! Bienvenue!");
   }
 
-  handleInput(eventType, evt){
-    if(eventType == 'keyup'){
-    console.dir(evt);
-    this.game.switchModes('persistence');
-    return true;
+  render(){
+  this.display.drawText(2,2, "Welcome!");
+  this.display.drawText(2,4,"Press any key to continue");
+  }
+
+  handleInput(inputType, inputData){
+
+    if(inputType == 'keypress' && inputData.charCode !== 0){
+      this.keyPressGate = true;
     }
+
+    if(inputType == 'keyup' && this.keyPressGate){
+    this.game.switchModes('persistence');
+    }
+    return false;
   }
 }
 
@@ -57,10 +79,9 @@ export class PlayMode extends UIMode {
       cameramapx : '',
       cameramapy : '',
     };
+    this.game.isPlaying = true;
+    setKeyBinding(['play','movement_numpad']);
   }
-
-
-
   enter(){
     if(!this.state.mapId)
     {
@@ -101,7 +122,7 @@ export class PlayMode extends UIMode {
       m.addEntityAtRandomPosition(EntityFactory.create('moss'));
     }
 
-    for(let monsterCount = 0; monsterCount < 1;monsterCount++){
+    for(let monsterCount = 0; monsterCount < 3;monsterCount++){
       m.addEntityAtRandomPosition(EntityFactory.create('monster'));
     }
 
@@ -124,6 +145,11 @@ export class PlayMode extends UIMode {
     display.drawText(1,2,"Time: "+ a.getTime());
     display.drawText(1,3,"Location: "+ a.getX() + "," + a.getY());
     display.drawText(1,4,"HP: "+ a.getHp() + "/" + a.getMaxHp());
+  }
+
+  WinOrLose(){
+
+
   }
     handleInput(eventType, evt){
     if(eventType == 'keyup'){
@@ -237,72 +263,118 @@ export class LoseMode extends UIMode {
 }
 
 export class PersistenceMode extends UIMode {
-  render(display){
-    display.clear();
-    display.drawText(2,3,"N for New Game");
-    display.drawText(2,4,"S to Save Game");
-    display.drawText(2,5,"L to Load Game");
+  enter(){
+    super.enter();
+    if(window.localStorage.getItem(this.game._PERSISTANCE_NAMESPACE)){
+      this.game.hasSaved = true;
+    }
+    setKeyBinding('persistence');
+  }
+  render(){
+    this.display.clear();
+    this.display.drawText(2,3,"N for New Game");
+    if(this.game.isPlaying){
+      this.display.drawText(2,4,"S to Save Game");
+      this.display.drawText(2,6,"Escape to return to game")
+    }
+
+    if(this.game.hasSaved){
+      this.display.drawText(2,5,"L to Load Game");
+    }
   }
 
-  handleInput(eventType, evt){
-  if(eventType == 'keyup'){
-    if(evt.key == 'N'||evt.key == 'n')
-    {
-      console.log("new game");
+  handleInput(inputType, inputData){
+
+    let gameComm = getCommandFromInput(inputType,inputData);
+
+    if(gameComm == COMMAND.NULLCOMMAND){
+      return false;
+    }
+
+    if(gameComm == COMMAND.NEW_GAME){
       this.game.setupNewGame();
+      Message.send("New Game Created");
       this.game.switchModes('play');
-      return true;
     }
 
-    if (evt.key == 'S'||evt.key == 's')
-    {
-      this.handleSave();
-      this.game.switchModes('play');
-      console.log("save game");
-      return true;
+    else if(gameComm == COMMAND.SAVE_GAME){
+      if(this.game.isPlaying){
+        this.handleSave();
+      }
     }
 
-    if(evt.key == 'L'||evt.key == 'l')
-    {
-      this.handleRestore();
-      this.game.switchModes('play');
-      return true;
+    else if(gameComm == COMMAND.LOAD_GAME){
+      if(this.game.hasSaved){
+        this.handleRestore();
+      }
     }
 
-    if(evt.key == 'Escape')
-    {
-      this.game.switchModes('play');
-      return true;
+    else if(gameComm == COMMAND.CANCEL){
+      if(this.game.isPlaying){
+        this.game.switchModes('play');
+      }
     }
+    return false;
   }
-  return false;
- }
+ //  if(eventType == 'keyup'){
+ //    if(evt.key == 'N'||evt.key == 'n')
+ //    {
+ //      console.log("new game");
+ //      this.game.setupNewGame();
+ //      this.game.switchModes('play');
+ //      return true;
+ //    }
+ //
+ //    if (evt.key == 'S'||evt.key == 's')
+ //    {
+ //      this.handleSave();
+ //      this.game.switchModes('play');
+ //      console.log("save game");
+ //      return true;
+ //    }
+ //
+ //    if(evt.key == 'L'||evt.key == 'l')
+ //    {
+ //      this.handleRestore();
+ //      this.game.switchModes('play');
+ //      return true;
+ //    }
+ //
+ //    if(evt.key == 'Escape')
+ //    {
+ //      this.game.switchModes('play');
+ //      return true;
+ //    }
+ //  }
+ //  return false;
+ // }
 
  handleSave() {
   console.log("save game");
   if(!this.localStorageAvailable())
   {
-    return false;
+    return;
   }
-  window.localStorage.setItem('roguelikegame', JSON.stringify(DATASTORE));
-
+  window.localStorage.setItem(this.game._PERSISTANCE_NAMESPACE, JSON.stringify(DATASTORE));
+  this.game.hasSaved = true;
+  Message.send("Game saved");
+  this.game.switchModes('play');
  }
 
  handleRestore() {
   console.log("load game");
   if (! this.localStorageAvailable())
   {
-    return false;
+    return;
   }
 
-  let restorationString = window.localStorage.getItem('roguelikegame');
+  let restorationString = window.localStorage.getItem(this.game._PERSISTANCE_NAMESPACE);
   let state = JSON.parse(restorationString);
 
-  clearDataStore();
+  initDataStore();
   DATASTORE.ID_SEQ = state.ID_SEQ;
   DATASTORE.GAME = this.game;
 
-  this.game.fromJSON(state.GAME);
 
   for (let mapId in state.MAPS){
     let mapData = JSON.parse(state.MAPS[mapId]);
@@ -320,6 +392,7 @@ export class PersistenceMode extends UIMode {
       delete DATASTORE.ENTITIES[entId];
   }
 
+  this.game.fromJSON(state.GAME);
   console.log('post-save data store: ');
   console.dir(DATASTORE);
  }

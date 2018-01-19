@@ -42,7 +42,10 @@ export let Game = {
 
    curMode:'',
 
+   _PERSISTANCE_NAMESPACE: 'roguelikegame',
 
+   isPlaying: false,
+   hasSaved: false,
    //this. refers to game object
    init: function() {
 

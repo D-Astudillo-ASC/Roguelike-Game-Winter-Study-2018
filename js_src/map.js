@@ -21,6 +21,7 @@ class Map {
 
 
   build(){
+      //this.rng.setRngState(this.state.setupRngState);
       this.tileGrid = TILE_GRID_GENERATOR[this.state.mapType](this.state.xdim,this.state.ydim,this.state.setupRngState);
 
   }
@@ -214,7 +215,11 @@ export function MapMaker(mapData){
     m.setId(mapData.setupRngState);
   }
 
-  DATASTORE.MAPS[m.getId()] = m;
+  // if(mapData.setupRngState){
+  //   m.setId(mapData.setupRngState);
+  // }
 
+  DATASTORE.MAPS[m.getId()] = m;
+  m.build();
   return m;
 }

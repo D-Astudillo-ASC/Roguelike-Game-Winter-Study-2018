@@ -28,8 +28,6 @@ export function setKeyBinding(bindingNameList) {
   if (bindingNameList[0] != 'universal') {
     bindingNameList.unshift('universal');
   }
-  // console.log('bindingNameList:');
-  // console.dir(bindingNameList)
 
   let commandNumber = 1;
   COMMAND = {
@@ -37,7 +35,7 @@ export function setKeyBinding(bindingNameList) {
   };
   BINDING_LOOKUPS = {};
 
-  for (let i=0; i<bindingNameList.length; bni++) {
+  for (let bni=0; bni<bindingNameList.length; bni++) {
     let bindingName = bindingNameList[bni];
     if (! KEY_BINDINGS.hasOwnProperty(bindingName)) { return; }
     for (let command in KEY_BINDINGS[bindingName]) {
