@@ -46,13 +46,14 @@ export class MixableSymbol extends DisplaySymbol{
     for (let mi=0;mi<this.mixins.length;mi++){
             let m = this.mixins[mi];
             if(m.META.initialize){
-              console.log("call initializer for" + m.META.mixInName)
+              console.log("template ");
+              console.dir(template);
               m.META.initialize.call(this,template);
             }
 
-          }
+    }
 
-        }
+}
 
     raiseMixinEvent(evtLabel,evtData){
       for(let mi=0;mi<this.mixins.length;mi++){

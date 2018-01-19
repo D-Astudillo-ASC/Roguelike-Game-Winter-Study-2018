@@ -204,11 +204,11 @@ export let PlayerMessages = {
       },
 
       'kills': function(evtData){
-        Message.send(this.name + " " + "kills the" + " " + evtData.target.name);
+        Message.send(this.name.toUpperCase() + " " + "kills the" + " " + evtData.target.name.toUpperCase());
       },
 
       'killedBy':function(evtData){
-        Message.send(this.getName()+ "killed by" + evtData.target.name);
+        Message.send(this.name().toUpperCase+ "killed by" + evtData.target.name);
       }
 
     }
@@ -220,7 +220,7 @@ export let MeleeAttacker = {
     mixInGroupName: 'MeleeAttacker',
     stateNamespace: '_MeleeAttacker',
     stateModel: {
-      meleeDamage: 5
+      meleeDamage: 0
     },
 
     initialize: function (template){

@@ -26,7 +26,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'name': 'monster',
     'chr': '&',
     'fg': '#d63',
-    'maxHp': 50,
+    'maxHp': 5,
     'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints']
 
   });

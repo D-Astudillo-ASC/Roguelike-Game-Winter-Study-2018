@@ -118,13 +118,13 @@ export class PlayMode extends UIMode {
     m.addEntityAtRandomPosition(a);
     this.moveCameraToAvatar();
 
-    for (let mossCount = 0; mossCount < 1; mossCount++){
-      m.addEntityAtRandomPosition(EntityFactory.create('moss'));
-    }
-
-    // for(let monsterCount = 0; monsterCount < 3;monsterCount++){
-    //   m.addEntityAtRandomPosition(EntityFactory.create('monster'));
+    // for (let mossCount = 0; mossCount < 3; mossCount++){
+    //   m.addEntityAtRandomPosition(EntityFactory.create('moss'));
     // }
+
+    for(let monsterCount = 0; monsterCount < 1;monsterCount++){
+      m.addEntityAtRandomPosition(EntityFactory.create('monster'));
+    }
 
   }
   render(display){
@@ -145,6 +145,7 @@ export class PlayMode extends UIMode {
     display.drawText(1,2,"Time: "+ a.getTime());
     display.drawText(1,3,"Location: "+ a.getX() + "," + a.getY());
     display.drawText(1,4,"HP: "+ a.getHp() + "/" + a.getMaxHp());
+    display.drawText(1,5,"Attack: "+ a.getMeleeDamage());
   }
 
   WinOrLose(){
@@ -331,7 +332,7 @@ export class PersistenceMode extends UIMode {
 
  handleRestore() {
   console.log("load game");
-  if (! this.localStorageAvailable())
+  if (!this.localStorageAvailable())
   {
     return;
   }
@@ -343,26 +344,27 @@ export class PersistenceMode extends UIMode {
   DATASTORE.ID_SEQ = state.ID_SEQ;
   DATASTORE.GAME = this.game;
 
-
   for (let mapId in state.MAPS){
+    console.log("pre-restore map");
     let mapData = JSON.parse(state.MAPS[mapId]);
     DATASTORE.MAPS[mapId]= MapMaker(mapData);
     DATASTORE.MAPS[mapId].build();
+    console.log("post-restore map");
   }
 
   for (let entId in state.ENTITIES){
+      console.log("pre-restore entities");
       DATASTORE.ENTITIES[entId] = JSON.parse(state.ENTITIES[entId]);
-      let ent = EntityFactory.create(DATASTORE.ENTITIES[entId].name);
-      if (DATASTORE.ENTITIES[entId].name == 'avatar') {
-        this.game.modes.play.state.avatarId = ent.getId();
-      }
-      DATASTORE.MAPS[Object.keys(DATASTORE.MAPS)[0]].addEntityAt(ent, DATASTORE.ENTITIES[entId].x, DATASTORE.ENTITIES[entId].y)
-      delete DATASTORE.ENTITIES[entId];
+      console.dir(DATASTORE.ENTITIES[entId]);
+      let ent = EntityFactory.create(DATASTORE.ENTITIES[entId].name,DATASTORE.ENTITIES[entId]);
+      //delete DATASTORE.ENTITIES[entId];
+      console.log("post-restore entities");
   }
 
   this.game.fromJSON(state.GAME);
   console.log('post-save data store: ');
   console.dir(DATASTORE);
+  this.game.switchModes('play');
  }
 
  localStorageAvailable(){

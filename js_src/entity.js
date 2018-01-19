@@ -1,15 +1,15 @@
 import {uniqueId} from './util.js';
 import {MixableSymbol} from './mixable_symbol.js';
 import {DATASTORE} from './datastore.js';
-
+import {SCHEDULER} from './timing.js';
 
 export class Entity extends MixableSymbol{
     constructor(template){
       super(template);
-      this.name = template.name;
       if(!this.state){
         this.state = {};
       }
+      this.state.name = template.name;
       this.state.x = 0;
       this.state.y= 0;
       this.state.mapId = 0;
@@ -74,6 +74,7 @@ export class Entity extends MixableSymbol{
       this.getMap().extractEntity(this);
 
       delete DATASTORE[this.getId()];
+      SCHEDULER.remove(this);
     }
 
     toJSON(){
