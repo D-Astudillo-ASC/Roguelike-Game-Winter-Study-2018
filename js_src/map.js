@@ -140,6 +140,7 @@ class Map {
 
 
   render(display,camera_map_x,camera_map_y){
+    //
     let cx = 0;
     let cy = 0;
     let xstart = camera_map_x - Math.trunc(display.getOptions().width/2) ;
@@ -151,13 +152,13 @@ class Map {
        for( let y1 = ystart; y1 < yend; y1++)
        {
             let pos = `${x1},${y1}`;
-            // console.log(pos);
+            console.log(pos);
             if(this.state.mapPosToEntityId[pos]){
-              console.log('found entity:');
-              console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);
-              console.dir(display);
-              console.log(cx);
-              console.log(cy);
+              //console.log('found entity:');
+              // console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);
+              // console.dir(display);
+              // console.log(cx);
+              // console.log(cy);
               DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]].render(display,cx,cy);
             }
             else {
@@ -207,6 +208,8 @@ let TILE_GRID_GENERATOR = {
 
 export function MapMaker(mapData){
   let m = new Map(mapData.xdim,mapData.ydim,mapData.mapType);
+  console.log("Map is: ");
+  console.dir(m);
   if(mapData.id){
     m.setId(mapData.id);
   }
@@ -215,11 +218,7 @@ export function MapMaker(mapData){
     m.setId(mapData.setupRngState);
   }
 
-  // if(mapData.setupRngState){
-  //   m.setId(mapData.setupRngState);
-  // }
-
   DATASTORE.MAPS[m.getId()] = m;
-  m.build();
+  //m.build();
   return m;
 }

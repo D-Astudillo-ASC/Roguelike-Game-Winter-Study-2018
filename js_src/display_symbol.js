@@ -7,6 +7,6 @@ export class DisplaySymbol{
     this._bg = template.bg || Color.BG;
   }
  render(display,console_x,console_y){
-   display.draw(console_x,console_y, this.chr, this.fg,this.bg);
+   display.draw(console_x,console_y, this._chr, this._fg,this._bg);
  }
 }
