@@ -9847,7 +9847,7 @@ var Map = function () {
       for (var x1 = xstart; x1 < xend; x1++) {
         for (var y1 = ystart; y1 < yend; y1++) {
           var pos = x1 + ',' + y1;
-          console.log(pos);
+          // console.log(pos);
           if (this.state.mapPosToEntityId[pos]) {
             //console.log('found entity:');
             // console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);
@@ -15938,7 +15938,7 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
     key: 'setupNewGame',
     value: function setupNewGame() {
       (0, _timing.initTiming)();
-      var m = (0, _map.MapMaker)({ xdim: 30, ydim: 20 });
+      var m = (0, _map.MapMaker)({ xdim: 20, ydim: 15 });
       this.state.mapId = m.getId();
       _message.Message.send("Building map....");
       this.game.renderMessage();
@@ -15951,13 +15951,13 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       m.addEntityAtRandomPosition(a);
       this.moveCameraToAvatar();
 
-      for (var mossCount = 0; mossCount < 10; mossCount++) {
+      for (var mossCount = 0; mossCount < 1; mossCount++) {
         m.addEntityAtRandomPosition(_entity_templates.EntityFactory.create('moss'));
       }
 
-      for (var monsterCount = 0; monsterCount < 3; monsterCount++) {
-        m.addEntityAtRandomPosition(_entity_templates.EntityFactory.create('monster'));
-      }
+      // for(let monsterCount = 0; monsterCount < 3;monsterCount++){
+      //   m.addEntityAtRandomPosition(EntityFactory.create('monster'));
+      // }
     }
   }, {
     key: 'render',
@@ -15974,9 +15974,9 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
     value: function renderAvatar(display) {
       display.clear();
       var a = this.getAvatar();
-      console.log(a.getTime());
-      console.log(a.getHp());
-      display.drawText(1, 0, "AVATAR: " + a.chr);
+      // console.log(a.getTime());
+      // console.log(a.getHp());
+      display.drawText(1, 0, "AVATAR: " + a._chr);
       display.drawText(1, 2, "Time: " + a.getTime());
       display.drawText(1, 3, "Location: " + a.getX() + "," + a.getY());
       display.drawText(1, 4, "HP: " + a.getHp() + "/" + a.getMaxHp());
@@ -16643,7 +16643,7 @@ var HitPoints = exports.HitPoints = {
   LISTENERS: {
     'damaged': function damaged(evtData) {
       var amount = evtData.damageAmount;
-      this.loseHp(amt);
+      this.loseHp(amount);
       evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: amount });
 
       if (this.getHp() == 0) {
@@ -16686,15 +16686,16 @@ var PlayerMessages = exports.PlayerMessages = {
     },
 
     'damages': function damages(evtData) {
-      _message.Message.send(this.getName() + "deals" + evtData.damageAmount + "damage to" + evtData.target.getName());
+      _message.Message.send(this.getName() + "deals" + evtData.damageAmount + "damage to" + evtData.target.name);
+      _message.Message.send("Entity detected, Type: " + " " + evtData.target.name.toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
     },
 
     'kills': function kills(evtData) {
-      _message.Message.send(this.getName() + "kills the" + evtData.target.getName());
+      _message.Message.send(this.name + " " + "kills the" + " " + evtData.target.name);
     },
 
     'killedBy': function killedBy(evtData) {
-      _message.Message.send(this.getName() + "killed by" + evtData.target.getName());
+      _message.Message.send(this.getName() + "killed by" + evtData.target.name);
     }
 
   }
@@ -16711,25 +16712,24 @@ var MeleeAttacker = exports.MeleeAttacker = {
 
     initialize: function initialize(template) {
       this.state._MeleeAttacker.meleeDamage = template.meleeDamage || 1;
-    },
-    METHODS: {
+    }
+  },
+  METHODS: {
 
-      getMeleeDamage: function getMeleeDamage() {
-        return this.state._MeleeAttacker.meleeDamage;
-      },
-      setMeleeDamage: function setMeleeDamage(newVal) {
-        this.state._MeleeAttacker.meleeDamage = newVal;
-      }
+    getMeleeDamage: function getMeleeDamage() {
+      return this.state._MeleeAttacker.meleeDamage;
     },
-    LISTENERS: {
-      'bumpEntity': function bumpEntity(evtData) {
-        console.log("bumping entity");
-        this.raiseMixinEvent('attacks', { src: this, target: evtData.target });
-        evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
-      }
+    setMeleeDamage: function setMeleeDamage(newVal) {
+      this.state._MeleeAttacker.meleeDamage = newVal;
+    }
+  },
+  LISTENERS: {
+    'bumpEntity': function bumpEntity(evtData) {
+      console.log("bumping entity");
+      this.raiseMixinEvent('attacks', { src: this, target: evtData.target });
+      evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
     }
   }
-
 };
 
 var ActorPlayer = exports.ActorPlayer = {

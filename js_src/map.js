@@ -152,7 +152,7 @@ class Map {
        for( let y1 = ystart; y1 < yend; y1++)
        {
             let pos = `${x1},${y1}`;
-            console.log(pos);
+            // console.log(pos);
             if(this.state.mapPosToEntityId[pos]){
               //console.log('found entity:');
               // console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);

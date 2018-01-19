@@ -154,7 +154,7 @@ export let HitPoints = {
        LISTENERS: {
          'damaged': function(evtData){
               let amount = evtData.damageAmount;
-              this.loseHp(amt);
+              this.loseHp(amount);
               evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: amount});
 
               if(this.getHp() == 0){
@@ -199,15 +199,16 @@ export let PlayerMessages = {
       },
 
       'damages': function(evtData){
-        Message.send(this.getName()+ "deals" + evtData.damageAmount + "damage to" + evtData.target.getName());
+        Message.send(this.getName()+ "deals" + evtData.damageAmount + "damage to" + evtData.target.name);
+        Message.send("Entity detected, Type: " + " " + evtData.target.name.toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
       },
 
       'kills': function(evtData){
-        Message.send(this.getName()+ "kills the" + evtData.target.getName());
+        Message.send(this.name + " " + "kills the" + " " + evtData.target.name);
       },
 
       'killedBy':function(evtData){
-        Message.send(this.getName()+ "killed by" + evtData.target.getName());
+        Message.send(this.getName()+ "killed by" + evtData.target.name);
       }
 
     }
@@ -225,6 +226,7 @@ export let MeleeAttacker = {
     initialize: function (template){
       this.state._MeleeAttacker.meleeDamage = template.meleeDamage || 1;
     },
+  },
   METHODS: {
 
     getMeleeDamage: function (){return this.state._MeleeAttacker.meleeDamage},
@@ -237,10 +239,10 @@ export let MeleeAttacker = {
       evtData.target.raiseMixinEvent('damaged', {src:this,damageAmount:this.getMeleeDamage()});
     }
   }
-}
-
-
 };
+
+
+
 
 export let ActorPlayer = {
   META: {

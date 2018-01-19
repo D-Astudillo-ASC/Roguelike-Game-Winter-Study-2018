@@ -105,7 +105,7 @@ export class PlayMode extends UIMode {
 
   setupNewGame(){
     initTiming();
-    let m = MapMaker({xdim:30, ydim:20});
+    let m = MapMaker({xdim:20, ydim:15});
     this.state.mapId = m.getId();
     Message.send("Building map....");
     this.game.renderMessage();
@@ -118,13 +118,13 @@ export class PlayMode extends UIMode {
     m.addEntityAtRandomPosition(a);
     this.moveCameraToAvatar();
 
-    for (let mossCount = 0; mossCount < 10; mossCount++){
+    for (let mossCount = 0; mossCount < 1; mossCount++){
       m.addEntityAtRandomPosition(EntityFactory.create('moss'));
     }
 
-    for(let monsterCount = 0; monsterCount < 3;monsterCount++){
-      m.addEntityAtRandomPosition(EntityFactory.create('monster'));
-    }
+    // for(let monsterCount = 0; monsterCount < 3;monsterCount++){
+    //   m.addEntityAtRandomPosition(EntityFactory.create('monster'));
+    // }
 
   }
   render(display){
@@ -139,9 +139,9 @@ export class PlayMode extends UIMode {
   renderAvatar(display){
     display.clear();
     let a = this.getAvatar();
-    console.log(a.getTime());
-    console.log(a.getHp());
-    display.drawText(1,0,"AVATAR: "+ a.chr);
+    // console.log(a.getTime());
+    // console.log(a.getHp());
+    display.drawText(1,0,"AVATAR: "+ a._chr);
     display.drawText(1,2,"Time: "+ a.getTime());
     display.drawText(1,3,"Location: "+ a.getX() + "," + a.getY());
     display.drawText(1,4,"HP: "+ a.getHp() + "/" + a.getMaxHp());
@@ -316,38 +316,6 @@ export class PersistenceMode extends UIMode {
     }
     return false;
   }
- //  if(eventType == 'keyup'){
- //    if(evt.key == 'N'||evt.key == 'n')
- //    {
- //      console.log("new game");
- //      this.game.setupNewGame();
- //      this.game.switchModes('play');
- //      return true;
- //    }
- //
- //    if (evt.key == 'S'||evt.key == 's')
- //    {
- //      this.handleSave();
- //      this.game.switchModes('play');
- //      console.log("save game");
- //      return true;
- //    }
- //
- //    if(evt.key == 'L'||evt.key == 'l')
- //    {
- //      this.handleRestore();
- //      this.game.switchModes('play');
- //      return true;
- //    }
- //
- //    if(evt.key == 'Escape')
- //    {
- //      this.game.switchModes('play');
- //      return true;
- //    }
- //  }
- //  return false;
- // }
 
  handleSave() {
   console.log("save game");
