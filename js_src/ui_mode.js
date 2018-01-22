@@ -84,15 +84,16 @@ export class PlayMode extends UIMode {
   enter(){
     if(!this.state.mapId)
     {
-      let m = MapMaker({xdim:300, ydim:160, mapType:'basic caves'});
-      this.state.mapId = m.getId();
-      m.build();
-      this.state.cameramapx = 0;
-      this.state.cameramapy = 0;
+      this.game.setupNewGame();
+      // let m = MapMaker({xdim:300, ydim:160, mapType:'basic caves'});
+      // this.state.mapId = m.getId();
+      // m.build();
+      // this.state.cameramapx = 0;
+      // this.state.cameramapy = 0;
     }
     TIME_ENGINE.unlock();
     setKeyBinding(['play','movement_wasd','universal']);
-    this.cameraSymbol = new DisplaySymbol('@','#eb4');
+    // this.cameraSymbol = new DisplaySymbol('@','#eb4');
   }
 
   toJSON(){
@@ -104,8 +105,15 @@ export class PlayMode extends UIMode {
   }
 
   setupNewGame(){
+    console.log("play mode set up new game");
     initTiming();
-    let m = MapMaker({xdim:20, ydim:15});
+    initDataStore();
+    // console.dir(this.game);
+    DATASTORE.GAME = this.game;
+    // console.log("datastore post assignment");
+    // console.dir(DATASTORE);
+    // return;
+    let m = MapMaker({xdim:10, ydim:10});
     this.state.mapId = m.getId();
     Message.send("Building map....");
     this.game.renderMessage();
@@ -117,6 +125,9 @@ export class PlayMode extends UIMode {
     console.log('about to call add entity');
     m.addEntityAtRandomPosition(a);
     this.moveCameraToAvatar();
+
+    console.log("datastore post game setup");
+    console.dir(DATASTORE);
 
     // for (let mossCount = 0; mossCount < 3; mossCount++){
     //   m.addEntityAtRandomPosition(EntityFactory.create('moss'));
@@ -144,8 +155,10 @@ export class PlayMode extends UIMode {
     display.drawText(1,0,"AVATAR: "+ a._chr);
     display.drawText(1,2,"Time: "+ a.getTime());
     display.drawText(1,3,"Location: "+ a.getX() + "," + a.getY());
-    display.drawText(1,4,"HP: "+ a.getHp() + "/" + a.getMaxHp());
-    display.drawText(1,5,"Attack: "+ a.getMeleeDamage());
+    display.drawText(1,4,"Kills: "+ a.getKills());
+    display.drawText(1,5,"HP: "+ a.getHp() + "/" + a.getMaxHp());
+    display.drawText(1,6,"Attack: "+ a.getMeleeDamage());
+
   }
 
   // WinOrLose(){
@@ -175,7 +188,7 @@ export class PlayMode extends UIMode {
         this.moveAvatar(0,1);
       }
 
-      else if (gameComm == COMMAND.PAUSE){
+      else if(gameComm == COMMAND.PAUSE){
         this.game.switchModes('persistence');
       }
 
@@ -230,10 +243,11 @@ export class PlayMode extends UIMode {
     {
       this.moveCameraToAvatar();
       //this.getAvatar().addTime(1);
-      return true;
+      // return true;
     }
 
-    return false;
+    this.game.render();
+    return true;
     //this.state.cameramapx += dx;
     //this.state.cameramapy += dy;
     // DATASTORE.CAMERA_X = this.state.cameramapx;
@@ -392,6 +406,7 @@ export class PersistenceMode extends UIMode {
   // console.log('post-save data store: ');
   // console.dir(DATASTORE);
   this.game.switchModes('play');
+  this.game.render();
  }
 
  localStorageAvailable(){

@@ -66,7 +66,6 @@ export let Game = {
 
 
      this.setupModes();
-     DATASTORE.GAME = this;
      this.switchModes('startup');
      Message.send("Greetings!");
      console.dir(this);

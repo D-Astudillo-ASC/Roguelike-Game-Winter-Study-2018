@@ -1361,25 +1361,20 @@ module.exports = function (target, src, safe) {
 
 
 Object.defineProperty(exports, "__esModule", {
-   value: true
+  value: true
 });
 exports.initDataStore = initDataStore;
 //Database for all objects in the game that are used
 
-var DATASTORE = exports.DATASTORE = {
-   GAME: {},
-   ID_SEQ: 0,
-   MAPS: {},
-   ENTITIES: {}
-};
+var DATASTORE = exports.DATASTORE = {};
 //clearDataStore();
 function initDataStore() {
-   exports.DATASTORE = DATASTORE = {
-      GAME: {},
-      ID_SEQ: 1,
-      MAPS: {},
-      ENTITIES: {}
-   };
+  exports.DATASTORE = DATASTORE = {
+    GAME: {},
+    ID_SEQ: 0,
+    MAPS: {},
+    ENTITIES: {}
+  };
 }
 
 /***/ }),
@@ -8708,8 +8703,8 @@ var Entity = exports.Entity = function (_MixableSymbol) {
     key: 'destroy',
     value: function destroy() {
       this.getMap().extractEntity(this);
-
-      delete _datastore.DATASTORE[this.getId()];
+      console.log("Removing from datastore");
+      delete _datastore.DATASTORE.ENTITIES[this.getId()];
       _timing.SCHEDULER.remove(this);
     }
   }, {
@@ -15634,7 +15629,6 @@ var Game = exports.Game = {
       spacing: this.display.SPACING });
 
     this.setupModes();
-    _datastore.DATASTORE.GAME = this;
     this.switchModes('startup');
     _message.Message.send("Greetings!");
     console.dir(this);
@@ -15921,15 +15915,16 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
     key: 'enter',
     value: function enter() {
       if (!this.state.mapId) {
-        var m = (0, _map.MapMaker)({ xdim: 300, ydim: 160, mapType: 'basic caves' });
-        this.state.mapId = m.getId();
-        m.build();
-        this.state.cameramapx = 0;
-        this.state.cameramapy = 0;
+        this.game.setupNewGame();
+        // let m = MapMaker({xdim:300, ydim:160, mapType:'basic caves'});
+        // this.state.mapId = m.getId();
+        // m.build();
+        // this.state.cameramapx = 0;
+        // this.state.cameramapy = 0;
       }
       _timing.TIME_ENGINE.unlock();
       (0, _commands.setKeyBinding)(['play', 'movement_wasd', 'universal']);
-      this.cameraSymbol = new _display_symbol.DisplaySymbol('@', '#eb4');
+      // this.cameraSymbol = new DisplaySymbol('@','#eb4');
     }
   }, {
     key: 'toJSON',
@@ -15944,8 +15939,15 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
   }, {
     key: 'setupNewGame',
     value: function setupNewGame() {
+      console.log("play mode set up new game");
       (0, _timing.initTiming)();
-      var m = (0, _map.MapMaker)({ xdim: 20, ydim: 15 });
+      (0, _datastore.initDataStore)();
+      // console.dir(this.game);
+      _datastore.DATASTORE.GAME = this.game;
+      // console.log("datastore post assignment");
+      // console.dir(DATASTORE);
+      // return;
+      var m = (0, _map.MapMaker)({ xdim: 10, ydim: 10 });
       this.state.mapId = m.getId();
       _message.Message.send("Building map....");
       this.game.renderMessage();
@@ -15957,6 +15959,9 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       console.log('about to call add entity');
       m.addEntityAtRandomPosition(a);
       this.moveCameraToAvatar();
+
+      console.log("datastore post game setup");
+      console.dir(_datastore.DATASTORE);
 
       // for (let mossCount = 0; mossCount < 3; mossCount++){
       //   m.addEntityAtRandomPosition(EntityFactory.create('moss'));
@@ -15986,8 +15991,9 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       display.drawText(1, 0, "AVATAR: " + a._chr);
       display.drawText(1, 2, "Time: " + a.getTime());
       display.drawText(1, 3, "Location: " + a.getX() + "," + a.getY());
-      display.drawText(1, 4, "HP: " + a.getHp() + "/" + a.getMaxHp());
-      display.drawText(1, 5, "Attack: " + a.getMeleeDamage());
+      display.drawText(1, 4, "Kills: " + a.getKills());
+      display.drawText(1, 5, "HP: " + a.getHp() + "/" + a.getMaxHp());
+      display.drawText(1, 6, "Attack: " + a.getMeleeDamage());
     }
 
     // WinOrLose(){
@@ -16064,10 +16070,11 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       if (this.getAvatar().tryWalk(dx, dy)) {
         this.moveCameraToAvatar();
         //this.getAvatar().addTime(1);
-        return true;
+        // return true;
       }
 
-      return false;
+      this.game.render();
+      return true;
       //this.state.cameramapx += dx;
       //this.state.cameramapy += dy;
       // DATASTORE.CAMERA_X = this.state.cameramapx;
@@ -16257,6 +16264,7 @@ var PersistenceMode = exports.PersistenceMode = function (_UIMode5) {
       // console.log('post-save data store: ');
       // console.dir(DATASTORE);
       this.game.switchModes('play');
+      this.game.render();
     }
   }, {
     key: 'localStorageAvailable',
@@ -16463,8 +16471,8 @@ var MixableSymbol = exports.MixableSymbol = function (_DisplaySymbol) {
     for (var _mi2 = 0; _mi2 < _this.mixins.length; _mi2++) {
       var _m = _this.mixins[_mi2];
       if (_m.META.initialize) {
-        console.log("template ");
-        console.dir(template);
+        // console.log("template ");
+        // console.dir(template);
         _m.META.initialize.call(_this, template);
       }
     }
@@ -16656,7 +16664,7 @@ var HitPoints = exports.HitPoints = {
       if (this.getHp() == 0) {
         this.raiseMixinEvent('killedBy', { src: evtData.src });
         evtData.src.raiseMixinEvent('kills', { target: this });
-        // console.log("destroying");
+        console.log("destroying");
         this.destroy();
       }
     }
@@ -16689,6 +16697,7 @@ var PlayerMessages = exports.PlayerMessages = {
       _message.Message.send("Keep walking, it's" + " " + evtData.status + ". " + "Press p to pause your game.");
     },
     'attacks': function attacks(evtData) {
+      console.log("attacking");
       _message.Message.send("You've attacked" + evtData.target.getName());
     },
 
@@ -16714,7 +16723,8 @@ var MeleeAttacker = exports.MeleeAttacker = {
     mixInGroupName: 'MeleeAttacker',
     stateNamespace: '_MeleeAttacker',
     stateModel: {
-      meleeDamage: 0
+      meleeDamage: 0,
+      kills: 0
     },
 
     initialize: function initialize(template) {
@@ -16728,13 +16738,25 @@ var MeleeAttacker = exports.MeleeAttacker = {
     },
     setMeleeDamage: function setMeleeDamage(newVal) {
       this.state._MeleeAttacker.meleeDamage = newVal;
+    },
+    getKills: function getKills() {
+      return this.state._MeleeAttacker.kills;
     }
   },
   LISTENERS: {
     'bumpEntity': function bumpEntity(evtData) {
-      // console.log("bumping entity");
+      console.log("bumping entity for attack");
       this.raiseMixinEvent('attacks', { src: this, target: evtData.target });
       evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
+    },
+    'kills': function kills(evtData) {
+      this.state._MeleeAttacker.kills++;
+
+      var initKillDamageCounter = 5;
+      if (this.state._MeleeAttacker.kills >= initKillDamageCounter) {
+        this.setMeleeDamage(5 + this.state._MeleeAttacker.kills);
+        initKillDamageCounter *= 2;
+      }
     }
   }
 };

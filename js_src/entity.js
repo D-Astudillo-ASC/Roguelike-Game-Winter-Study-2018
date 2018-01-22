@@ -72,8 +72,8 @@ export class Entity extends MixableSymbol{
     destroy()
     {
       this.getMap().extractEntity(this);
-
-      delete DATASTORE[this.getId()];
+      console.log("Removing from datastore");
+      delete DATASTORE.ENTITIES[this.getId()];
       SCHEDULER.remove(this);
     }
 

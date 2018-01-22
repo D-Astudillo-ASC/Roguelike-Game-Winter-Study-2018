@@ -160,7 +160,7 @@ export let HitPoints = {
               if(this.getHp() == 0){
                 this.raiseMixinEvent('killedBy',{src:evtData.src});
                 evtData.src.raiseMixinEvent('kills',{target:this});
-                // console.log("destroying");
+                console.log("destroying");
                 this.destroy();
               }
 
@@ -195,7 +195,9 @@ export let PlayerMessages = {
         Message.send("Keep walking, it's"+ " " + evtData.status + ". " + "Press p to pause your game.");
       },
       'attacks': function(evtData){
+        console.log("attacking");
         Message.send("You've attacked" +evtData.target.getName());
+        
       },
 
       'damages': function(evtData){
@@ -220,7 +222,8 @@ export let MeleeAttacker = {
     mixInGroupName: 'MeleeAttacker',
     stateNamespace: '_MeleeAttacker',
     stateModel: {
-      meleeDamage: 0
+      meleeDamage: 0,
+      kills: 0
     },
 
     initialize: function (template){
@@ -230,13 +233,23 @@ export let MeleeAttacker = {
   METHODS: {
 
     getMeleeDamage: function (){return this.state._MeleeAttacker.meleeDamage},
-    setMeleeDamage: function (newVal){ this.state._MeleeAttacker.meleeDamage = newVal;}
+    setMeleeDamage: function (newVal){ this.state._MeleeAttacker.meleeDamage = newVal;},
+    getKills: function(){return this.state._MeleeAttacker.kills}
   },
   LISTENERS:{
     'bumpEntity': function(evtData){
-      // console.log("bumping entity");
+      console.log("bumping entity for attack");
       this.raiseMixinEvent('attacks',{src:this,target:evtData.target});
       evtData.target.raiseMixinEvent('damaged', {src:this,damageAmount:this.getMeleeDamage()});
+    },
+    'kills': function(evtData){
+      this.state._MeleeAttacker.kills++;
+
+      let initKillDamageCounter = 5;
+      if(this.state._MeleeAttacker.kills >= initKillDamageCounter){
+        this.setMeleeDamage(5 + this.state._MeleeAttacker.kills);
+        initKillDamageCounter *= 2;
+      }
     }
   }
 };
