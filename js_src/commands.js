@@ -72,17 +72,13 @@ let KEY_BINDINGS = {
   'play': {
     'GAME_CONTROLS':['key:=,altKey:false,ctrlKey:false,shiftKey:false'],
     'MESSAGES':     ['key:M,altKey:false,ctrlKey:false,shiftKey:true',
-                     'key:m,altKey:false,ctrlKey:false,shiftKey:false']
+                     'key:m,altKey:false,ctrlKey:false,shiftKey:false'],
+    'PAUSE':['key:p,altKey:false,ctrlKey:false,shiftKey:false']
   },
-  'movement_numpad': {
-    'MOVE_UL':  ['key:7,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_U':   ['key:8,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_UR':  ['key:9,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_L':   ['key:4,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_WAIT':['key:5,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_R':   ['key:6,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_DL':  ['key:1,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_D':   ['key:2,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_DR':  ['key:3,altKey:false,ctrlKey:false,shiftKey:false']
+  'movement_wasd': {
+    'UP':   ['key:w,altKey:false,ctrlKey:false,shiftKey:false'],
+    'LEFT':   ['key:a,altKey:false,ctrlKey:false,shiftKey:false'],
+    'RIGHT':   ['key:d,altKey:false,ctrlKey:false,shiftKey:false'],
+    'DOWN':   ['key:s,altKey:false,ctrlKey:false,shiftKey:false']
   }
 };

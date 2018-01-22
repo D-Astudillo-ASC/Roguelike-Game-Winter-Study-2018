@@ -80,7 +80,6 @@ export class PlayMode extends UIMode {
       cameramapy : '',
     };
     this.game.isPlaying = true;
-    setKeyBinding(['play','movement_numpad']);
   }
   enter(){
     if(!this.state.mapId)
@@ -88,10 +87,11 @@ export class PlayMode extends UIMode {
       let m = MapMaker({xdim:300, ydim:160, mapType:'basic caves'});
       this.state.mapId = m.getId();
       m.build();
-      this.state.cameramapx = 5;
-      this.state.cameramapy = 8;
+      this.state.cameramapx = 0;
+      this.state.cameramapy = 0;
     }
     TIME_ENGINE.unlock();
+    setKeyBinding(['play','movement_wasd','universal']);
     this.cameraSymbol = new DisplaySymbol('@','#eb4');
   }
 
@@ -128,8 +128,8 @@ export class PlayMode extends UIMode {
 
   }
   render(display){
-    console.dir(DATASTORE);
-    console.dir(this);
+    // console.dir(DATASTORE);
+    // console.dir(this);
     display.clear();
     DATASTORE.MAPS[this.state.mapId].render(display, this.state.cameramapx,this.state.cameramapy);
     // DATASTORE.MAPS[this.state.mapId].render(display, 15, 10);
@@ -148,57 +148,84 @@ export class PlayMode extends UIMode {
     display.drawText(1,5,"Attack: "+ a.getMeleeDamage());
   }
 
-  WinOrLose(){
+  // WinOrLose(){
+  //
+  //
+  // }
+    handleInput(inputType, inputData){
+      let gameComm = getCommandFromInput(inputType,inputData);
 
-
-  }
-    handleInput(eventType, evt){
-    if(eventType == 'keyup'){
-      console.dir(evt);
-      if(evt.key == 'v')
-      {
-
-        this.game.switchModes('win');
-        return true;
+      if(gameComm == COMMAND.NULLCOMMAND){
+        return false;
       }
 
-      if (evt.key == 'l')
-      {
-        this.game.switchModes('lose');
-        return true;
-      }
-
-      if(evt.key == 'p')
-      {
-        this.game.switchModes('persistence');
-        return true;
-      }
-
-
-      if(evt.key === 'a'){
-        console.log('move left');
-        this.moveAvatar(-1,0);
-        return true;
-      }
-
-      if(evt.key === 'd'){
-        this.moveAvatar(1,0);
-        return true;
-      }
-
-      if(evt.key === 'w'){
+      else if(gameComm == COMMAND.UP){
         this.moveAvatar(0,-1);
-        return true;
       }
 
-      if(evt.key === 's'){
-        this.moveAvatar(0,1);
-        return true;
+      else if(gameComm == COMMAND.LEFT){
+        this.moveAvatar(-1,0);
       }
+
+      else if(gameComm == COMMAND.RIGHT){
+        this.moveAvatar(1,0);
+      }
+
+      else if(gameComm == COMMAND.DOWN){
+        this.moveAvatar(0,1);
+      }
+
+      else if (gameComm == COMMAND.PAUSE){
+        this.game.switchModes('persistence');
+      }
+
+    // if(eventType == 'keyup'){
+    //   console.dir(evt);
+    //   if(evt.key == 'v')
+    //   {
+    //
+    //     this.game.switchModes('win');
+    //     return true;
+    //   }
+    //
+    //   if (evt.key == 'l')
+    //   {
+    //     this.game.switchModes('lose');
+    //     return true;
+    //   }
+    //
+    //   if(evt.key == 'p')
+    //   {
+    //     this.game.switchModes('persistence');
+    //     return true;
+    //   }
+    //
+    //
+    //   if(evt.key === 'a'){
+    //     console.log('move left');
+    //     this.moveAvatar(-1,0);
+    //     return true;
+    //   }
+    //
+    //   if(evt.key === 'd'){
+    //     this.moveAvatar(1,0);
+    //     return true;
+    //   }
+    //
+    //   if(evt.key === 'w'){
+    //     this.moveAvatar(0,-1);
+    //     return true;
+    //   }
+    //
+    //   if(evt.key === 's'){
+    //     this.moveAvatar(0,1);
+    //     return true;
+    //   }
     }
-  }
+
+
   moveAvatar(dx,dy){
-    console.log(this.getAvatar());
+    // console.log(this.getAvatar());
     if(this.getAvatar().tryWalk(dx,dy))
     {
       this.moveCameraToAvatar();
@@ -221,8 +248,8 @@ export class PlayMode extends UIMode {
 
   getAvatar(){
     //console.log('avatar created');
-    console.dir(this);
-    console.log(DATASTORE.ENTITIES[this.state.avatarId]);
+    // console.dir(this);
+    // console.log(DATASTORE.ENTITIES[this.state.avatarId]);
     return DATASTORE.ENTITIES[this.state.avatarId];
 
   }
@@ -344,15 +371,6 @@ export class PersistenceMode extends UIMode {
   DATASTORE.ID_SEQ = state.ID_SEQ;
   DATASTORE.GAME = this.game;
   this.game.fromJSON(state.GAME);
-  for (let mapId in state.MAPS){
-    console.log("pre-restore map");
-    let mapData = JSON.parse(state.MAPS[mapId]);
-    DATASTORE.MAPS[mapId]= MapMaker(mapData);
-    DATASTORE.MAPS[mapId].build();
-    console.log(JSON.stringify(DATASTORE.MAPS[mapId].tileGrid));
-    console.log("post-restore map");
-  }
-
   for (let entId in state.ENTITIES){
       console.log("pre-restore entities");
       DATASTORE.ENTITIES[entId] = JSON.parse(state.ENTITIES[entId]);
@@ -362,9 +380,17 @@ export class PersistenceMode extends UIMode {
       console.log("post-restore entities");
   }
 
+  for (let mapId in state.MAPS){
+    console.log("pre-restore map");
+    let mapData = JSON.parse(state.MAPS[mapId]);
+    DATASTORE.MAPS[mapId]= MapMaker(mapData);
+    DATASTORE.MAPS[mapId].build();
+    console.log(JSON.stringify(DATASTORE.MAPS[mapId].tileGrid));
+    console.log("post-restore map");
+  }
   //this.game.fromJSON(state.GAME);
-  console.log('post-save data store: ');
-  console.dir(DATASTORE);
+  // console.log('post-save data store: ');
+  // console.dir(DATASTORE);
   this.game.switchModes('play');
  }
 

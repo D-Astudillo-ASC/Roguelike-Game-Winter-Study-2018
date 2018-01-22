@@ -70,9 +70,9 @@ export let WalkerCorporeal = {
       // }
       // this.raiseMixinEvent('walkBlocked',{reason: "there's something in the way"});
       let targetPositionInfo = this.getMap().getTargetPositionInfo(newX,newY);
-      console.log(targetPositionInfo.entity);
+      // console.log(targetPositionInfo.entity);
       if(targetPositionInfo.entity){
-        console.log(targetPositionInfo.entity);
+        // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity',{actor:this,target:targetPositionInfo.entity})
         return false;
       }
@@ -160,7 +160,7 @@ export let HitPoints = {
               if(this.getHp() == 0){
                 this.raiseMixinEvent('killedBy',{src:evtData.src});
                 evtData.src.raiseMixinEvent('kills',{target:this});
-                console.log("destroying");
+                // console.log("destroying");
                 this.destroy();
               }
 
@@ -192,7 +192,7 @@ export let PlayerMessages = {
       },
 
       'walkClear': function(evtData){
-        Message.send("Keep walking, it's"+ " " + evtData.status);
+        Message.send("Keep walking, it's"+ " " + evtData.status + ". " + "Press p to pause your game.");
       },
       'attacks': function(evtData){
         Message.send("You've attacked" +evtData.target.getName());
@@ -234,7 +234,7 @@ export let MeleeAttacker = {
   },
   LISTENERS:{
     'bumpEntity': function(evtData){
-      console.log("bumping entity");
+      // console.log("bumping entity");
       this.raiseMixinEvent('attacks',{src:this,target:evtData.target});
       evtData.target.raiseMixinEvent('damaged', {src:this,damageAmount:this.getMeleeDamage()});
     }
@@ -289,7 +289,7 @@ export let ActorPlayer = {
       TIME_ENGINE.lock();
       DATASTORE.GAME.render();
       this.isActing(false);
-      console.log("Player is Acting");
+      // console.log("Player is Acting");
     }
   },
 
@@ -298,7 +298,7 @@ export let ActorPlayer = {
       SCHEDULER.setDuration(this.getCurrentActionDuration());
       this.setCurrentActionDuration(this.getBaseActionDuration()+randomInt(-5,5));
       setTimeout(function(){ TIME_ENGINE.unlock();},1);
-      console.log("Player still working");
+      // console.log("Player still working");
     }
   }
 }
@@ -350,7 +350,7 @@ export let ActorWanderer = {
       SCHEDULER.setDuration(this.getCurrentActionDuration());
       this.setCurrentActionDuration(this.getBaseActionDuration()+randomInt(-5,5));
       setTimeout(function(){ TIME_ENGINE.unlock();},1);
-      console.log("Player still working");
+      // console.log("Player still working");
     }
   }
 }

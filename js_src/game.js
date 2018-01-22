@@ -135,7 +135,7 @@ export let Game = {
      this.state = stateData;
    },
 
-   fromJSON: function (json){
+   fromJSON: function(json){
       console.log(json);
       let state = JSON.parse(json);
       this._randomSeed = state.rseed;
@@ -158,7 +158,7 @@ export let Game = {
    },
 
    renderMain: function() {
-    console.log("renderMain");
+    // console.log("renderMain");
     this.curMode.render(this.display.main.o);
     //if(this.curMode.hasOwnProperty('render')){
         //this.curMode.render(this.display.main.o);
@@ -186,7 +186,7 @@ export let Game = {
        let d = this.display.message.o;
        Message.render(d);
 
-      console.log("renderMessage");
+      // console.log("renderMessage");
       // this.curMode.render(this.display.main.o);
       //if(this.curMode.hasOwnProperty('render')){
           //this.curMode.render(this.display.main.o);

@@ -6,7 +6,7 @@ import {DATASTORE} from './datastore.js';
 
 class Map {
   constructor(xdim , ydim, mapType){
-    console.dir(TILES);
+    // console.dir(TILES);
     this.state = {};
     this.state.xdim = xdim || 1;
     this.state.ydim = ydim || 1;
@@ -15,7 +15,7 @@ class Map {
     this.state.id = uniqueId('map- '+this.state.mapType);
     this.state.entityIdToMapPos = {};
     this.state.mapPosToEntityId = {};
-    console.dir(this);
+    // console.dir(this);
   }
 
 
@@ -70,7 +70,7 @@ class Map {
 
   updateEntityPosition(ent,newMapX,newMapY){
     let oldPos = this.state.entityIdToMapPos[ent.getId()];
-    console.log(this.state.mapPosToEntityId);
+    // console.log(this.state.mapPosToEntityId);
     delete this.state.mapPosToEntityId[oldPos];
 
     this.state.mapPosToEntityId[`${newMapX},${newMapY}`] = ent.getId();
@@ -129,8 +129,8 @@ class Map {
 
     let x = Math.trunc(ROT.RNG.getUniform()*this.state.xdim);
     let y = Math.trunc(ROT.RNG.getUniform()*this.state.ydim);
-    console.log(x);
-    console.log(y);
+    // console.log(x);
+    // console.log(y);
     if(this.isPositionOpen(x,y)){
       return `${x},${y}`;
     }
@@ -193,6 +193,9 @@ let TILE_GRID_GENERATOR = {
       let gen = new ROT.Map.Cellular(xdim, ydim, { connected: true });
       let origRngState = ROT.RNG.getState();
       ROT.RNG.setState(rngState);
+      console.log("tile generation rng state is: ")
+      console.dir(ROT.RNG.getState());
+      //ROT.RNG.setSeed(12);
       gen.randomize(.5);
       gen.create();
       gen.create();
@@ -208,14 +211,14 @@ let TILE_GRID_GENERATOR = {
 
 export function MapMaker(mapData){
   let m = new Map(mapData.xdim,mapData.ydim,mapData.mapType);
-  console.log("Map is: ");
-  console.dir(m);
+  // console.log("Map is: ");
+  // console.dir(m);
   if(mapData.id){
     m.setId(mapData.id);
   }
 
   if(mapData.setupRngState){
-    m.setId(mapData.setupRngState);
+    m.setRngState(mapData.setupRngState);
   }
 
   DATASTORE.MAPS[m.getId()] = m;

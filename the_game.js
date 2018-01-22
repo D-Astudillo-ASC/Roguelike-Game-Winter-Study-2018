@@ -8534,19 +8534,20 @@ var Messager = function () {
     key: 'render',
     value: function render(targetDisplay) {
       targetDisplay.clear();
-      targetDisplay.drawText(2, 2, this.message);
+      targetDisplay.drawText(2, 3, this.message);
     }
   }, {
     key: 'send',
     value: function send(msg) {
       this.message = msg;
     }
-  }, {
-    key: 'delayedSend',
-    value: function delayedSend(msg) {
-      this.message = msg;
-      setTimeout(msg, 2000);
-    }
+
+    // add(){
+    //   let messageLog = [];
+    //   this.message = msg;
+    //   messageLog.push(msg);
+    // }
+
   }, {
     key: 'clear',
     value: function clear() {
@@ -9694,7 +9695,7 @@ var Map = function () {
   function Map(xdim, ydim, mapType) {
     _classCallCheck(this, Map);
 
-    console.dir(_tile.TILES);
+    // console.dir(TILES);
     this.state = {};
     this.state.xdim = xdim || 1;
     this.state.ydim = ydim || 1;
@@ -9703,7 +9704,7 @@ var Map = function () {
     this.state.id = (0, _util.uniqueId)('map- ' + this.state.mapType);
     this.state.entityIdToMapPos = {};
     this.state.mapPosToEntityId = {};
-    console.dir(this);
+    // console.dir(this);
   }
 
   _createClass(Map, [{
@@ -9766,7 +9767,7 @@ var Map = function () {
     key: 'updateEntityPosition',
     value: function updateEntityPosition(ent, newMapX, newMapY) {
       var oldPos = this.state.entityIdToMapPos[ent.getId()];
-      console.log(this.state.mapPosToEntityId);
+      // console.log(this.state.mapPosToEntityId);
       delete this.state.mapPosToEntityId[oldPos];
 
       this.state.mapPosToEntityId[newMapX + ',' + newMapY] = ent.getId();
@@ -9829,8 +9830,8 @@ var Map = function () {
 
       var x = Math.trunc(_rotJs2.default.RNG.getUniform() * this.state.xdim);
       var y = Math.trunc(_rotJs2.default.RNG.getUniform() * this.state.ydim);
-      console.log(x);
-      console.log(y);
+      // console.log(x);
+      // console.log(y);
       if (this.isPositionOpen(x, y)) {
         return x + ',' + y;
       }
@@ -9893,6 +9894,9 @@ var TILE_GRID_GENERATOR = {
     var gen = new _rotJs2.default.Map.Cellular(xdim, ydim, { connected: true });
     var origRngState = _rotJs2.default.RNG.getState();
     _rotJs2.default.RNG.setState(rngState);
+    console.log("tile generation rng state is: ");
+    console.dir(_rotJs2.default.RNG.getState());
+    //ROT.RNG.setSeed(12);
     gen.randomize(.5);
     gen.create();
     gen.create();
@@ -9908,14 +9912,14 @@ var TILE_GRID_GENERATOR = {
 
 function MapMaker(mapData) {
   var m = new Map(mapData.xdim, mapData.ydim, mapData.mapType);
-  console.log("Map is: ");
-  console.dir(m);
+  // console.log("Map is: ");
+  // console.dir(m);
   if (mapData.id) {
     m.setId(mapData.id);
   }
 
   if (mapData.setupRngState) {
-    m.setId(mapData.setupRngState);
+    m.setRngState(mapData.setupRngState);
   }
 
   _datastore.DATASTORE.MAPS[m.getId()] = m;
@@ -15724,7 +15728,7 @@ var Game = exports.Game = {
   },
 
   renderMain: function renderMain() {
-    console.log("renderMain");
+    // console.log("renderMain");
     this.curMode.render(this.display.main.o);
     //if(this.curMode.hasOwnProperty('render')){
     //this.curMode.render(this.display.main.o);
@@ -15750,7 +15754,7 @@ var Game = exports.Game = {
     var d = this.display.message.o;
     _message.Message.render(d);
 
-    console.log("renderMessage");
+    // console.log("renderMessage");
     // this.curMode.render(this.display.main.o);
     //if(this.curMode.hasOwnProperty('render')){
     //this.curMode.render(this.display.main.o);
@@ -15910,7 +15914,6 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       cameramapy: ''
     };
     _this2.game.isPlaying = true;
-    (0, _commands.setKeyBinding)(['play', 'movement_numpad']);
     return _this2;
   }
 
@@ -15921,10 +15924,11 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
         var m = (0, _map.MapMaker)({ xdim: 300, ydim: 160, mapType: 'basic caves' });
         this.state.mapId = m.getId();
         m.build();
-        this.state.cameramapx = 5;
-        this.state.cameramapy = 8;
+        this.state.cameramapx = 0;
+        this.state.cameramapy = 0;
       }
       _timing.TIME_ENGINE.unlock();
+      (0, _commands.setKeyBinding)(['play', 'movement_wasd', 'universal']);
       this.cameraSymbol = new _display_symbol.DisplaySymbol('@', '#eb4');
     }
   }, {
@@ -15965,8 +15969,8 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
   }, {
     key: 'render',
     value: function render(display) {
-      console.dir(_datastore.DATASTORE);
-      console.dir(this);
+      // console.dir(DATASTORE);
+      // console.dir(this);
       display.clear();
       _datastore.DATASTORE.MAPS[this.state.mapId].render(display, this.state.cameramapx, this.state.cameramapy);
       // DATASTORE.MAPS[this.state.mapId].render(display, 15, 10);
@@ -15985,56 +15989,78 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       display.drawText(1, 4, "HP: " + a.getHp() + "/" + a.getMaxHp());
       display.drawText(1, 5, "Attack: " + a.getMeleeDamage());
     }
-  }, {
-    key: 'WinOrLose',
-    value: function WinOrLose() {}
+
+    // WinOrLose(){
+    //
+    //
+    // }
+
   }, {
     key: 'handleInput',
-    value: function handleInput(eventType, evt) {
-      if (eventType == 'keyup') {
-        console.dir(evt);
-        if (evt.key == 'v') {
+    value: function handleInput(inputType, inputData) {
+      var gameComm = (0, _commands.getCommandFromInput)(inputType, inputData);
 
-          this.game.switchModes('win');
-          return true;
-        }
-
-        if (evt.key == 'l') {
-          this.game.switchModes('lose');
-          return true;
-        }
-
-        if (evt.key == 'p') {
-          this.game.switchModes('persistence');
-          return true;
-        }
-
-        if (evt.key === 'a') {
-          console.log('move left');
-          this.moveAvatar(-1, 0);
-          return true;
-        }
-
-        if (evt.key === 'd') {
-          this.moveAvatar(1, 0);
-          return true;
-        }
-
-        if (evt.key === 'w') {
-          this.moveAvatar(0, -1);
-          return true;
-        }
-
-        if (evt.key === 's') {
-          this.moveAvatar(0, 1);
-          return true;
-        }
+      if (gameComm == _commands.COMMAND.NULLCOMMAND) {
+        return false;
+      } else if (gameComm == _commands.COMMAND.UP) {
+        this.moveAvatar(0, -1);
+      } else if (gameComm == _commands.COMMAND.LEFT) {
+        this.moveAvatar(-1, 0);
+      } else if (gameComm == _commands.COMMAND.RIGHT) {
+        this.moveAvatar(1, 0);
+      } else if (gameComm == _commands.COMMAND.DOWN) {
+        this.moveAvatar(0, 1);
+      } else if (gameComm == _commands.COMMAND.PAUSE) {
+        this.game.switchModes('persistence');
       }
+
+      // if(eventType == 'keyup'){
+      //   console.dir(evt);
+      //   if(evt.key == 'v')
+      //   {
+      //
+      //     this.game.switchModes('win');
+      //     return true;
+      //   }
+      //
+      //   if (evt.key == 'l')
+      //   {
+      //     this.game.switchModes('lose');
+      //     return true;
+      //   }
+      //
+      //   if(evt.key == 'p')
+      //   {
+      //     this.game.switchModes('persistence');
+      //     return true;
+      //   }
+      //
+      //
+      //   if(evt.key === 'a'){
+      //     console.log('move left');
+      //     this.moveAvatar(-1,0);
+      //     return true;
+      //   }
+      //
+      //   if(evt.key === 'd'){
+      //     this.moveAvatar(1,0);
+      //     return true;
+      //   }
+      //
+      //   if(evt.key === 'w'){
+      //     this.moveAvatar(0,-1);
+      //     return true;
+      //   }
+      //
+      //   if(evt.key === 's'){
+      //     this.moveAvatar(0,1);
+      //     return true;
+      //   }
     }
   }, {
     key: 'moveAvatar',
     value: function moveAvatar(dx, dy) {
-      console.log(this.getAvatar());
+      // console.log(this.getAvatar());
       if (this.getAvatar().tryWalk(dx, dy)) {
         this.moveCameraToAvatar();
         //this.getAvatar().addTime(1);
@@ -16057,8 +16083,8 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
     key: 'getAvatar',
     value: function getAvatar() {
       //console.log('avatar created');
-      console.dir(this);
-      console.log(_datastore.DATASTORE.ENTITIES[this.state.avatarId]);
+      // console.dir(this);
+      // console.log(DATASTORE.ENTITIES[this.state.avatarId]);
       return _datastore.DATASTORE.ENTITIES[this.state.avatarId];
     }
   }]);
@@ -16210,15 +16236,6 @@ var PersistenceMode = exports.PersistenceMode = function (_UIMode5) {
       _datastore.DATASTORE.ID_SEQ = state.ID_SEQ;
       _datastore.DATASTORE.GAME = this.game;
       this.game.fromJSON(state.GAME);
-      for (var mapId in state.MAPS) {
-        console.log("pre-restore map");
-        var mapData = JSON.parse(state.MAPS[mapId]);
-        _datastore.DATASTORE.MAPS[mapId] = (0, _map.MapMaker)(mapData);
-        _datastore.DATASTORE.MAPS[mapId].build();
-        console.log(JSON.stringify(_datastore.DATASTORE.MAPS[mapId].tileGrid));
-        console.log("post-restore map");
-      }
-
       for (var entId in state.ENTITIES) {
         console.log("pre-restore entities");
         _datastore.DATASTORE.ENTITIES[entId] = JSON.parse(state.ENTITIES[entId]);
@@ -16228,9 +16245,17 @@ var PersistenceMode = exports.PersistenceMode = function (_UIMode5) {
         console.log("post-restore entities");
       }
 
+      for (var mapId in state.MAPS) {
+        console.log("pre-restore map");
+        var mapData = JSON.parse(state.MAPS[mapId]);
+        _datastore.DATASTORE.MAPS[mapId] = (0, _map.MapMaker)(mapData);
+        _datastore.DATASTORE.MAPS[mapId].build();
+        console.log(JSON.stringify(_datastore.DATASTORE.MAPS[mapId].tileGrid));
+        console.log("post-restore map");
+      }
       //this.game.fromJSON(state.GAME);
-      console.log('post-save data store: ');
-      console.dir(_datastore.DATASTORE);
+      // console.log('post-save data store: ');
+      // console.dir(DATASTORE);
       this.game.switchModes('play');
     }
   }, {
@@ -16548,9 +16573,9 @@ var WalkerCorporeal = exports.WalkerCorporeal = {
       // }
       // this.raiseMixinEvent('walkBlocked',{reason: "there's something in the way"});
       var targetPositionInfo = this.getMap().getTargetPositionInfo(newX, newY);
-      console.log(targetPositionInfo.entity);
+      // console.log(targetPositionInfo.entity);
       if (targetPositionInfo.entity) {
-        console.log(targetPositionInfo.entity);
+        // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity', { actor: this, target: targetPositionInfo.entity });
         return false;
       } else if (targetPositionInfo.tile.isImpassable()) {
@@ -16631,7 +16656,7 @@ var HitPoints = exports.HitPoints = {
       if (this.getHp() == 0) {
         this.raiseMixinEvent('killedBy', { src: evtData.src });
         evtData.src.raiseMixinEvent('kills', { target: this });
-        console.log("destroying");
+        // console.log("destroying");
         this.destroy();
       }
     }
@@ -16661,7 +16686,7 @@ var PlayerMessages = exports.PlayerMessages = {
     },
 
     'walkClear': function walkClear(evtData) {
-      _message.Message.send("Keep walking, it's" + " " + evtData.status);
+      _message.Message.send("Keep walking, it's" + " " + evtData.status + ". " + "Press p to pause your game.");
     },
     'attacks': function attacks(evtData) {
       _message.Message.send("You've attacked" + evtData.target.getName());
@@ -16707,7 +16732,7 @@ var MeleeAttacker = exports.MeleeAttacker = {
   },
   LISTENERS: {
     'bumpEntity': function bumpEntity(evtData) {
-      console.log("bumping entity");
+      // console.log("bumping entity");
       this.raiseMixinEvent('attacks', { src: this, target: evtData.target });
       evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
     }
@@ -16758,7 +16783,7 @@ var ActorPlayer = exports.ActorPlayer = {
       _timing.TIME_ENGINE.lock();
       _datastore.DATASTORE.GAME.render();
       this.isActing(false);
-      console.log("Player is Acting");
+      // console.log("Player is Acting");
     }
   },
 
@@ -16769,7 +16794,7 @@ var ActorPlayer = exports.ActorPlayer = {
       setTimeout(function () {
         _timing.TIME_ENGINE.unlock();
       }, 1);
-      console.log("Player still working");
+      // console.log("Player still working");
     }
   }
 };
@@ -16822,7 +16847,7 @@ var ActorWanderer = exports.ActorWanderer = {
       setTimeout(function () {
         _timing.TIME_ENGINE.unlock();
       }, 1);
-      console.log("Player still working");
+      // console.log("Player still working");
     }
   }
 };
@@ -16909,18 +16934,14 @@ var KEY_BINDINGS = {
   },
   'play': {
     'GAME_CONTROLS': ['key:=,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MESSAGES': ['key:M,altKey:false,ctrlKey:false,shiftKey:true', 'key:m,altKey:false,ctrlKey:false,shiftKey:false']
+    'MESSAGES': ['key:M,altKey:false,ctrlKey:false,shiftKey:true', 'key:m,altKey:false,ctrlKey:false,shiftKey:false'],
+    'PAUSE': ['key:p,altKey:false,ctrlKey:false,shiftKey:false']
   },
-  'movement_numpad': {
-    'MOVE_UL': ['key:7,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_U': ['key:8,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_UR': ['key:9,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_L': ['key:4,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_WAIT': ['key:5,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_R': ['key:6,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_DL': ['key:1,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_D': ['key:2,altKey:false,ctrlKey:false,shiftKey:false'],
-    'MOVE_DR': ['key:3,altKey:false,ctrlKey:false,shiftKey:false']
+  'movement_wasd': {
+    'UP': ['key:w,altKey:false,ctrlKey:false,shiftKey:false'],
+    'LEFT': ['key:a,altKey:false,ctrlKey:false,shiftKey:false'],
+    'RIGHT': ['key:d,altKey:false,ctrlKey:false,shiftKey:false'],
+    'DOWN': ['key:s,altKey:false,ctrlKey:false,shiftKey:false']
   }
 };
 
