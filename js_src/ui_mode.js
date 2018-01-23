@@ -157,7 +157,7 @@ export class PlayMode extends UIMode {
     // console.log(a.getTime());
     // console.log(a.getHp());
     display.drawText(1,0,"AVATAR: "+ a._chr);
-    display.drawText(1,2,"Time: "+ a.getTime());
+    display.drawText(1,2,"Steps: "+ a.getTime());
     display.drawText(1,3,"Location: "+ a.getX() + "," + a.getY());
     display.drawText(1,4,"Kills: "+ a.getKills());
     display.drawText(1,5,"HP: "+ a.getHp() + "/" + a.getMaxHp());

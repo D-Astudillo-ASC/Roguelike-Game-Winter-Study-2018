@@ -7,6 +7,7 @@ import {Map} from './map.js';
 import {randomInt} from './util.js';
 import {Entity} from './entity.js';
 import {MixableSymbol} from './mixable_symbol.js';
+import {PlayMode} from './ui_mode.js';
 //********************************************************//
 export let TimeTracker = {
     META:{
@@ -57,15 +58,15 @@ export let EntityTracker = {
     mixInGroupName: 'EntityTracker',
     stateNamespace: '_EntityTracker',
     stateModel: {
-    initEntityNum: -1
+    initEntityNum: 0
     }
   },
 
   METHODS: {
     getEntities(){
-        console.log('starting entity num:')
-        console.log(this.state._EntityTracker.initEntityNum);
-        console.log('length of datastore.entities array:')
+        // console.log('starting entity num:')
+        // console.log(this.state._EntityTracker.initEntityNum);
+        // console.log('length of datastore.entities array:')
         let numEntities = Object.keys(DATASTORE.ENTITIES).length - 1;
         // console.log("Number of entities: ");
         // console.log(numEntities);
@@ -88,7 +89,8 @@ export let EntityTracker = {
           let totalEntities = this.getEntities();
           let entitiesRemaining = totalEntities - kills;
           if(entitiesRemaining == 0){
-            this.raiseMixinEvent('cleared',{status:"clear"})
+            this.raiseMixinEvent('cleared',{status:"clear"});
+            // this.game.switchModes('win');
           }
           return entitiesRemaining;
     }
@@ -116,12 +118,13 @@ export let WalkerCorporeal = {
         // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity',{actor:this,target:targetPositionInfo.entity})
 
-        // if(target == "^"){
+        if(target == "^"){
         //      console.log("Hitting herb");
         //      console.log(this.getName());
-        //      this.raiseMixinEvent('damaged',{:this,damageAmount:1});
-        //      //this.raiseMixinEvent('heals',{target:targetPositionInfo.entity,healAmount:5});
-        // }
+        this.raiseMixinEvent('heals',{target:this,healAmount:5});
+        this.raiseMixinEvent('damaged',{src:targetPositionInfo.entity,damageAmount:9});
+
+      }
         return false;
       }
 
@@ -209,10 +212,10 @@ export let HitPoints = {
               evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: evtData.damageAmount});
               console.log(this);
               if(this.getHp() <= 0){
-                this.raiseMixinEvent('killedBy',{src:evtData.src});
                 evtData.src.raiseMixinEvent('kills',{target:this});
                 console.log("destroying");
                 console.log(this);
+                this.raiseMixinEvent('killedBy',{src:evtData.src});
                 this.destroy();
                 //SCHEDULER.remove(this);
               }
@@ -221,9 +224,9 @@ export let HitPoints = {
         'heals': function(evtData){
           let currentHp = this.getHp();
           console.log(currentHp);
-          if(currentHp >= this.getMaxHp()){
-            this.gainHp(0);
-          }
+          // if(currentHp >= this.getMaxHp()){
+          //   this.gainHp(0);
+          // }
            this.gainHp(evtData.healAmount);
         }
     }
@@ -266,6 +269,10 @@ export let PlayerMessages = {
 
       },
 
+      'heals': function(evtData){
+        Message.send("You've healed "+ evtData.healAmount + "HP");
+      },
+
       'damages': function(evtData){
         Message.send(this.getName()+ " deals " + evtData.damageAmount + " damage to " + evtData.target.getName());
         Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
@@ -277,7 +284,7 @@ export let PlayerMessages = {
       },
 
       'killedBy':function(evtData){
-        Message.send(this.getName().toUpperCase+ "killed by" + evtData.target.getName());
+        Message.send(this.getName().toUpperCase()+ " killed by " + evtData.src.getName().toUpperCase());
       }
 
     }
@@ -326,9 +333,9 @@ export let MeleeAttacker = {
       }
       console.log("Entities: ")
       console.log(Object.keys(DATASTORE.ENTITIES));
-      if(Object.keys(DATASTORE.ENTITIES).length == 1){
-        console.log("you win!");//this.game.switchModes('win');
-      }
+      // if(Object.keys(DATASTORE.ENTITIES).length == 1){
+      //   this.game.switchModes('win');
+      // }
     }
   }
 };

@@ -9,7 +9,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'name': 'avatar',
     'chr': '@',
     'fg': '#eb4',
-    'maxHp': 10,
+    'maxHp': 20,
     'mixInNames':['ActorPlayer','PlayerMessages','TimeTracker','EntityTracker','WalkerCorporeal','HitPoints','MeleeAttacker']
   });
 
@@ -27,7 +27,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': '&',
     'fg': '#d63',
     'maxHp': 5,
-    'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints','MeleeAttacker']
+    'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints','MeleeAttacker','PlayerMessages','EntityTracker']
 
   });
 
@@ -36,6 +36,6 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': '^',
     'fg': '#0f0',
     'maxHp': 3,
-    'mixInNames': ['HitPoints']
+    'mixInNames': ['HitPoints','MeleeAttacker','PlayerMessages','EntityTracker']
 
   });
