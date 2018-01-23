@@ -34,6 +34,23 @@ class Map {
   setId(newId){
     this.state.id = newId;
   }
+  getEntityIdtoMapPos(){
+    return this.state.entityIdToMapPos;
+  }
+
+  setEntityIdtoMapPos(newEntityIdToMapPos){
+    this.state.entityIdToMapPos = newEntityIdToMapPos;
+  }
+
+  getMapPosToEntityId(){
+    return this.state.entityIdToMapPos;
+  }
+
+  setMapPosToEntityId(newMapPosToEntityId){
+    this.state.entityIdToMapPos = newMapPosToEntityId;
+  }
+
+
 
   getXDim()
   {
@@ -141,6 +158,7 @@ class Map {
 
   render(display,camera_map_x,camera_map_y){
     //
+    console.log("Rendering map");
     let cx = 0;
     let cy = 0;
     let xstart = camera_map_x - Math.trunc(display.getOptions().width/2) ;
@@ -154,6 +172,7 @@ class Map {
             let pos = `${x1},${y1}`;
             // console.log(pos);
             if(this.state.mapPosToEntityId[pos]){
+              console.log(pos);
               //console.log('found entity:');
               // console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);
               // console.dir(display);
@@ -213,6 +232,14 @@ export function MapMaker(mapData){
   let m = new Map(mapData.xdim,mapData.ydim,mapData.mapType);
   // console.log("Map is: ");
   // console.dir(m);
+  if(mapData.mapPosToEntityId){
+    m.setMapPosToEntityId(mapData.mapPosToEntityId);
+  }
+
+  if(mapData.entityIdToMapPos){
+    m.setEntityIdtoMapPos(mapData.entityIdToMapPos);
+  }
+
   if(mapData.id){
     m.setId(mapData.id);
   }
@@ -220,6 +247,7 @@ export function MapMaker(mapData){
   if(mapData.setupRngState){
     m.setRngState(mapData.setupRngState);
   }
+
 
   DATASTORE.MAPS[m.getId()] = m;
   //m.build();

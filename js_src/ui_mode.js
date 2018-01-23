@@ -133,14 +133,19 @@ export class PlayMode extends UIMode {
     //   m.addEntityAtRandomPosition(EntityFactory.create('moss'));
     // }
 
-    for(let monsterCount = 0; monsterCount < 1;monsterCount++){
+    for(let monsterCount = 0; monsterCount < 2;monsterCount++){
       m.addEntityAtRandomPosition(EntityFactory.create('monster'));
+    }
+
+    for(let herbCount = 0; herbCount < 3;herbCount++){
+      m.addEntityAtRandomPosition(EntityFactory.create('herb'));
     }
 
   }
   render(display){
     // console.dir(DATASTORE);
     // console.dir(this);
+    console.log('play mode render');
     display.clear();
     DATASTORE.MAPS[this.state.mapId].render(display, this.state.cameramapx,this.state.cameramapy);
     // DATASTORE.MAPS[this.state.mapId].render(display, 15, 10);
@@ -381,15 +386,19 @@ export class PersistenceMode extends UIMode {
   let restorationString = window.localStorage.getItem(this.game._PERSISTANCE_NAMESPACE);
   let state = JSON.parse(restorationString);
 
+  initTiming();
   initDataStore();
   DATASTORE.ID_SEQ = state.ID_SEQ;
   DATASTORE.GAME = this.game;
+  console.log("Datastore near start of handleRestore");
+  console.dir(DATASTORE);
   this.game.fromJSON(state.GAME);
   for (let entId in state.ENTITIES){
       console.log("pre-restore entities");
-      DATASTORE.ENTITIES[entId] = JSON.parse(state.ENTITIES[entId]);
+      let entityRestorationData = JSON.parse(state.ENTITIES[entId]);
+      EntityFactory.create(entityRestorationData.name,entityRestorationData);
+      // DATASTORE.ENTITIES[entId] = ent;
       console.dir(DATASTORE.ENTITIES[entId]);
-      let ent = EntityFactory.create(DATASTORE.ENTITIES[entId].name,DATASTORE.ENTITIES[entId]);
       //delete DATASTORE.ENTITIES[entId];
       console.log("post-restore entities");
   }
@@ -399,14 +408,14 @@ export class PersistenceMode extends UIMode {
     let mapData = JSON.parse(state.MAPS[mapId]);
     DATASTORE.MAPS[mapId]= MapMaker(mapData);
     DATASTORE.MAPS[mapId].build();
-    console.log(JSON.stringify(DATASTORE.MAPS[mapId].tileGrid));
+    // console.log(JSON.stringify(DATASTORE.MAPS[mapId].tileGrid));
     console.log("post-restore map");
   }
   //this.game.fromJSON(state.GAME);
-  // console.log('post-save data store: ');
-  // console.dir(DATASTORE);
+  console.log('post-save data store: ');
+  console.dir(DATASTORE);
   this.game.switchModes('play');
-  this.game.render();
+  // this.game.renderAvatar();
  }
 
  localStorageAvailable(){

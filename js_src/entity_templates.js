@@ -27,6 +27,15 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': '&',
     'fg': '#d63',
     'maxHp': 5,
-    'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints']
+    'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints','MeleeAttacker']
+
+  });
+
+  EntityFactory.learn({
+    'name': 'herb',
+    'chr': '*',
+    'fg': '#0f0',
+    'maxHp': 30,
+    'mixInNames': ['HitPoints']
 
   });

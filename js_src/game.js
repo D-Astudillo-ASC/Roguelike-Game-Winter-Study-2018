@@ -135,7 +135,7 @@ export let Game = {
    },
 
    fromJSON: function(json){
-      console.log(json);
+      // console.log(json);
       let state = JSON.parse(json);
       this._randomSeed = state.rseed;
       ROT.RNG.setSeed(this.randomSeed);
