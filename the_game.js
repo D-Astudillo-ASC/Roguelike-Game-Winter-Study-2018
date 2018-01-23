@@ -8600,7 +8600,7 @@ var DisplaySymbol = exports.DisplaySymbol = function () {
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 exports.Entity = undefined;
 
@@ -8621,105 +8621,105 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Entity = exports.Entity = function (_MixableSymbol) {
-    _inherits(Entity, _MixableSymbol);
+  _inherits(Entity, _MixableSymbol);
 
-    function Entity(template) {
-        _classCallCheck(this, Entity);
+  function Entity(template) {
+    _classCallCheck(this, Entity);
 
-        var _this = _possibleConstructorReturn(this, (Entity.__proto__ || Object.getPrototypeOf(Entity)).call(this, template));
+    var _this = _possibleConstructorReturn(this, (Entity.__proto__ || Object.getPrototypeOf(Entity)).call(this, template));
 
-        if (!_this.state) {
-            _this.state = {};
-        }
-        _this.state.name = template.name;
-        _this.state.x = 0;
-        _this.state.y = 0;
-        _this.state.mapId = 0;
-        _this.state.id = (0, _util.uniqueId)();
-        return _this;
+    if (!_this.state) {
+      _this.state = {};
     }
+    _this.state.name = template.name;
+    _this.state.x = 0;
+    _this.state.y = 0;
+    _this.state.mapId = 0;
+    _this.state.id = (0, _util.uniqueId)();
+    return _this;
+  }
 
-    _createClass(Entity, [{
-        key: 'getId',
-        value: function getId() {
-            return this.state.id;
-        }
-    }, {
-        key: 'setId',
-        value: function setId(newId) {
-            this.state.id = newId;
-        }
-    }, {
-        key: 'getName',
-        value: function getName() {
-            return this.state.name;
-        }
-    }, {
-        key: 'setName',
-        value: function setName(newName) {
-            this.state.name = newName;
-        }
-    }, {
-        key: 'getX',
-        value: function getX() {
-            return this.state.x;
-        }
-    }, {
-        key: 'setX',
-        value: function setX(newX) {
-            this.state.x = newX;
-        }
-    }, {
-        key: 'getY',
-        value: function getY() {
-            return this.state.y;
-        }
-    }, {
-        key: 'setY',
-        value: function setY(newY) {
-            this.state.y = newY;
-        }
-    }, {
-        key: 'getPos',
-        value: function getPos() {
-            return this.state.x + ',' + this.state.y;
-        }
-    }, {
-        key: 'getMapId',
-        value: function getMapId() {
-            return this.state.mapId;
-        }
-    }, {
-        key: 'setMapId',
-        value: function setMapId(newInfo) {
-            this.state.mapId = newInfo;
-        }
-    }, {
-        key: 'getMap',
-        value: function getMap() {
-            return _datastore.DATASTORE.MAPS[this.state.mapId];
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.getMap().extractEntity(this);
-            console.log("Removing from datastore");
-            delete _datastore.DATASTORE.ENTITIES[this.getId()];
-            _timing.SCHEDULER.remove(this);
-        }
-    }, {
-        key: 'toJSON',
-        value: function toJSON() {
-            return JSON.stringify(this.state);
-        }
-    }, {
-        key: 'fromJSON',
-        value: function fromJSON(s) {
-            this.state = JSON.parse(s);
-        }
-    }]);
+  _createClass(Entity, [{
+    key: 'getId',
+    value: function getId() {
+      return this.state.id;
+    }
+  }, {
+    key: 'setId',
+    value: function setId(newId) {
+      this.state.id = newId;
+    }
+  }, {
+    key: 'getName',
+    value: function getName() {
+      return this.state.name;
+    }
+  }, {
+    key: 'setName',
+    value: function setName(newName) {
+      this.state.name = newName;
+    }
+  }, {
+    key: 'getX',
+    value: function getX() {
+      return this.state.x;
+    }
+  }, {
+    key: 'setX',
+    value: function setX(newX) {
+      this.state.x = newX;
+    }
+  }, {
+    key: 'getY',
+    value: function getY() {
+      return this.state.y;
+    }
+  }, {
+    key: 'setY',
+    value: function setY(newY) {
+      this.state.y = newY;
+    }
+  }, {
+    key: 'getPos',
+    value: function getPos() {
+      return this.state.x + ',' + this.state.y;
+    }
+  }, {
+    key: 'getMapId',
+    value: function getMapId() {
+      return this.state.mapId;
+    }
+  }, {
+    key: 'setMapId',
+    value: function setMapId(newInfo) {
+      this.state.mapId = newInfo;
+    }
+  }, {
+    key: 'getMap',
+    value: function getMap() {
+      return _datastore.DATASTORE.MAPS[this.state.mapId];
+    }
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      this.getMap().extractEntity(this);
+      console.log("Removing from datastore");
+      delete _datastore.DATASTORE.ENTITIES[this.getId()];
+      _timing.SCHEDULER.remove(this);
+    }
+  }, {
+    key: 'toJSON',
+    value: function toJSON() {
+      return JSON.stringify(this.state);
+    }
+  }, {
+    key: 'fromJSON',
+    value: function fromJSON(s) {
+      this.state = JSON.parse(s);
+    }
+  }]);
 
-    return Entity;
+  return Entity;
 }(_mixable_symbol.MixableSymbol);
 
 /***/ }),
@@ -9841,11 +9841,7 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       console.log("play mode set up new game");
       (0, _timing.initTiming)();
       (0, _datastore.initDataStore)();
-      // console.dir(this.game);
       _datastore.DATASTORE.GAME = this.game;
-      // console.log("datastore post assignment");
-      // console.dir(DATASTORE);
-      // return;
       var m = (0, _map.MapMaker)({ xdim: 25, ydim: 25 });
       this.state.mapId = m.getId();
       _message.Message.send("Building map....");
@@ -9899,20 +9895,11 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       display.drawText(1, 5, "HP: " + a.getHp() + "/" + a.getMaxHp());
       display.drawText(1, 6, "Attack: " + a.getMeleeDamage());
       display.drawText(1, 7, "Enemies Left: " + a.getEntities());
+
+      if (a.getEntities() == 0) {
+        this.game.switchModes('win');
+      }
     }
-
-    // getEntities(){
-    //     let entityNum = 0;
-    //     for(let i = 0; Object.keys(DATASTORE.ENTITIES).length < 1; i++){
-    //        entityNum++;
-    //     }
-    // return entityNum;
-    // }
-    // WinOrLose(){
-    //
-    //
-    // }
-
   }, {
     key: 'handleInput',
     value: function handleInput(inputType, inputData) {
@@ -9931,49 +9918,6 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       } else if (gameComm == _commands.COMMAND.PAUSE) {
         this.game.switchModes('persistence');
       }
-
-      // if(eventType == 'keyup'){
-      //   console.dir(evt);
-      //   if(evt.key == 'v')
-      //   {
-      //
-      //     this.game.switchModes('win');
-      //     return true;
-      //   }
-      //
-      //   if (evt.key == 'l')
-      //   {
-      //     this.game.switchModes('lose');
-      //     return true;
-      //   }
-      //
-      //   if(evt.key == 'p')
-      //   {
-      //     this.game.switchModes('persistence');
-      //     return true;
-      //   }
-      //
-      //
-      //   if(evt.key === 'a'){
-      //     console.log('move left');
-      //     this.moveAvatar(-1,0);
-      //     return true;
-      //   }
-      //
-      //   if(evt.key === 'd'){
-      //     this.moveAvatar(1,0);
-      //     return true;
-      //   }
-      //
-      //   if(evt.key === 'w'){
-      //     this.moveAvatar(0,-1);
-      //     return true;
-      //   }
-      //
-      //   if(evt.key === 's'){
-      //     this.moveAvatar(0,1);
-      //     return true;
-      //   }
     }
   }, {
     key: 'moveAvatar',
@@ -16346,12 +16290,13 @@ var Game = exports.Game = {
     if (this.curMode) {
       this.curMode.exit();
     }
-    _message.Message.send(newModeName + " " + "mode");
+    _message.Message.send(newModeName.toUpperCase() + " " + "MODE");
     this.curMode = this.modes[newModeName];
 
     if (this.curMode) {
       this.curMode.enter();
     }
+
     this.render();
   },
 
@@ -16468,7 +16413,7 @@ EntityFactory.learn({
   'chr': '@',
   'fg': '#eb4',
   'maxHp': 20,
-  'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'EntityTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker']
+  'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'EntityTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker', 'HealingMixin']
 });
 
 EntityFactory.learn({
@@ -16492,9 +16437,9 @@ EntityFactory.learn({
 EntityFactory.learn({
   'name': 'herb',
   'chr': '^',
-  'fg': '#0f0',
+  'fg': '#f00',
   'maxHp': 3,
-  'mixInNames': ['HitPoints', 'MeleeAttacker', 'PlayerMessages', 'EntityTracker']
+  'mixInNames': ['HitPoints', 'MeleeAttacker', 'PlayerMessages', 'EntityTracker', 'HealingMixin']
 
 });
 
@@ -16561,7 +16506,7 @@ var Factory = exports.Factory = function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ActorWanderer = exports.ActorPlayer = exports.MeleeAttacker = exports.PlayerMessages = exports.HitPoints = exports.WalkerCorporeal = exports.EntityTracker = exports.TimeTracker = undefined;
+exports.ActorWanderer = exports.ActorPlayer = exports.MeleeAttacker = exports.PlayerMessages = exports.HitPoints = exports.HealingMixin = exports.WalkerCorporeal = exports.EntityTracker = exports.TimeTracker = undefined;
 
 var _message = __webpack_require__(95);
 
@@ -16638,15 +16583,7 @@ var EntityTracker = exports.EntityTracker = {
 
   METHODS: {
     getEntities: function getEntities() {
-      // console.log('starting entity num:')
-      // console.log(this.state._EntityTracker.initEntityNum);
-      // console.log('length of datastore.entities array:')
       var numEntities = Object.keys(_datastore.DATASTORE.ENTITIES).length - 1;
-      // console.log("Number of entities: ");
-      // console.log(numEntities);
-      // let totalEntities = this.state._EntityTracker.initEntityNum + numEntities;
-      // console.log("total:");
-      // console.log(totalEntities);
       return numEntities;
     }
   },
@@ -16659,7 +16596,6 @@ var EntityTracker = exports.EntityTracker = {
       var entitiesRemaining = totalEntities - kills;
       if (entitiesRemaining == 0) {
         this.raiseMixinEvent('cleared', { status: "clear" });
-        // this.game.switchModes('win');
       }
       return entitiesRemaining;
     }
@@ -16683,14 +16619,15 @@ var EntityTracker = exports.EntityTracker = {
       console.log(target);
       if (targetPositionInfo.entity) {
         // console.log(targetPositionInfo.entity);
-        this.raiseMixinEvent('bumpEntity', { actor: this, target: targetPositionInfo.entity });
-
-        if (target == "^") {
-          //      console.log("Hitting herb");
-          //      console.log(this.getName());
-          this.raiseMixinEvent('heals', { target: this, healAmount: 5 });
-          this.raiseMixinEvent('damaged', { src: targetPositionInfo.entity, damageAmount: 9 });
-        }
+        this.raiseMixinEvent('bumpEntity', { target: targetPositionInfo.entity });
+        targetPositionInfo.entity.raiseMixinEvent('bumpedBy', { bumper: this });
+        //   if(target == "^"){
+        //   //      console.log("Hitting herb");
+        //   //      console.log(this.getName());
+        //   this.raiseMixinEvent('heals',{target:this,healAmount:5});
+        //   this.raiseMixinEvent('damaged',{src:targetPositionInfo.entity,damageAmount:9});
+        //
+        // }
         return false;
       } else if (targetPositionInfo.tile.isImpassable()) {
         this.raiseMixinEvent('walkBlocked', { reason: "there's a wall in the way" });
@@ -16712,6 +16649,46 @@ var EntityTracker = exports.EntityTracker = {
   LISTENERS: {
     'walkAttempt': function walkAttempt(evtData) {
       this.tryWalk(evtData.dx, evtData.dy);
+    }
+  }
+};
+
+//********************************************************//
+
+var HealingMixin = exports.HealingMixin = {
+  META: {
+    mixInName: 'HealingMixin',
+    mixInGroupName: 'HealingMixin',
+    stateNamespace: '_Healing',
+    stateModel: {
+      healingPower: 0
+    },
+    initialize: function initialize(template) {
+      this.state._Healing.healingPower = template.healingPower || 1;
+    }
+  },
+
+  METHODS: {
+    getHealingPower: function getHealingPower() {
+      return this.state._Healing.healingPower;
+    },
+    setHealingPower: function setHealingPower(newValue) {
+      this.state._Healing.healingPower = newValue;
+    },
+    loseHealingPower: function loseHealingPower(amount) {
+      this.state._Healing.healingPower -= amount;
+    },
+
+    gainHealingPower: function gainHealingPower(amount) {
+      this.state._Healing.healingPower += amount;
+    }
+  },
+
+  LISTENERS: {
+    'bumpedBy': function bumpedBy(evtData) {
+      evtData.bumper.raiseMixinEvent('heals', { healAmount: this.getHealingPower() });
+      //       //if(evtData.actor == "")
+      // }
     }
   }
 };
@@ -16769,7 +16746,7 @@ var HitPoints = exports.HitPoints = {
       this.loseHp(evtData.damageAmount);
       console.log(evtData.src);
       evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
-      console.log(this);
+      //console.log(this);
       if (this.getHp() <= 0) {
         evtData.src.raiseMixinEvent('kills', { target: this });
         console.log("destroying");
@@ -16778,13 +16755,9 @@ var HitPoints = exports.HitPoints = {
         this.destroy();
         //SCHEDULER.remove(this);
       }
+      //{src:entity,damageAmount:entity.getMeleeDamage()}
     },
     'heals': function heals(evtData) {
-      var currentHp = this.getHp();
-      console.log(currentHp);
-      // if(currentHp >= this.getMaxHp()){
-      //   this.gainHp(0);
-      // }
       this.gainHp(evtData.healAmount);
     }
   }
@@ -16817,12 +16790,12 @@ var PlayerMessages = exports.PlayerMessages = {
       _message.Message.send("What a beast! Your attack has definitely increased!");
     },
     'walkClear': function walkClear(evtData) {
-      _message.Message.send("Keep walking, it's" + " " + evtData.status + ". " + "Press p to pause your game.");
+      _message.Message.send("Keep walking, it's " + evtData.status + ". Press p to pause your game.");
     },
     'attacks': function attacks(evtData) {
       console.log("attacking");
-      //Message.send("You've attacked" +evtData.target.getName());
-      _message.Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+      _message.Message.send("You've attacked" + evtData.target.getName());
+      //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
     },
 
     'heals': function heals(evtData) {
@@ -16830,12 +16803,19 @@ var PlayerMessages = exports.PlayerMessages = {
     },
 
     'damages': function damages(evtData) {
+      console.log("evtData:");
+      console.dir(evtData);
       _message.Message.send(this.getName() + " deals " + evtData.damageAmount + " damage to " + evtData.target.getName());
-      _message.Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+      //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+    },
+
+    'damaged': function damaged(evtData) {
+      _message.Message.send(evtData.src.getName() + " deals " + evtData.damageAmount + " damage to " + this.getName());
+      //Message.send("Entity detected, Type: " + " " + evtData.src.getName().toUpperCase() + ", " + " " + "HP: " + evtData.src.getHp() + "/" + evtData.src.getMaxHp());
     },
 
     'kills': function kills(evtData) {
-      _message.Message.send(this.getName().toUpperCase() + " " + "kills the" + " " + evtData.target.getName().toUpperCase());
+      _message.Message.send(this.getName().toUpperCase() + " kills the " + evtData.target.getName().toUpperCase());
       _message.Message.send("What a beast! Your attack has definitely increased!");
     },
 
@@ -16883,6 +16863,12 @@ var MeleeAttacker = exports.MeleeAttacker = {
       evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
       //this.raiseMixinEvent('attacks', {actor:this,target:evtData.target});
       //evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
+    },
+
+    'bumpedBy': function bumpedBy(evtData) {
+
+      this.raiseMixinEvent('attacks', { target: evtData.bumper });
+      evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
     },
     'kills': function kills(evtData) {
       this.state._MeleeAttacker.kills++;

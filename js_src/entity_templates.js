@@ -10,7 +10,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': '@',
     'fg': '#eb4',
     'maxHp': 20,
-    'mixInNames':['ActorPlayer','PlayerMessages','TimeTracker','EntityTracker','WalkerCorporeal','HitPoints','MeleeAttacker']
+    'mixInNames':['ActorPlayer','PlayerMessages','TimeTracker','EntityTracker','WalkerCorporeal','HitPoints','MeleeAttacker','HealingMixin']
   });
 
   EntityFactory.learn({
@@ -34,8 +34,8 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
   EntityFactory.learn({
     'name': 'herb',
     'chr': '^',
-    'fg': '#0f0',
+    'fg': '#f00',
     'maxHp': 3,
-    'mixInNames': ['HitPoints','MeleeAttacker','PlayerMessages','EntityTracker']
+    'mixInNames': ['HitPoints','MeleeAttacker','PlayerMessages','EntityTracker','HealingMixin']
 
   });

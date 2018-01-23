@@ -111,12 +111,13 @@ export let Game = {
     if(this.curMode){
       this.curMode.exit();
      }
-     Message.send(newModeName + " " + "mode");
+     Message.send(newModeName.toUpperCase()+ " " + "MODE");
      this.curMode = this.modes[newModeName];
 
      if(this.curMode){
        this.curMode.enter();
      }
+     
      this.render();
    },
 

@@ -64,21 +64,9 @@ export let EntityTracker = {
 
   METHODS: {
     getEntities(){
-        // console.log('starting entity num:')
-        // console.log(this.state._EntityTracker.initEntityNum);
-        // console.log('length of datastore.entities array:')
         let numEntities = Object.keys(DATASTORE.ENTITIES).length - 1;
-        // console.log("Number of entities: ");
-        // console.log(numEntities);
-        // let totalEntities = this.state._EntityTracker.initEntityNum + numEntities;
-        // console.log("total:");
-        // console.log(totalEntities);
         return numEntities;
-  },
-   //
-   //  setEntities(entityNum){
-   //      this.state._EntityTracker.initEntityNum = entityNum;
-   // }
+      }
 
   },
 
@@ -90,7 +78,6 @@ export let EntityTracker = {
           let entitiesRemaining = totalEntities - kills;
           if(entitiesRemaining == 0){
             this.raiseMixinEvent('cleared',{status:"clear"});
-            // this.game.switchModes('win');
           }
           return entitiesRemaining;
     }
@@ -116,15 +103,15 @@ export let WalkerCorporeal = {
       console.log(target);
       if(targetPositionInfo.entity){
         // console.log(targetPositionInfo.entity);
-        this.raiseMixinEvent('bumpEntity',{actor:this,target:targetPositionInfo.entity})
-
-        if(target == "^"){
-        //      console.log("Hitting herb");
-        //      console.log(this.getName());
-        this.raiseMixinEvent('heals',{target:this,healAmount:5});
-        this.raiseMixinEvent('damaged',{src:targetPositionInfo.entity,damageAmount:9});
-
-      }
+        this.raiseMixinEvent('bumpEntity',{target:targetPositionInfo.entity});
+        targetPositionInfo.entity.raiseMixinEvent('bumpedBy',{bumper:this});
+      //   if(target == "^"){
+      //   //      console.log("Hitting herb");
+      //   //      console.log(this.getName());
+      //   this.raiseMixinEvent('heals',{target:this,healAmount:5});
+      //   this.raiseMixinEvent('damaged',{src:targetPositionInfo.entity,damageAmount:9});
+      //
+      // }
         return false;
       }
 
@@ -155,6 +142,46 @@ export let WalkerCorporeal = {
     }
   }
 };
+
+//********************************************************//
+
+export let HealingMixin = {
+  META: {
+    mixInName: 'HealingMixin',
+    mixInGroupName:'HealingMixin',
+    stateNamespace:'_Healing',
+    stateModel: {
+      healingPower: 0
+    },
+    initialize: function(template){
+      this.state._Healing.healingPower = template.healingPower || 1;
+    }
+  },
+
+  METHODS: {
+    getHealingPower: function(){
+      return this.state._Healing.healingPower;
+    },
+    setHealingPower: function(newValue){
+      this.state._Healing.healingPower = newValue;
+    },
+    loseHealingPower: function(amount){
+      this.state._Healing.healingPower -= amount;
+    },
+
+    gainHealingPower: function(amount){
+      this.state._Healing.healingPower += amount;
+    }
+  },
+
+  LISTENERS: {
+    'bumpedBy': function(evtData){
+         evtData.bumper.raiseMixinEvent('heals',{healAmount:this.getHealingPower()});
+    //       //if(evtData.actor == "")
+    // }
+      }
+    }
+ };
 
 //********************************************************//
 
@@ -210,7 +237,7 @@ export let HitPoints = {
               this.loseHp(evtData.damageAmount);
               console.log(evtData.src);
               evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: evtData.damageAmount});
-              console.log(this);
+              //console.log(this);
               if(this.getHp() <= 0){
                 evtData.src.raiseMixinEvent('kills',{target:this});
                 console.log("destroying");
@@ -219,14 +246,10 @@ export let HitPoints = {
                 this.destroy();
                 //SCHEDULER.remove(this);
               }
+          //{src:entity,damageAmount:entity.getMeleeDamage()}
 
           },
         'heals': function(evtData){
-          let currentHp = this.getHp();
-          console.log(currentHp);
-          // if(currentHp >= this.getMaxHp()){
-          //   this.gainHp(0);
-          // }
            this.gainHp(evtData.healAmount);
         }
     }
@@ -260,12 +283,12 @@ export let PlayerMessages = {
         Message.send("What a beast! Your attack has definitely increased!");
       },
       'walkClear': function(evtData){
-        Message.send("Keep walking, it's"+ " " + evtData.status + ". " + "Press p to pause your game.");
+        Message.send("Keep walking, it's " + evtData.status + ". Press p to pause your game.");
       },
       'attacks': function(evtData){
         console.log("attacking");
-        //Message.send("You've attacked" +evtData.target.getName());
-        Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+        Message.send("You've attacked" +evtData.target.getName());
+        //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
 
       },
 
@@ -274,12 +297,19 @@ export let PlayerMessages = {
       },
 
       'damages': function(evtData){
+        console.log("evtData:");
+        console.dir(evtData);
         Message.send(this.getName()+ " deals " + evtData.damageAmount + " damage to " + evtData.target.getName());
-        Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+        //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+      },
+
+      'damaged':function(evtData){
+        Message.send(evtData.src.getName()+ " deals " + evtData.damageAmount + " damage to " + this.getName());
+        //Message.send("Entity detected, Type: " + " " + evtData.src.getName().toUpperCase() + ", " + " " + "HP: " + evtData.src.getHp() + "/" + evtData.src.getMaxHp());
       },
 
       'kills': function(evtData){
-        Message.send(this.getName().toUpperCase() + " " + "kills the" + " " + evtData.target.getName().toUpperCase());
+        Message.send(this.getName().toUpperCase() + " kills the " + evtData.target.getName().toUpperCase());
         Message.send("What a beast! Your attack has definitely increased!");
       },
 
@@ -321,6 +351,12 @@ export let MeleeAttacker = {
       evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
       //this.raiseMixinEvent('attacks', {actor:this,target:evtData.target});
       //evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
+    },
+
+    'bumpedBy': function(evtData){
+
+          this.raiseMixinEvent('attacks', {target:evtData.bumper});
+          evtData.bumper.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
     },
     'kills': function(evtData){
       this.state._MeleeAttacker.kills++;

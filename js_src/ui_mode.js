@@ -108,11 +108,7 @@ export class PlayMode extends UIMode {
     console.log("play mode set up new game");
     initTiming();
     initDataStore();
-    // console.dir(this.game);
     DATASTORE.GAME = this.game;
-    // console.log("datastore post assignment");
-    // console.dir(DATASTORE);
-    // return;
     let m = MapMaker({xdim:25, ydim:25});
     this.state.mapId = m.getId();
     Message.send("Building map....");
@@ -163,21 +159,11 @@ export class PlayMode extends UIMode {
     display.drawText(1,5,"HP: "+ a.getHp() + "/" + a.getMaxHp());
     display.drawText(1,6,"Attack: "+ a.getMeleeDamage());
     display.drawText(1,7,"Enemies Left: " +a.getEntities());
+
+    if(a.getEntities() == 0){
+      this.game.switchModes('win');
+    }
   }
-
-
-
-  // getEntities(){
-  //     let entityNum = 0;
-  //     for(let i = 0; Object.keys(DATASTORE.ENTITIES).length < 1; i++){
-  //        entityNum++;
-  //     }
-  // return entityNum;
-  // }
-  // WinOrLose(){
-  //
-  //
-  // }
     handleInput(inputType, inputData){
       let gameComm = getCommandFromInput(inputType,inputData);
 
@@ -204,49 +190,6 @@ export class PlayMode extends UIMode {
       else if(gameComm == COMMAND.PAUSE){
         this.game.switchModes('persistence');
       }
-
-    // if(eventType == 'keyup'){
-    //   console.dir(evt);
-    //   if(evt.key == 'v')
-    //   {
-    //
-    //     this.game.switchModes('win');
-    //     return true;
-    //   }
-    //
-    //   if (evt.key == 'l')
-    //   {
-    //     this.game.switchModes('lose');
-    //     return true;
-    //   }
-    //
-    //   if(evt.key == 'p')
-    //   {
-    //     this.game.switchModes('persistence');
-    //     return true;
-    //   }
-    //
-    //
-    //   if(evt.key === 'a'){
-    //     console.log('move left');
-    //     this.moveAvatar(-1,0);
-    //     return true;
-    //   }
-    //
-    //   if(evt.key === 'd'){
-    //     this.moveAvatar(1,0);
-    //     return true;
-    //   }
-    //
-    //   if(evt.key === 'w'){
-    //     this.moveAvatar(0,-1);
-    //     return true;
-    //   }
-    //
-    //   if(evt.key === 's'){
-    //     this.moveAvatar(0,1);
-    //     return true;
-    //   }
     }
 
 
