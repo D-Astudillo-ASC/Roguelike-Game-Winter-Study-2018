@@ -209,8 +209,10 @@ export let HitPoints = {
            },
 
            gainHp: function(amt){
+             console.log(this.getName() + " gaining " + amt + "HP");
              this.state._HitPoints.curHp += amt;
              this.state._HitPoints.curHp = Math.min(this.state._HitPoints.maxHp,this.state._HitPoints.curHp);
+             console.dir(this);
            },
 
            getHp: function(){
@@ -250,6 +252,8 @@ export let HitPoints = {
 
           },
         'heals': function(evtData){
+          console.log(this.getName() + "being healed");
+          console.dir(evtData);
            this.gainHp(evtData.healAmount);
         }
     }

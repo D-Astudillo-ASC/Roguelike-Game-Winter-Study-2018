@@ -16413,7 +16413,8 @@ EntityFactory.learn({
   'chr': '@',
   'fg': '#eb4',
   'maxHp': 20,
-  'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'EntityTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker', 'HealingMixin']
+  'curHp': 10,
+  'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'EntityTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker']
 });
 
 EntityFactory.learn({
@@ -16439,7 +16440,7 @@ EntityFactory.learn({
   'chr': '^',
   'fg': '#f00',
   'maxHp': 3,
-  'mixInNames': ['HitPoints', 'MeleeAttacker', 'PlayerMessages', 'EntityTracker', 'HealingMixin']
+  'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'HealingMixin']
 
 });
 
@@ -16719,8 +16720,10 @@ var HitPoints = exports.HitPoints = {
     },
 
     gainHp: function gainHp(amt) {
+      console.log(this.getName() + " gaining " + amt + "HP");
       this.state._HitPoints.curHp += amt;
       this.state._HitPoints.curHp = Math.min(this.state._HitPoints.maxHp, this.state._HitPoints.curHp);
+      console.dir(this);
     },
 
     getHp: function getHp() {
@@ -16758,6 +16761,8 @@ var HitPoints = exports.HitPoints = {
       //{src:entity,damageAmount:entity.getMeleeDamage()}
     },
     'heals': function heals(evtData) {
+      console.log(this.getName() + "being healed");
+      console.dir(evtData);
       this.gainHp(evtData.healAmount);
     }
   }
