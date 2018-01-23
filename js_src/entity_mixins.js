@@ -49,7 +49,52 @@ export let TimeTracker = {
       }
     }
 };
+//********************************************************//
 
+export let EntityTracker = {
+  META: {
+    mixInName: 'EntityTracker',
+    mixInGroupName: 'EntityTracker',
+    stateNamespace: '_EntityTracker',
+    stateModel: {
+    initEntityNum: -1
+    }
+  },
+
+  METHODS: {
+    getEntities(){
+        console.log('starting entity num:')
+        console.log(this.state._EntityTracker.initEntityNum);
+        console.log('length of datastore.entities array:')
+        let numEntities = Object.keys(DATASTORE.ENTITIES).length - 1;
+        // console.log("Number of entities: ");
+        // console.log(numEntities);
+        // let totalEntities = this.state._EntityTracker.initEntityNum + numEntities;
+        // console.log("total:");
+        // console.log(totalEntities);
+        return numEntities;
+  },
+   //
+   //  setEntities(entityNum){
+   //      this.state._EntityTracker.initEntityNum = entityNum;
+   // }
+
+  },
+
+  LISTENERS: {
+    'kills': function(evtData){
+      //if(evtData.target){
+          let kills = this.getKills();
+          let totalEntities = this.getEntities();
+          let entitiesRemaining = totalEntities - kills;
+          if(entitiesRemaining == 0){
+            this.raiseMixinEvent('cleared',{status:"clear"})
+          }
+          return entitiesRemaining;
+    }
+  }
+
+}
 //********************************************************//
 
 export let WalkerCorporeal = {
@@ -62,21 +107,8 @@ export let WalkerCorporeal = {
     tryWalk: function(dx,dy){
       let newX = this.state.x*1 + dx*1;
       let newY = this.state.y*1 + dy*1;
-
-      // if(this.getMap().isPositionOpen(newX,newY)){
-      //
-      //   this.state.x = newX;
-      //   this.state.y = newY;
-      //   this.getMap().updateEntityPosition(this, this.state.x,this.state.y);
-      //
-      //   this.raiseMixinEvent('turnTaken',{timeUsed: 1});
-      //   return true;
-      //
-      // }
-      // this.raiseMixinEvent('walkBlocked',{reason: "there's something in the way"});
       let targetPositionInfo = this.getMap().getTargetPositionInfo(newX,newY);
       let target = this.getMap().getTargetPositionInfo(newX,newY).entity._chr;
-      // console.log(targetPositionInfo.entity);
       console.log("This is targetPositionInfo.entity:")
       console.log(targetPositionInfo.entity);
       console.log(target);
@@ -84,12 +116,12 @@ export let WalkerCorporeal = {
         // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity',{actor:this,target:targetPositionInfo.entity})
 
-        if(target == "*"){
-          console.log("Hitting herb");
-          //console.log(this.getName());
-          this.raiseMixinEvent('damaged',{src:this,damageAmount:8});
-          this.raiseMixinEvent('heals',{healer:targetPositionInfo.entity,healAmount:5});
-        }
+        // if(target == "^"){
+        //      console.log("Hitting herb");
+        //      console.log(this.getName());
+        //      this.raiseMixinEvent('damaged',{:this,damageAmount:1});
+        //      //this.raiseMixinEvent('heals',{target:targetPositionInfo.entity,healAmount:5});
+        // }
         return false;
       }
 
@@ -173,21 +205,23 @@ export let HitPoints = {
        LISTENERS: {
          'damaged': function(evtData){
               this.loseHp(evtData.damageAmount);
+              console.log(evtData.src);
               evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: evtData.damageAmount});
-
+              console.log(this);
               if(this.getHp() <= 0){
-                //this.raiseMixinEvent('killedBy',{target:evtData.src});
-                SCHEDULER.remove(this);
+                this.raiseMixinEvent('killedBy',{src:evtData.src});
                 evtData.src.raiseMixinEvent('kills',{target:this});
                 console.log("destroying");
+                console.log(this);
                 this.destroy();
+                //SCHEDULER.remove(this);
               }
 
           },
         'heals': function(evtData){
           let currentHp = this.getHp();
           console.log(currentHp);
-          if(this.getHp() >= this.getMaxHp()){
+          if(currentHp >= this.getMaxHp()){
             this.gainHp(0);
           }
            this.gainHp(evtData.healAmount);
@@ -219,13 +253,16 @@ export let PlayerMessages = {
         //  setTimeout(Message.send("Very Low Threat Level Detected, this shouldn't be challenging at all!"),100000);
         //}
       },
-
+      'cleared': function(evtData){
+        Message.send("What a beast! Your attack has definitely increased!");
+      },
       'walkClear': function(evtData){
         Message.send("Keep walking, it's"+ " " + evtData.status + ". " + "Press p to pause your game.");
       },
       'attacks': function(evtData){
         console.log("attacking");
-        Message.send("You've attacked" +evtData.target.getName());
+        //Message.send("You've attacked" +evtData.target.getName());
+        Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
 
       },
 
@@ -236,6 +273,7 @@ export let PlayerMessages = {
 
       'kills': function(evtData){
         Message.send(this.getName().toUpperCase() + " " + "kills the" + " " + evtData.target.getName().toUpperCase());
+        Message.send("What a beast! Your attack has definitely increased!");
       },
 
       'killedBy':function(evtData){
@@ -272,8 +310,9 @@ export let MeleeAttacker = {
     'bumpEntity': function(evtData){
       console.log("bumping entity for attack");
       console.log(this.getHp());
+      this.raiseMixinEvent('attacks', {src:this,target:evtData.target});
+      evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
       //this.raiseMixinEvent('attacks', {actor:this,target:evtData.target});
-      evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage(), target: evtData.target});
       //evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
     },
     'kills': function(evtData){
@@ -281,8 +320,14 @@ export let MeleeAttacker = {
 
       let initKillDamageCounter = 5;
       if(this.state._MeleeAttacker.kills >= initKillDamageCounter){
-        this.setMeleeDamage(5 + this.state._MeleeAttacker.kills);
-        initKillDamageCounter *= 2;
+        initKillDamageCounter *= 3;
+        initKillDamageCounter -= 1;
+        this.setMeleeDamage(this.state._MeleeAttacker.kills/2 + 1);
+      }
+      console.log("Entities: ")
+      console.log(Object.keys(DATASTORE.ENTITIES));
+      if(Object.keys(DATASTORE.ENTITIES).length == 1){
+        console.log("you win!");//this.game.switchModes('win');
       }
     }
   }

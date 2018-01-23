@@ -139,7 +139,7 @@ class Map {
     let openPos = this.getRandomOpenPosition();
     let p = openPos.split(',');
     this.addEntityAt(ent, p[0],p[1]);
-
+    
   }
 
   getRandomOpenPosition(){
@@ -172,7 +172,7 @@ class Map {
             let pos = `${x1},${y1}`;
             // console.log(pos);
             if(this.state.mapPosToEntityId[pos]){
-              console.log(pos);
+              //console.log(pos);
               //console.log('found entity:');
               // console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);
               // console.dir(display);

@@ -8600,7 +8600,7 @@ var DisplaySymbol = exports.DisplaySymbol = function () {
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 exports.Entity = undefined;
 
@@ -8621,105 +8621,105 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Entity = exports.Entity = function (_MixableSymbol) {
-  _inherits(Entity, _MixableSymbol);
+    _inherits(Entity, _MixableSymbol);
 
-  function Entity(template) {
-    _classCallCheck(this, Entity);
+    function Entity(template) {
+        _classCallCheck(this, Entity);
 
-    var _this = _possibleConstructorReturn(this, (Entity.__proto__ || Object.getPrototypeOf(Entity)).call(this, template));
+        var _this = _possibleConstructorReturn(this, (Entity.__proto__ || Object.getPrototypeOf(Entity)).call(this, template));
 
-    if (!_this.state) {
-      _this.state = {};
+        if (!_this.state) {
+            _this.state = {};
+        }
+        _this.state.name = template.name;
+        _this.state.x = 0;
+        _this.state.y = 0;
+        _this.state.mapId = 0;
+        _this.state.id = (0, _util.uniqueId)();
+        return _this;
     }
-    _this.state.name = template.name;
-    _this.state.x = 0;
-    _this.state.y = 0;
-    _this.state.mapId = 0;
-    _this.state.id = (0, _util.uniqueId)();
-    return _this;
-  }
 
-  _createClass(Entity, [{
-    key: 'getId',
-    value: function getId() {
-      return this.state.id;
-    }
-  }, {
-    key: 'setId',
-    value: function setId(newId) {
-      this.state.id = newId;
-    }
-  }, {
-    key: 'getName',
-    value: function getName() {
-      return this.state.name;
-    }
-  }, {
-    key: 'setName',
-    value: function setName(newName) {
-      this.state.name = newName;
-    }
-  }, {
-    key: 'getX',
-    value: function getX() {
-      return this.state.x;
-    }
-  }, {
-    key: 'setX',
-    value: function setX(newX) {
-      this.state.x = newX;
-    }
-  }, {
-    key: 'getY',
-    value: function getY() {
-      return this.state.y;
-    }
-  }, {
-    key: 'setY',
-    value: function setY(newY) {
-      this.state.y = newY;
-    }
-  }, {
-    key: 'getPos',
-    value: function getPos() {
-      return this.state.x + ',' + this.state.y;
-    }
-  }, {
-    key: 'getMapId',
-    value: function getMapId() {
-      return this.state.mapId;
-    }
-  }, {
-    key: 'setMapId',
-    value: function setMapId(newInfo) {
-      this.state.mapId = newInfo;
-    }
-  }, {
-    key: 'getMap',
-    value: function getMap() {
-      return _datastore.DATASTORE.MAPS[this.state.mapId];
-    }
-  }, {
-    key: 'destroy',
-    value: function destroy() {
-      this.getMap().extractEntity(this);
-      console.log("Removing from datastore");
-      delete _datastore.DATASTORE.ENTITIES[this.getId()];
-      _timing.SCHEDULER.remove(this);
-    }
-  }, {
-    key: 'toJSON',
-    value: function toJSON() {
-      return JSON.stringify(this.state);
-    }
-  }, {
-    key: 'fromJSON',
-    value: function fromJSON(s) {
-      this.state = JSON.parse(s);
-    }
-  }]);
+    _createClass(Entity, [{
+        key: 'getId',
+        value: function getId() {
+            return this.state.id;
+        }
+    }, {
+        key: 'setId',
+        value: function setId(newId) {
+            this.state.id = newId;
+        }
+    }, {
+        key: 'getName',
+        value: function getName() {
+            return this.state.name;
+        }
+    }, {
+        key: 'setName',
+        value: function setName(newName) {
+            this.state.name = newName;
+        }
+    }, {
+        key: 'getX',
+        value: function getX() {
+            return this.state.x;
+        }
+    }, {
+        key: 'setX',
+        value: function setX(newX) {
+            this.state.x = newX;
+        }
+    }, {
+        key: 'getY',
+        value: function getY() {
+            return this.state.y;
+        }
+    }, {
+        key: 'setY',
+        value: function setY(newY) {
+            this.state.y = newY;
+        }
+    }, {
+        key: 'getPos',
+        value: function getPos() {
+            return this.state.x + ',' + this.state.y;
+        }
+    }, {
+        key: 'getMapId',
+        value: function getMapId() {
+            return this.state.mapId;
+        }
+    }, {
+        key: 'setMapId',
+        value: function setMapId(newInfo) {
+            this.state.mapId = newInfo;
+        }
+    }, {
+        key: 'getMap',
+        value: function getMap() {
+            return _datastore.DATASTORE.MAPS[this.state.mapId];
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this.getMap().extractEntity(this);
+            console.log("Removing from datastore");
+            delete _datastore.DATASTORE.ENTITIES[this.getId()];
+            _timing.SCHEDULER.remove(this);
+        }
+    }, {
+        key: 'toJSON',
+        value: function toJSON() {
+            return JSON.stringify(this.state);
+        }
+    }, {
+        key: 'fromJSON',
+        value: function fromJSON(s) {
+            this.state = JSON.parse(s);
+        }
+    }]);
 
-  return Entity;
+    return Entity;
 }(_mixable_symbol.MixableSymbol);
 
 /***/ }),
@@ -9869,7 +9869,7 @@ var Map = function () {
           var pos = x1 + ',' + y1;
           // console.log(pos);
           if (this.state.mapPosToEntityId[pos]) {
-            console.log(pos);
+            //console.log(pos);
             //console.log('found entity:');
             // console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);
             // console.dir(display);
@@ -16074,7 +16074,7 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       // console.log("datastore post assignment");
       // console.dir(DATASTORE);
       // return;
-      var m = (0, _map.MapMaker)({ xdim: 10, ydim: 10 });
+      var m = (0, _map.MapMaker)({ xdim: 25, ydim: 25 });
       this.state.mapId = m.getId();
       _message.Message.send("Building map....");
       this.game.renderMessage();
@@ -16093,12 +16093,11 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       // for (let mossCount = 0; mossCount < 3; mossCount++){
       //   m.addEntityAtRandomPosition(EntityFactory.create('moss'));
       // }
-
-      for (var monsterCount = 0; monsterCount < 2; monsterCount++) {
+      for (var monsterCount = 0; monsterCount < 5; monsterCount++) {
         m.addEntityAtRandomPosition(_entity_templates.EntityFactory.create('monster'));
       }
 
-      for (var herbCount = 0; herbCount < 3; herbCount++) {
+      for (var herbCount = 0; herbCount < 5; herbCount++) {
         m.addEntityAtRandomPosition(_entity_templates.EntityFactory.create('herb'));
       }
     }
@@ -16118,6 +16117,7 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
     value: function renderAvatar(display) {
       display.clear();
       var a = this.getAvatar();
+      console.log(a);
       // console.log(a.getTime());
       // console.log(a.getHp());
       display.drawText(1, 0, "AVATAR: " + a._chr);
@@ -16126,8 +16126,16 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       display.drawText(1, 4, "Kills: " + a.getKills());
       display.drawText(1, 5, "HP: " + a.getHp() + "/" + a.getMaxHp());
       display.drawText(1, 6, "Attack: " + a.getMeleeDamage());
+      display.drawText(1, 7, "Enemies Left: " + a.getEntities());
     }
 
+    // getEntities(){
+    //     let entityNum = 0;
+    //     for(let i = 0; Object.keys(DATASTORE.ENTITIES).length < 1; i++){
+    //        entityNum++;
+    //     }
+    // return entityNum;
+    // }
     // WinOrLose(){
     //
     //
@@ -16460,7 +16468,7 @@ EntityFactory.learn({
   'chr': '@',
   'fg': '#eb4',
   'maxHp': 10,
-  'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker']
+  'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'EntityTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker']
 });
 
 EntityFactory.learn({
@@ -16483,9 +16491,9 @@ EntityFactory.learn({
 
 EntityFactory.learn({
   'name': 'herb',
-  'chr': '*',
+  'chr': '^',
   'fg': '#0f0',
-  'maxHp': 30,
+  'maxHp': 3,
   'mixInNames': ['HitPoints']
 
 });
@@ -16553,7 +16561,7 @@ var Factory = exports.Factory = function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ActorWanderer = exports.ActorPlayer = exports.MeleeAttacker = exports.PlayerMessages = exports.HitPoints = exports.WalkerCorporeal = exports.TimeTracker = undefined;
+exports.ActorWanderer = exports.ActorPlayer = exports.MeleeAttacker = exports.PlayerMessages = exports.HitPoints = exports.WalkerCorporeal = exports.EntityTracker = exports.TimeTracker = undefined;
 
 var _message = __webpack_require__(95);
 
@@ -16614,10 +16622,48 @@ var TimeTracker = exports.TimeTracker = {
     }
   }
 };
-
 //********************************************************//
 
-var WalkerCorporeal = exports.WalkerCorporeal = {
+var EntityTracker = exports.EntityTracker = {
+  META: {
+    mixInName: 'EntityTracker',
+    mixInGroupName: 'EntityTracker',
+    stateNamespace: '_EntityTracker',
+    stateModel: {
+      initEntityNum: -1
+    }
+  },
+
+  METHODS: {
+    getEntities: function getEntities() {
+      console.log('starting entity num:');
+      console.log(this.state._EntityTracker.initEntityNum);
+      console.log('length of datastore.entities array:');
+      var numEntities = Object.keys(_datastore.DATASTORE.ENTITIES).length - 1;
+      // console.log("Number of entities: ");
+      // console.log(numEntities);
+      // let totalEntities = this.state._EntityTracker.initEntityNum + numEntities;
+      // console.log("total:");
+      // console.log(totalEntities);
+      return numEntities;
+    }
+  },
+
+  LISTENERS: {
+    'kills': function kills(evtData) {
+      //if(evtData.target){
+      var kills = this.getKills();
+      var totalEntities = this.getEntities();
+      var entitiesRemaining = totalEntities - kills;
+      if (entitiesRemaining == 0) {
+        this.raiseMixinEvent('cleared', { status: "clear" });
+      }
+      return entitiesRemaining;
+    }
+  }
+  //********************************************************//
+
+};var WalkerCorporeal = exports.WalkerCorporeal = {
   META: {
     mixInName: 'WalkerCorporeal',
     mixInGroupName: 'Walker'
@@ -16627,21 +16673,8 @@ var WalkerCorporeal = exports.WalkerCorporeal = {
     tryWalk: function tryWalk(dx, dy) {
       var newX = this.state.x * 1 + dx * 1;
       var newY = this.state.y * 1 + dy * 1;
-
-      // if(this.getMap().isPositionOpen(newX,newY)){
-      //
-      //   this.state.x = newX;
-      //   this.state.y = newY;
-      //   this.getMap().updateEntityPosition(this, this.state.x,this.state.y);
-      //
-      //   this.raiseMixinEvent('turnTaken',{timeUsed: 1});
-      //   return true;
-      //
-      // }
-      // this.raiseMixinEvent('walkBlocked',{reason: "there's something in the way"});
       var targetPositionInfo = this.getMap().getTargetPositionInfo(newX, newY);
       var target = this.getMap().getTargetPositionInfo(newX, newY).entity._chr;
-      // console.log(targetPositionInfo.entity);
       console.log("This is targetPositionInfo.entity:");
       console.log(targetPositionInfo.entity);
       console.log(target);
@@ -16649,12 +16682,12 @@ var WalkerCorporeal = exports.WalkerCorporeal = {
         // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity', { actor: this, target: targetPositionInfo.entity });
 
-        if (target == "*") {
-          console.log("Hitting herb");
-          //console.log(this.getName());
-          this.raiseMixinEvent('damaged', { src: this, damageAmount: 8 });
-          this.raiseMixinEvent('heals', { healer: targetPositionInfo.entity, healAmount: 5 });
-        }
+        // if(target == "^"){
+        //      console.log("Hitting herb");
+        //      console.log(this.getName());
+        //      this.raiseMixinEvent('damaged',{:this,damageAmount:1});
+        //      //this.raiseMixinEvent('heals',{target:targetPositionInfo.entity,healAmount:5});
+        // }
         return false;
       } else if (targetPositionInfo.tile.isImpassable()) {
         this.raiseMixinEvent('walkBlocked', { reason: "there's a wall in the way" });
@@ -16731,20 +16764,22 @@ var HitPoints = exports.HitPoints = {
   LISTENERS: {
     'damaged': function damaged(evtData) {
       this.loseHp(evtData.damageAmount);
+      console.log(evtData.src);
       evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
-
+      console.log(this);
       if (this.getHp() <= 0) {
-        //this.raiseMixinEvent('killedBy',{target:evtData.src});
-        _timing.SCHEDULER.remove(this);
+        this.raiseMixinEvent('killedBy', { src: evtData.src });
         evtData.src.raiseMixinEvent('kills', { target: this });
         console.log("destroying");
+        console.log(this);
         this.destroy();
+        //SCHEDULER.remove(this);
       }
     },
     'heals': function heals(evtData) {
       var currentHp = this.getHp();
       console.log(currentHp);
-      if (this.getHp() >= this.getMaxHp()) {
+      if (currentHp >= this.getMaxHp()) {
         this.gainHp(0);
       }
       this.gainHp(evtData.healAmount);
@@ -16775,13 +16810,16 @@ var PlayerMessages = exports.PlayerMessages = {
       //  setTimeout(Message.send("Very Low Threat Level Detected, this shouldn't be challenging at all!"),100000);
       //}
     },
-
+    'cleared': function cleared(evtData) {
+      _message.Message.send("What a beast! Your attack has definitely increased!");
+    },
     'walkClear': function walkClear(evtData) {
       _message.Message.send("Keep walking, it's" + " " + evtData.status + ". " + "Press p to pause your game.");
     },
     'attacks': function attacks(evtData) {
       console.log("attacking");
-      _message.Message.send("You've attacked" + evtData.target.getName());
+      //Message.send("You've attacked" +evtData.target.getName());
+      _message.Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
     },
 
     'damages': function damages(evtData) {
@@ -16791,6 +16829,7 @@ var PlayerMessages = exports.PlayerMessages = {
 
     'kills': function kills(evtData) {
       _message.Message.send(this.getName().toUpperCase() + " " + "kills the" + " " + evtData.target.getName().toUpperCase());
+      _message.Message.send("What a beast! Your attack has definitely increased!");
     },
 
     'killedBy': function killedBy(evtData) {
@@ -16833,8 +16872,9 @@ var MeleeAttacker = exports.MeleeAttacker = {
     'bumpEntity': function bumpEntity(evtData) {
       console.log("bumping entity for attack");
       console.log(this.getHp());
+      this.raiseMixinEvent('attacks', { src: this, target: evtData.target });
+      evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
       //this.raiseMixinEvent('attacks', {actor:this,target:evtData.target});
-      evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage(), target: evtData.target });
       //evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
     },
     'kills': function kills(evtData) {
@@ -16842,8 +16882,14 @@ var MeleeAttacker = exports.MeleeAttacker = {
 
       var initKillDamageCounter = 5;
       if (this.state._MeleeAttacker.kills >= initKillDamageCounter) {
-        this.setMeleeDamage(5 + this.state._MeleeAttacker.kills);
-        initKillDamageCounter *= 2;
+        initKillDamageCounter *= 3;
+        initKillDamageCounter -= 1;
+        this.setMeleeDamage(this.state._MeleeAttacker.kills / 2 + 1);
+      }
+      console.log("Entities: ");
+      console.log(Object.keys(_datastore.DATASTORE.ENTITIES));
+      if (Object.keys(_datastore.DATASTORE.ENTITIES).length == 1) {
+        console.log("you win!"); //this.game.switchModes('win');
       }
     }
   }

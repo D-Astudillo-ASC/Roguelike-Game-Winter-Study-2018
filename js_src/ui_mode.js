@@ -113,7 +113,7 @@ export class PlayMode extends UIMode {
     // console.log("datastore post assignment");
     // console.dir(DATASTORE);
     // return;
-    let m = MapMaker({xdim:10, ydim:10});
+    let m = MapMaker({xdim:25, ydim:25});
     this.state.mapId = m.getId();
     Message.send("Building map....");
     this.game.renderMessage();
@@ -132,15 +132,13 @@ export class PlayMode extends UIMode {
     // for (let mossCount = 0; mossCount < 3; mossCount++){
     //   m.addEntityAtRandomPosition(EntityFactory.create('moss'));
     // }
-
-    for(let monsterCount = 0; monsterCount < 2;monsterCount++){
+    for(let monsterCount = 0; monsterCount < 5;monsterCount++){
       m.addEntityAtRandomPosition(EntityFactory.create('monster'));
     }
 
-    for(let herbCount = 0; herbCount < 3;herbCount++){
+    for(let herbCount = 0; herbCount < 5;herbCount++){
       m.addEntityAtRandomPosition(EntityFactory.create('herb'));
     }
-
   }
   render(display){
     // console.dir(DATASTORE);
@@ -155,6 +153,7 @@ export class PlayMode extends UIMode {
   renderAvatar(display){
     display.clear();
     let a = this.getAvatar();
+    console.log(a);
     // console.log(a.getTime());
     // console.log(a.getHp());
     display.drawText(1,0,"AVATAR: "+ a._chr);
@@ -163,9 +162,18 @@ export class PlayMode extends UIMode {
     display.drawText(1,4,"Kills: "+ a.getKills());
     display.drawText(1,5,"HP: "+ a.getHp() + "/" + a.getMaxHp());
     display.drawText(1,6,"Attack: "+ a.getMeleeDamage());
-
+    display.drawText(1,7,"Enemies Left: " +a.getEntities());
   }
 
+
+
+  // getEntities(){
+  //     let entityNum = 0;
+  //     for(let i = 0; Object.keys(DATASTORE.ENTITIES).length < 1; i++){
+  //        entityNum++;
+  //     }
+  // return entityNum;
+  // }
   // WinOrLose(){
   //
   //
