@@ -85,11 +85,6 @@ export class PlayMode extends UIMode {
     if(!this.state.mapId)
     {
       this.game.setupNewGame();
-      // let m = MapMaker({xdim:300, ydim:160, mapType:'basic caves'});
-      // this.state.mapId = m.getId();
-      // m.build();
-      // this.state.cameramapx = 0;
-      // this.state.cameramapy = 0;
     }
     TIME_ENGINE.unlock();
     setKeyBinding(['play','movement_wasd','universal']);

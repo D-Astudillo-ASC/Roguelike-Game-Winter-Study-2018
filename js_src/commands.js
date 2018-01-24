@@ -80,5 +80,8 @@ let KEY_BINDINGS = {
     'LEFT':   ['key:a,altKey:false,ctrlKey:false,shiftKey:false'],
     'RIGHT':   ['key:d,altKey:false,ctrlKey:false,shiftKey:false'],
     'DOWN':   ['key:s,altKey:false,ctrlKey:false,shiftKey:false']
-  }
+  },
+  // 'combat': {
+  //   ''
+  // }
 };

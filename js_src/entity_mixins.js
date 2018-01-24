@@ -29,15 +29,11 @@ export let TimeTracker = {
       },
 
       setTime: function (t){
-
         this.state._TimeTracker.timeTaken = t;
-
       },
 
       addTime: function (t){
-
         this.state._TimeTracker.timeTaken += t;
-
       }
 
 
@@ -153,7 +149,7 @@ export let HealingMixin = {
       healingPower: 0
     },
     initialize: function(template){
-      this.state._Healing.healingPower = template.healingPower || 1;
+      this.state._Healing.healingPower = template.healingPower;
     }
   },
 
@@ -176,8 +172,6 @@ export let HealingMixin = {
   LISTENERS: {
     'bumpedBy': function(evtData){
          evtData.bumper.raiseMixinEvent('heals',{healAmount:this.getHealingPower()});
-    //       //if(evtData.actor == "")
-    // }
       }
     }
  };
@@ -204,7 +198,7 @@ export let HitPoints = {
       METHODS:{
            loseHp: function(amt){
              this.state._HitPoints.curHp -= amt;
-             this.state._HitPoints.curHp = Math.max(0,this.state._HitPoints.curHp);
+             this.state._HitPoints.curHp = Math.max(0,Math.round(this.state._HitPoints.curHp * 10)/10);
            },
 
            gainHp: function(amt){
@@ -235,11 +229,14 @@ export let HitPoints = {
        },
        LISTENERS: {
          'damaged': function(evtData){
+              if (this.getName() == evtData.src.getName()){
+                return;
+              }
               if (evtData.damageAmount < 0){
                 this.loseHp(0);
               }
               if (evtData.damageAmount >= 0){
-                this.loseHp(evtData.damageAmount);
+                this.loseHp(Math.round(evtData.damageAmount * 10)/10);
               }
 
               console.log(evtData.src);
@@ -255,18 +252,18 @@ export let HitPoints = {
               }
             },
             //{src:entity,damageAmount:entity.getMeleeDamage()}
-          'damages':function(evtData){
-            console.log("damages event: ");
-            console.log(this);
-            if(this.name == evtData.target.name){
-              evtData.damageAmount == 0;
-            }
-          },
+          // 'damages':function(evtData){
+          //   console.log("damages event: ");
+          //   console.log(this);
+          //   if(this.name == evtData.target.name){
+          //     evtData.damageAmount == 0;
+          //   }
+          // },
         'heals': function(evtData){
           // console.log(this.getName() + "being healed");
           // console.dir(evtData);
            this.gainHp(evtData.healAmount);
-        }
+        },
     }
 };
 
@@ -302,7 +299,7 @@ export let PlayerMessages = {
       },
       'attacks': function(evtData){
         console.log("attacking");
-        Message.send("You've attacked" +evtData.target.getName());
+        Message.send(evtData.target.getName().toUpperCase() + " attacked.");
         //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
 
       },
@@ -367,7 +364,8 @@ export let MeleeAttacker = {
       console.log("bumping entity for attack");
       console.log(this.getHp());
       this.raiseMixinEvent('attacks', {src:this,target:evtData.target});
-      let totalDamage = this.getMeleeDamage() - (evtData.target.getMeleeDefense() * 0.5);
+      let totalDamage = Math.round((this.getMeleeDamage() - (evtData.target.getMeleeDefense() * 0.5)) * 10)/10;
+
       evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:totalDamage});
       if (totalDamage < 0){
         evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:0});
@@ -379,7 +377,7 @@ export let MeleeAttacker = {
     'bumpedBy': function(evtData){
 
           this.raiseMixinEvent('attacks', {target:evtData.bumper});
-          let totalDamage = this.getMeleeDamage() - (evtData.bumper.getMeleeDefense() * 0.75);
+          let totalDamage = Math.round((this.getMeleeDamage() - (evtData.bumper.getMeleeDefense() * 0.75)) * 10)/10;
           evtData.bumper.raiseMixinEvent('damaged',{src:this,damageAmount:totalDamage});
           if (totalDamage < 0){
             evtData.bumper.raiseMixinEvent('damaged',{src:this,damageAmount:0});
@@ -393,7 +391,7 @@ export let MeleeAttacker = {
         initKillDamageCounter *= 3;
         initKillDamageCounter -= 1;
         this.setMeleeDamage(this.state._MeleeAttacker.kills/2 + 1);
-        this.setMeleeDefense(this.state._MeleeAttacker.kills/3.5 + 1);
+        this.setMeleeDefense(Math.round((this.state._MeleeAttacker.kills/3.5 + 1)*10)/10);
       }
       console.log("Entities: ")
       console.log(Object.keys(DATASTORE.ENTITIES));

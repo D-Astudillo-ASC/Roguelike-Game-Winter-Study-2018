@@ -117,7 +117,7 @@ export let Game = {
      if(this.curMode){
        this.curMode.enter();
      }
-     
+
      this.render();
    },
 

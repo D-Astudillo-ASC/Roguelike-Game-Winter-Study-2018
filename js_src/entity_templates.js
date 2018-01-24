@@ -29,6 +29,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': '&',
     'fg': '#d63',
     'maxHp': 5,
+    'healingPower': 2,
     'meleeDamage': 7,
     'meleeDefense': 2,
     'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints','MeleeAttacker','PlayerMessages','EntityTracker']
@@ -40,6 +41,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': '^',
     'fg': '#0f0',
     'maxHp': 10,
+    'healingPower': 3,
     'meleeDamage': 0,
     'meleeDefense': 4.5,
     'mixInNames': ['HitPoints','PlayerMessages','EntityTracker','HealingMixin','MeleeAttacker']

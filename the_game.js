@@ -8523,17 +8523,23 @@ var Messager = function () {
     _classCallCheck(this, Messager);
 
     this.message = ' ';
+    this.message1 = ' ';
+    this.message2 = ' ';
   }
 
   _createClass(Messager, [{
     key: 'render',
     value: function render(targetDisplay) {
       targetDisplay.clear();
-      targetDisplay.drawText(2, 3, this.message);
+      targetDisplay.drawText(2, 2, this.message);
+      targetDisplay.drawText(2, 3, this.message1);
+      //targetDisplay.drawText(2,4,(this.message2));
     }
   }, {
     key: 'send',
     value: function send(msg) {
+      this.message2 = this.message1;
+      this.message1 = this.message;
       this.message = msg;
     }
 
@@ -8546,6 +8552,8 @@ var Messager = function () {
   }, {
     key: 'clear',
     value: function clear() {
+      this.message2 = ' ';
+      this.message1 = ' ';
       this.message = ' ';
     }
   }]);
@@ -16432,6 +16440,7 @@ EntityFactory.learn({
   'chr': '&',
   'fg': '#d63',
   'maxHp': 5,
+  'healingPower': 2,
   'meleeDamage': 7,
   'meleeDefense': 2,
   'mixInNames': ['ActorWanderer', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker', 'PlayerMessages', 'EntityTracker']
@@ -16443,6 +16452,7 @@ EntityFactory.learn({
   'chr': '^',
   'fg': '#0f0',
   'maxHp': 10,
+  'healingPower': 3,
   'meleeDamage': 0,
   'meleeDefense': 4.5,
   'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'HealingMixin', 'MeleeAttacker']
@@ -16557,12 +16567,10 @@ var TimeTracker = exports.TimeTracker = {
     },
 
     setTime: function setTime(t) {
-
       this.state._TimeTracker.timeTaken = t;
     },
 
     addTime: function addTime(t) {
-
       this.state._TimeTracker.timeTaken += t;
     }
 
@@ -16669,7 +16677,7 @@ var HealingMixin = exports.HealingMixin = {
       healingPower: 0
     },
     initialize: function initialize(template) {
-      this.state._Healing.healingPower = template.healingPower || 1;
+      this.state._Healing.healingPower = template.healingPower;
     }
   },
 
@@ -16692,8 +16700,6 @@ var HealingMixin = exports.HealingMixin = {
   LISTENERS: {
     'bumpedBy': function bumpedBy(evtData) {
       evtData.bumper.raiseMixinEvent('heals', { healAmount: this.getHealingPower() });
-      //       //if(evtData.actor == "")
-      // }
     }
   }
 };
@@ -16720,7 +16726,7 @@ var HitPoints = exports.HitPoints = {
   METHODS: {
     loseHp: function loseHp(amt) {
       this.state._HitPoints.curHp -= amt;
-      this.state._HitPoints.curHp = Math.max(0, this.state._HitPoints.curHp);
+      this.state._HitPoints.curHp = Math.max(0, Math.round(this.state._HitPoints.curHp * 10) / 10);
     },
 
     gainHp: function gainHp(amt) {
@@ -16750,11 +16756,14 @@ var HitPoints = exports.HitPoints = {
   },
   LISTENERS: {
     'damaged': function damaged(evtData) {
+      if (this.getName() == evtData.src.getName()) {
+        return;
+      }
       if (evtData.damageAmount < 0) {
         this.loseHp(0);
       }
       if (evtData.damageAmount >= 0) {
-        this.loseHp(evtData.damageAmount);
+        this.loseHp(Math.round(evtData.damageAmount * 10) / 10);
       }
 
       console.log(evtData.src);
@@ -16770,13 +16779,13 @@ var HitPoints = exports.HitPoints = {
       }
     },
     //{src:entity,damageAmount:entity.getMeleeDamage()}
-    'damages': function damages(evtData) {
-      console.log("damages event: ");
-      console.log(this);
-      if (this.name == evtData.target.name) {
-        evtData.damageAmount == 0;
-      }
-    },
+    // 'damages':function(evtData){
+    //   console.log("damages event: ");
+    //   console.log(this);
+    //   if(this.name == evtData.target.name){
+    //     evtData.damageAmount == 0;
+    //   }
+    // },
     'heals': function heals(evtData) {
       // console.log(this.getName() + "being healed");
       // console.dir(evtData);
@@ -16816,7 +16825,7 @@ var PlayerMessages = exports.PlayerMessages = {
     },
     'attacks': function attacks(evtData) {
       console.log("attacking");
-      _message.Message.send("You've attacked" + evtData.target.getName());
+      _message.Message.send(evtData.target.getName().toUpperCase() + " attacked.");
       //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
     },
 
@@ -16890,7 +16899,8 @@ var MeleeAttacker = exports.MeleeAttacker = {
       console.log("bumping entity for attack");
       console.log(this.getHp());
       this.raiseMixinEvent('attacks', { src: this, target: evtData.target });
-      var totalDamage = this.getMeleeDamage() - evtData.target.getMeleeDefense() * 0.5;
+      var totalDamage = Math.round((this.getMeleeDamage() - evtData.target.getMeleeDefense() * 0.5) * 10) / 10;
+
       evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
       if (totalDamage < 0) {
         evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
@@ -16902,7 +16912,7 @@ var MeleeAttacker = exports.MeleeAttacker = {
     'bumpedBy': function bumpedBy(evtData) {
 
       this.raiseMixinEvent('attacks', { target: evtData.bumper });
-      var totalDamage = this.getMeleeDamage() - evtData.bumper.getMeleeDefense() * 0.75;
+      var totalDamage = Math.round((this.getMeleeDamage() - evtData.bumper.getMeleeDefense() * 0.75) * 10) / 10;
       evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
       if (totalDamage < 0) {
         evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
@@ -16916,7 +16926,7 @@ var MeleeAttacker = exports.MeleeAttacker = {
         initKillDamageCounter *= 3;
         initKillDamageCounter -= 1;
         this.setMeleeDamage(this.state._MeleeAttacker.kills / 2 + 1);
-        this.setMeleeDefense(this.state._MeleeAttacker.kills / 3.5 + 1);
+        this.setMeleeDefense(Math.round((this.state._MeleeAttacker.kills / 3.5 + 1) * 10) / 10);
       }
       console.log("Entities: ");
       console.log(Object.keys(_datastore.DATASTORE.ENTITIES));
@@ -17136,6 +17146,9 @@ var KEY_BINDINGS = {
     'RIGHT': ['key:d,altKey:false,ctrlKey:false,shiftKey:false'],
     'DOWN': ['key:s,altKey:false,ctrlKey:false,shiftKey:false']
   }
+  // 'combat': {
+  //   ''
+  // }
 };
 
 /***/ })
