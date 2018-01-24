@@ -10,7 +10,8 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': '@',
     'fg': '#eb4',
     'maxHp': 20,
-    'curHp': 10,
+    'meleeDamage': 3,
+    'meleeDefense': 5,
     'mixInNames':['ActorPlayer','PlayerMessages','TimeTracker','EntityTracker','WalkerCorporeal','HitPoints','MeleeAttacker']
   });
 
@@ -28,6 +29,8 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': '&',
     'fg': '#d63',
     'maxHp': 5,
+    'meleeDamage': 7,
+    'meleeDefense': 2,
     'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints','MeleeAttacker','PlayerMessages','EntityTracker']
 
   });
@@ -35,8 +38,10 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
   EntityFactory.learn({
     'name': 'herb',
     'chr': '^',
-    'fg': '#f00',
-    'maxHp': 3,
-    'mixInNames': ['HitPoints','PlayerMessages','EntityTracker','HealingMixin']
+    'fg': '#0f0',
+    'maxHp': 10,
+    'meleeDamage': 0,
+    'meleeDefense': 4.5,
+    'mixInNames': ['HitPoints','PlayerMessages','EntityTracker','HealingMixin','MeleeAttacker']
 
   });

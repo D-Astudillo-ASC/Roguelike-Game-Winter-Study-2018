@@ -149,7 +149,6 @@ export class PlayMode extends UIMode {
   renderAvatar(display){
     display.clear();
     let a = this.getAvatar();
-    console.log(a);
     // console.log(a.getTime());
     // console.log(a.getHp());
     display.drawText(1,0,"AVATAR: "+ a._chr);
@@ -158,7 +157,8 @@ export class PlayMode extends UIMode {
     display.drawText(1,4,"Kills: "+ a.getKills());
     display.drawText(1,5,"HP: "+ a.getHp() + "/" + a.getMaxHp());
     display.drawText(1,6,"Attack: "+ a.getMeleeDamage());
-    display.drawText(1,7,"Enemies Left: " +a.getEntities());
+    display.drawText(1,7,"Defense: "+ a.getMeleeDefense());
+    display.drawText(1,8,"Enemies Left: " +a.getEntities());
 
     if(a.getEntities() == 0){
       this.game.switchModes('win');
@@ -200,6 +200,10 @@ export class PlayMode extends UIMode {
       this.moveCameraToAvatar();
       //this.getAvatar().addTime(1);
       // return true;
+    }
+
+    else if(!this.getAvatar()){
+      this.game.switchModes('lose');
     }
 
     this.game.render();

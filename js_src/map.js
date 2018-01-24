@@ -47,7 +47,7 @@ class Map {
   }
 
   setMapPosToEntityId(newMapPosToEntityId){
-    this.state.entityIdToMapPos = newMapPosToEntityId;
+    this.state.mapPosToEntityId = newMapPosToEntityId;
   }
 
 
@@ -139,7 +139,7 @@ class Map {
     let openPos = this.getRandomOpenPosition();
     let p = openPos.split(',');
     this.addEntityAt(ent, p[0],p[1]);
-    
+
   }
 
   getRandomOpenPosition(){
@@ -157,8 +157,6 @@ class Map {
 
 
   render(display,camera_map_x,camera_map_y){
-    //
-    console.log("Rendering map");
     let cx = 0;
     let cy = 0;
     let xstart = camera_map_x - Math.trunc(display.getOptions().width/2) ;

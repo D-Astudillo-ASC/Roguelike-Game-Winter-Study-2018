@@ -100,7 +100,6 @@ export let WalkerCorporeal = {
       let target = this.getMap().getTargetPositionInfo(newX,newY).entity._chr;
       console.log("This is targetPositionInfo.entity:")
       console.log(targetPositionInfo.entity);
-      console.log(target);
       if(targetPositionInfo.entity){
         // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity',{target:targetPositionInfo.entity});
@@ -236,7 +235,13 @@ export let HitPoints = {
        },
        LISTENERS: {
          'damaged': function(evtData){
-              this.loseHp(evtData.damageAmount);
+              if (evtData.damageAmount < 0){
+                this.loseHp(0);
+              }
+              if (evtData.damageAmount >= 0){
+                this.loseHp(evtData.damageAmount);
+              }
+
               console.log(evtData.src);
               evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: evtData.damageAmount});
               //console.log(this);
@@ -248,12 +253,18 @@ export let HitPoints = {
                 this.destroy();
                 //SCHEDULER.remove(this);
               }
-          //{src:entity,damageAmount:entity.getMeleeDamage()}
-
+            },
+            //{src:entity,damageAmount:entity.getMeleeDamage()}
+          'damages':function(evtData){
+            console.log("damages event: ");
+            console.log(this);
+            if(this.name == evtData.target.name){
+              evtData.damageAmount == 0;
+            }
           },
         'heals': function(evtData){
-          console.log(this.getName() + "being healed");
-          console.dir(evtData);
+          // console.log(this.getName() + "being healed");
+          // console.dir(evtData);
            this.gainHp(evtData.healAmount);
         }
     }
@@ -334,17 +345,21 @@ export let MeleeAttacker = {
     stateNamespace: '_MeleeAttacker',
     stateModel: {
       meleeDamage: 0,
+      meleeDefense: 0,
       kills: 0
     },
 
     initialize: function (template){
-      this.state._MeleeAttacker.meleeDamage = template.meleeDamage || 1;
+      this.state._MeleeAttacker.meleeDamage = template.meleeDamage || this.state._MeleeAttacker.meleeDamage;
+      this.state._MeleeAttacker.meleeDefense = template.meleeDefense || this.state._MeleeAttacker.meleeDefense;
     },
   },
   METHODS: {
 
     getMeleeDamage: function (){return this.state._MeleeAttacker.meleeDamage},
     setMeleeDamage: function (newVal){ this.state._MeleeAttacker.meleeDamage = newVal;},
+    getMeleeDefense: function (){return this.state._MeleeAttacker.meleeDefense},
+    setMeleeDefense: function (newVal){ this.state._MeleeAttacker.meleeDefense = newVal;},
     getKills: function(){return this.state._MeleeAttacker.kills}
   },
   LISTENERS:{
@@ -352,7 +367,11 @@ export let MeleeAttacker = {
       console.log("bumping entity for attack");
       console.log(this.getHp());
       this.raiseMixinEvent('attacks', {src:this,target:evtData.target});
-      evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
+      let totalDamage = this.getMeleeDamage() - (evtData.target.getMeleeDefense() * 0.5);
+      evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:totalDamage});
+      if (totalDamage < 0){
+        evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:0});
+      }
       //this.raiseMixinEvent('attacks', {actor:this,target:evtData.target});
       //evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
     },
@@ -360,7 +379,11 @@ export let MeleeAttacker = {
     'bumpedBy': function(evtData){
 
           this.raiseMixinEvent('attacks', {target:evtData.bumper});
-          evtData.bumper.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
+          let totalDamage = this.getMeleeDamage() - (evtData.bumper.getMeleeDefense() * 0.75);
+          evtData.bumper.raiseMixinEvent('damaged',{src:this,damageAmount:totalDamage});
+          if (totalDamage < 0){
+            evtData.bumper.raiseMixinEvent('damaged',{src:this,damageAmount:0});
+          }
     },
     'kills': function(evtData){
       this.state._MeleeAttacker.kills++;
@@ -370,6 +393,7 @@ export let MeleeAttacker = {
         initKillDamageCounter *= 3;
         initKillDamageCounter -= 1;
         this.setMeleeDamage(this.state._MeleeAttacker.kills/2 + 1);
+        this.setMeleeDefense(this.state._MeleeAttacker.kills/3.5 + 1);
       }
       console.log("Entities: ")
       console.log(Object.keys(DATASTORE.ENTITIES));
@@ -478,7 +502,9 @@ export let ActorWanderer = {
       TIME_ENGINE.lock();
       let dx = randomInt(-1,1);
       let dy = randomInt(-1,1);
-      this.raiseMixinEvent('walkAttempt',{'dx':dx, 'dy':dy});
+      if(!(dx == 0 && dy == 0)){
+        this.raiseMixinEvent('walkAttempt',{'dx':dx, 'dy':dy});
+      }
       SCHEDULER.setDuration(1000);
       TIME_ENGINE.unlock();
     }

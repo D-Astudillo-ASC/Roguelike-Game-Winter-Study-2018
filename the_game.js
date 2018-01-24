@@ -9885,7 +9885,6 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
     value: function renderAvatar(display) {
       display.clear();
       var a = this.getAvatar();
-      console.log(a);
       // console.log(a.getTime());
       // console.log(a.getHp());
       display.drawText(1, 0, "AVATAR: " + a._chr);
@@ -9894,7 +9893,8 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       display.drawText(1, 4, "Kills: " + a.getKills());
       display.drawText(1, 5, "HP: " + a.getHp() + "/" + a.getMaxHp());
       display.drawText(1, 6, "Attack: " + a.getMeleeDamage());
-      display.drawText(1, 7, "Enemies Left: " + a.getEntities());
+      display.drawText(1, 7, "Defense: " + a.getMeleeDefense());
+      display.drawText(1, 8, "Enemies Left: " + a.getEntities());
 
       if (a.getEntities() == 0) {
         this.game.switchModes('win');
@@ -9927,6 +9927,8 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
         this.moveCameraToAvatar();
         //this.getAvatar().addTime(1);
         // return true;
+      } else if (!this.getAvatar()) {
+        this.game.switchModes('lose');
       }
 
       this.game.render();
@@ -10224,7 +10226,7 @@ var Map = function () {
   }, {
     key: 'setMapPosToEntityId',
     value: function setMapPosToEntityId(newMapPosToEntityId) {
-      this.state.entityIdToMapPos = newMapPosToEntityId;
+      this.state.mapPosToEntityId = newMapPosToEntityId;
     }
   }, {
     key: 'getXDim',
@@ -10344,8 +10346,6 @@ var Map = function () {
   }, {
     key: 'render',
     value: function render(display, camera_map_x, camera_map_y) {
-      //
-      console.log("Rendering map");
       var cx = 0;
       var cy = 0;
       var xstart = camera_map_x - Math.trunc(display.getOptions().width / 2);
@@ -10518,7 +10518,7 @@ var Tile = exports.Tile = function (_DisplaySymbol) {
 
 var TILES = exports.TILES = {
   NULLTILE: new Tile({ name: 'nulltile', chr: '!', fg: '#f0f', transparent: false, passable: false }),
-  WALL: new Tile({ name: 'wall', chr: '|', fg: '#00f', transparent: false, passable: false }),
+  WALL: new Tile({ name: 'wall', chr: '\u074F', fg: '#00f', transparent: false, passable: false }),
   FLOOR: new Tile({ name: 'floor', chr: ' ', transparent: true, passable: true })
 };
 
@@ -16413,7 +16413,8 @@ EntityFactory.learn({
   'chr': '@',
   'fg': '#eb4',
   'maxHp': 20,
-  'curHp': 10,
+  'meleeDamage': 3,
+  'meleeDefense': 5,
   'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'EntityTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker']
 });
 
@@ -16431,6 +16432,8 @@ EntityFactory.learn({
   'chr': '&',
   'fg': '#d63',
   'maxHp': 5,
+  'meleeDamage': 7,
+  'meleeDefense': 2,
   'mixInNames': ['ActorWanderer', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker', 'PlayerMessages', 'EntityTracker']
 
 });
@@ -16438,9 +16441,11 @@ EntityFactory.learn({
 EntityFactory.learn({
   'name': 'herb',
   'chr': '^',
-  'fg': '#f00',
-  'maxHp': 3,
-  'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'HealingMixin']
+  'fg': '#0f0',
+  'maxHp': 10,
+  'meleeDamage': 0,
+  'meleeDefense': 4.5,
+  'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'HealingMixin', 'MeleeAttacker']
 
 });
 
@@ -16617,7 +16622,6 @@ var EntityTracker = exports.EntityTracker = {
       var target = this.getMap().getTargetPositionInfo(newX, newY).entity._chr;
       console.log("This is targetPositionInfo.entity:");
       console.log(targetPositionInfo.entity);
-      console.log(target);
       if (targetPositionInfo.entity) {
         // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity', { target: targetPositionInfo.entity });
@@ -16746,7 +16750,13 @@ var HitPoints = exports.HitPoints = {
   },
   LISTENERS: {
     'damaged': function damaged(evtData) {
-      this.loseHp(evtData.damageAmount);
+      if (evtData.damageAmount < 0) {
+        this.loseHp(0);
+      }
+      if (evtData.damageAmount >= 0) {
+        this.loseHp(evtData.damageAmount);
+      }
+
       console.log(evtData.src);
       evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
       //console.log(this);
@@ -16758,11 +16768,18 @@ var HitPoints = exports.HitPoints = {
         this.destroy();
         //SCHEDULER.remove(this);
       }
-      //{src:entity,damageAmount:entity.getMeleeDamage()}
+    },
+    //{src:entity,damageAmount:entity.getMeleeDamage()}
+    'damages': function damages(evtData) {
+      console.log("damages event: ");
+      console.log(this);
+      if (this.name == evtData.target.name) {
+        evtData.damageAmount == 0;
+      }
     },
     'heals': function heals(evtData) {
-      console.log(this.getName() + "being healed");
-      console.dir(evtData);
+      // console.log(this.getName() + "being healed");
+      // console.dir(evtData);
       this.gainHp(evtData.healAmount);
     }
   }
@@ -16841,11 +16858,13 @@ var MeleeAttacker = exports.MeleeAttacker = {
     stateNamespace: '_MeleeAttacker',
     stateModel: {
       meleeDamage: 0,
+      meleeDefense: 0,
       kills: 0
     },
 
     initialize: function initialize(template) {
-      this.state._MeleeAttacker.meleeDamage = template.meleeDamage || 1;
+      this.state._MeleeAttacker.meleeDamage = template.meleeDamage || this.state._MeleeAttacker.meleeDamage;
+      this.state._MeleeAttacker.meleeDefense = template.meleeDefense || this.state._MeleeAttacker.meleeDefense;
     }
   },
   METHODS: {
@@ -16856,6 +16875,12 @@ var MeleeAttacker = exports.MeleeAttacker = {
     setMeleeDamage: function setMeleeDamage(newVal) {
       this.state._MeleeAttacker.meleeDamage = newVal;
     },
+    getMeleeDefense: function getMeleeDefense() {
+      return this.state._MeleeAttacker.meleeDefense;
+    },
+    setMeleeDefense: function setMeleeDefense(newVal) {
+      this.state._MeleeAttacker.meleeDefense = newVal;
+    },
     getKills: function getKills() {
       return this.state._MeleeAttacker.kills;
     }
@@ -16865,7 +16890,11 @@ var MeleeAttacker = exports.MeleeAttacker = {
       console.log("bumping entity for attack");
       console.log(this.getHp());
       this.raiseMixinEvent('attacks', { src: this, target: evtData.target });
-      evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
+      var totalDamage = this.getMeleeDamage() - evtData.target.getMeleeDefense() * 0.5;
+      evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
+      if (totalDamage < 0) {
+        evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
+      }
       //this.raiseMixinEvent('attacks', {actor:this,target:evtData.target});
       //evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
     },
@@ -16873,7 +16902,11 @@ var MeleeAttacker = exports.MeleeAttacker = {
     'bumpedBy': function bumpedBy(evtData) {
 
       this.raiseMixinEvent('attacks', { target: evtData.bumper });
-      evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: this.getMeleeDamage() });
+      var totalDamage = this.getMeleeDamage() - evtData.bumper.getMeleeDefense() * 0.75;
+      evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
+      if (totalDamage < 0) {
+        evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
+      }
     },
     'kills': function kills(evtData) {
       this.state._MeleeAttacker.kills++;
@@ -16883,6 +16916,7 @@ var MeleeAttacker = exports.MeleeAttacker = {
         initKillDamageCounter *= 3;
         initKillDamageCounter -= 1;
         this.setMeleeDamage(this.state._MeleeAttacker.kills / 2 + 1);
+        this.setMeleeDefense(this.state._MeleeAttacker.kills / 3.5 + 1);
       }
       console.log("Entities: ");
       console.log(Object.keys(_datastore.DATASTORE.ENTITIES));
@@ -16991,7 +17025,9 @@ var ActorPlayer = exports.ActorPlayer = {
       _timing.TIME_ENGINE.lock();
       var dx = (0, _util.randomInt)(-1, 1);
       var dy = (0, _util.randomInt)(-1, 1);
-      this.raiseMixinEvent('walkAttempt', { 'dx': dx, 'dy': dy });
+      if (!(dx == 0 && dy == 0)) {
+        this.raiseMixinEvent('walkAttempt', { 'dx': dx, 'dy': dy });
+      }
       _timing.SCHEDULER.setDuration(1000);
       _timing.TIME_ENGINE.unlock();
     }
