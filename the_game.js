@@ -9926,7 +9926,6 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
     value: function render(display) {
       // console.dir(DATASTORE);
       // console.dir(this);
-      console.log('play mode render');
       display.clear();
       _datastore.DATASTORE.MAPS[this.state.mapId].render(display, this.state.cameramapx, this.state.cameramapy);
       // DATASTORE.MAPS[this.state.mapId].render(display, 15, 10);
@@ -16475,7 +16474,7 @@ EntityFactory.learn({
   'chr': '@',
   'fg': '#eb4',
   'maxHp': 20,
-  'meleeDamage': 3,
+  'meleeDamage': 5,
   'meleeDefense': 5,
   'radResist': 1,
   'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'EntityTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker']
@@ -16533,7 +16532,7 @@ EntityFactory.learn({
   'fg': '#ff0',
   'maxHp': 20,
   'meleeDamage': 12,
-  'meleeDefense': 4,
+  'meleeDefense': 2,
   'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'MeleeAttacker', 'ActorWanderer', 'WalkerCorporeal']
 
 });
@@ -16723,9 +16722,6 @@ var EntityTracker = exports.EntityTracker = {
       var newX = this.state.x * 1 + dx * 1;
       var newY = this.state.y * 1 + dy * 1;
       var targetPositionInfo = this.getMap().getTargetPositionInfo(newX, newY);
-      var target = this.getMap().getTargetPositionInfo(newX, newY).entity._chr;
-      console.log("This is targetPositionInfo.entity:");
-      console.log(targetPositionInfo.entity);
       if (targetPositionInfo.entity) {
         // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity', { target: targetPositionInfo.entity });
@@ -16856,12 +16852,8 @@ var HitPoints = exports.HitPoints = {
         return;
       }
       if (evtData.src.getName() == 'X-Ray') {
-        var resistedDamage = evtData.damageAmount * 0.5 * this.getRadResist();
-        var rounded = Math.round(resistedDamage * 10) / 10;
-        console.log("rounded");
-        console.log(rounded);
-        this.loseHp(rounded); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
-        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: rounded });
+        this.loseHp(evtData.damageAmount); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
 
         if (this.getHp() <= 0) {
           evtData.src.raiseMixinEvent('kills', { target: this });
@@ -16871,29 +16863,31 @@ var HitPoints = exports.HitPoints = {
           this.destroy();
           //SCHEDULER.remove(this);
         }
-      } else if (evtData.src.getName() == 'UV Radiation') {
-        var resistedUVdamage = evtData.damageAmount * 0.25 * this.getRadResist();
-        var uvRounded = Math.round(resistedUVdamage * 10) / 10;
-        console.log("uvRounded");
-        console.log(uvRounded);
-        this.loseHp(uvRounded); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
-        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: uvRounded });
+      }
 
-        if (this.getHp() <= 0) {
-          evtData.src.raiseMixinEvent('kills', { target: this });
-          console.log("destroying");
-          console.log(this);
-          this.raiseMixinEvent('killedBy', { src: evtData.src });
-          this.destroy();
-          //SCHEDULER.remove(this);
-        }
-      } else if (evtData.src.getName() == 'Gamma Radiation') {
-        var resistedGammaDamage = evtData.damageAmount * (0.85 * this.getRadResist());
-        var gammaRounded = Math.round(resistedGammaDamage * 10) / 10;
-        console.log("gammaRounded");
-        console.log(gammaRounded);
-        this.loseHp(gammaRounded); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
-        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: gammaRounded });
+      //if(evtData.src.getName() == 'UV Radiation'){
+      //    let resistedUVdamage = evtData.damageAmount * 0.25 * this.getRadResist();
+      //    let uvRounded = Math.round(resistedUVdamage * 10)/10;
+      //    console.log("uvRounded");
+      //    console.log(uvRounded);
+      //    this.loseHp(uvRounded);     //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+      //    evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: uvRounded});
+      //
+      //    if(this.getHp() <= 0){
+      //      evtData.src.raiseMixinEvent('kills',{target:this});
+      //      console.log("destroying");
+      //      console.log(this);
+      //      this.raiseMixinEvent('killedBy',{src:evtData.src});
+      //      this.destroy();
+      //    //SCHEDULER.remove(this);
+      //    }
+      //  }
+      //
+      if (evtData.src.getName() == 'Gamma Radiation') {
+        this.loseHp(evtData.damageAmount); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
+        //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        //evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: gammaRounded});
 
         if (this.getHp() <= 0) {
           evtData.src.raiseMixinEvent('kills', { target: this });
@@ -16910,7 +16904,7 @@ var HitPoints = exports.HitPoints = {
 
         if (evtData.damageAmount >= 0 || evtData.src.getName != 'X-Ray' || evtData.src.getName != 'UV Radiation' || evtData.src.getName != 'Gamma Radiation') {
           this.loseHp(Math.round(evtData.damageAmount * 10) / 10);
-          evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: Math.round(evtData.damageAmount * 10) / 10 });
+          //evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: Math.round(evtData.damageAmount * 10)/10});
         }
         //console.log(this);
         if (this.getHp() <= 0) {
@@ -16934,9 +16928,11 @@ var HitPoints = exports.HitPoints = {
     'heals': function heals(evtData) {
       // console.log(this.getName() + "being healed");
       // console.dir(evtData);
-      if (this.getHp() > this.getMaxHp()) {
+      console.log("this.getHp() = " + this.getHp() + " this.getMaxHp() = " + this.getMaxHp());
+      if (this.getHp() >= this.getMaxHp()) {
+        console.log("hp is max");
         this.gainHp(0);
-        this.loseHp(this.getHp() - this.getMaxHp());
+        //this.loseHp(this.getHp() - this.getMaxHp());
       } else {
         this.gainHp(evtData.healAmount);
       }
@@ -16984,11 +16980,14 @@ var PlayerMessages = exports.PlayerMessages = {
     },
 
     'damages': function damages(evtData) {
-      if (evtData.target.getName() == 'X-Ray' || evtData.target.getName() == 'Gamma Radiation' || evtData.target.getName() == 'UV Radiation') {
+      console.log(this.getName());
+      if (this.getName() == 'X-Ray' || this.getName() == 'Gamma Radiation' || this.getName() == 'UV Radiation') {
         _message.Message.send(this.getName().toUpperCase() + " deals " + evtData.damageAmount + " damage to " + evtData.target.getName().toUpperCase());
       } //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
       else {
-          _message.Message.send(evtData.target.getName().toUpperCase() + " deals " + evtData.damageAmount / 2 + " damage to " + this.getName().toUpperCase());
+          console.log("else:");
+          console.log(evtData.damageAmount);
+          _message.Message.send(this.getName().toUpperCase() + " deals " + evtData.damageAmount + " damage to " + evtData.target.getName().toUpperCase());
         }
     },
 
@@ -17062,11 +17061,15 @@ var MeleeAttacker = exports.MeleeAttacker = {
       console.log("bumping entity for attack");
       console.log(this.getHp());
       this.raiseMixinEvent('attacks', { src: this, target: evtData.target });
-      var totalDamage = Math.round((this.getMeleeDamage() - evtData.target.getMeleeDefense() * 0.5) * 10) / 10;
-
-      evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
+      console.log("melee damage: " + this.getMeleeDamage());
+      console.log("target defense: " + evtData.target.getMeleeDefense());
+      var totalDamage = Math.round(this.getMeleeDamage() - evtData.target.getMeleeDefense() * 0.5) * 10 / 10;
+      console.log("damage to: " + evtData.target.getName());
+      console.log(totalDamage);
       if (totalDamage < 0) {
         evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
+      } else {
+        evtData.target.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
       }
       //this.raiseMixinEvent('attacks', {actor:this,target:evtData.target});
       //evtData.target.raiseMixinEvent('damaged',{src:this,damageAmount:this.getMeleeDamage()});
@@ -17076,12 +17079,51 @@ var MeleeAttacker = exports.MeleeAttacker = {
       console.log("evtData:");
       console.dir(evtData);
       this.raiseMixinEvent('attacks', { target: evtData.bumper });
-      var totalDamage = Math.round((this.getMeleeDamage() - evtData.bumper.getMeleeDefense() * 0.75) * 10) / 10;
-      evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
+      var totalDamage = Math.round(this.getMeleeDamage() - evtData.bumper.getMeleeDefense() * 0.75) * 10 / 10;
       console.log(this.getName());
 
-      if (totalDamage < 0) {
-        evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
+      if (this.getName() == 'monster') {
+        console.log("true");
+      }
+      if (this.getName() == 'X-Ray') {
+        console.log(this.getName());
+        totalDamage = totalDamage * 0.5 * evtData.bumper.getRadResist();
+        if (totalDamage < 0) {
+          evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
+        } else {
+          var rounded = Math.round(totalDamage) * 10 / 10;
+          evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: rounded });
+        }
+      }
+
+      if (this.getName() == 'UV Radiation') {
+        console.log(this.getName());
+        totalDamage = totalDamage * 0.25 * evtData.bumper.getRadResist();
+        if (totalDamage < 0) {
+          evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
+        } else {
+          var rounded1 = Math.round(totalDamage) * 10 / 10;
+          evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: rounded1 });
+        }
+      }
+
+      if (this.getName() == 'Gamma Radiation') {
+        console.log(this.getName());
+        totalDamage = totalDamage * 0.85 * evtData.bumper.getRadResist();
+        if (totalDamage < 0) {
+          evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
+        } else {
+          var rounded2 = Math.round(totalDamage) * 10 / 10;
+          evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: rounded2 });
+        }
+      } else {
+        if (totalDamage < 0) {
+          evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
+        } else {
+          evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
+          console.log("totalDamage");
+          console.log(totalDamage);
+        }
       }
     },
     'kills': function kills(evtData) {
@@ -17093,6 +17135,7 @@ var MeleeAttacker = exports.MeleeAttacker = {
         initKillDamageCounter -= 1;
         this.setMeleeDamage(this.state._MeleeAttacker.kills / 2 + 1);
         this.setMeleeDefense(Math.round((this.state._MeleeAttacker.kills / 3.5 + 1) * 10) / 10);
+        this.setRadResist(Math.round((this.state._MeleeAttacker.kills / 3.25 + 1) * 10) / 10);
       }
       console.log("Entities: ");
       console.log(Object.keys(_datastore.DATASTORE.ENTITIES));

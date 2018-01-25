@@ -183,7 +183,6 @@ export class PlayMode extends UIMode {
   render(display){
     // console.dir(DATASTORE);
     // console.dir(this);
-    console.log('play mode render');
     display.clear();
     DATASTORE.MAPS[this.state.mapId].render(display, this.state.cameramapx,this.state.cameramapy);
     // DATASTORE.MAPS[this.state.mapId].render(display, 15, 10);
