@@ -2,6 +2,7 @@ import {Color} from './colors.js';
 
 export class DisplaySymbol{
   constructor(template){
+    console.log(this);
     this._chr = template.chr || ' ';
     this._fg = template.fg || Color.FG;
     this._bg = template.bg || Color.BG;

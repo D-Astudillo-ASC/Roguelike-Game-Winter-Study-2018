@@ -213,10 +213,20 @@ let TILE_GRID_GENERATOR = {
       console.log("tile generation rng state is: ")
       console.dir(ROT.RNG.getState());
       //ROT.RNG.setSeed(12);
-      gen.randomize(.5);
-      gen.create();
-      gen.create();
-      gen.create();
+      gen.randomize(.49);
+      for(let i=3;i>=0;i--) {
+       gen.create();
+     // set the boundary to all wall each pass
+        for (let x=0;x<xdim;x++) {
+          for (let y=0;y<ydim;y++) {
+            if (x<=1 || y<=1 || x>=xdim-2 || y>=ydim-2) {
+              gen.set(x,y,1);
+            }
+          }
+        }
+      }
+
+
       gen.connect(function(x,y,isWall) {
         tg[x][y] = (isWall || x==0 || y==0 || x==xdim-1 || y==ydim-1) ? TILES.WALL : TILES.FLOOR;
       });

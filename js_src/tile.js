@@ -39,6 +39,6 @@ export class Tile extends DisplaySymbol {
 
 export let TILES = {
   NULLTILE: new Tile({name:'nulltile',chr: '!',fg:'#f0f',transparent:false,passable:false}),
-  WALL: new Tile({name:'wall',chr:'\u074f',fg:'#00f',transparent:false,passable:false}),
-  FLOOR: new Tile({name:'floor',chr:' ',transparent:true,passable:true})
+  WALL: new Tile({name:'wall',chr:'!',fg:'#0f0',transparent:false,passable:false}),
+  FLOOR: new Tile({name:'floor',chr:'.',fg:'#0f0',transparent:true,passable:true})
 }

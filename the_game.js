@@ -1361,7 +1361,7 @@ module.exports = function (target, src, safe) {
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 exports.initDataStore = initDataStore;
 //Database for all objects in the game that are used
@@ -1369,12 +1369,12 @@ exports.initDataStore = initDataStore;
 var DATASTORE = exports.DATASTORE = {};
 //clearDataStore();
 function initDataStore() {
-  exports.DATASTORE = DATASTORE = {
-    GAME: {},
-    ID_SEQ: 0,
-    MAPS: {},
-    ENTITIES: {}
-  };
+    exports.DATASTORE = DATASTORE = {
+        GAME: {},
+        ID_SEQ: 0,
+        MAPS: {},
+        ENTITIES: {}
+    };
 }
 
 /***/ }),
@@ -8585,6 +8585,7 @@ var DisplaySymbol = exports.DisplaySymbol = function () {
   function DisplaySymbol(template) {
     _classCallCheck(this, DisplaySymbol);
 
+    console.log(this);
     this._chr = template.chr || ' ';
     this._fg = template.fg || _colors.Color.FG;
     this._bg = template.bg || _colors.Color.BG;
@@ -8608,7 +8609,7 @@ var DisplaySymbol = exports.DisplaySymbol = function () {
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 exports.Entity = undefined;
 
@@ -8629,105 +8630,105 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Entity = exports.Entity = function (_MixableSymbol) {
-  _inherits(Entity, _MixableSymbol);
+    _inherits(Entity, _MixableSymbol);
 
-  function Entity(template) {
-    _classCallCheck(this, Entity);
+    function Entity(template) {
+        _classCallCheck(this, Entity);
 
-    var _this = _possibleConstructorReturn(this, (Entity.__proto__ || Object.getPrototypeOf(Entity)).call(this, template));
+        var _this = _possibleConstructorReturn(this, (Entity.__proto__ || Object.getPrototypeOf(Entity)).call(this, template));
 
-    if (!_this.state) {
-      _this.state = {};
+        if (!_this.state) {
+            _this.state = {};
+        }
+        _this.state.name = template.name;
+        _this.state.x = 0;
+        _this.state.y = 0;
+        _this.state.mapId = 0;
+        _this.state.id = (0, _util.uniqueId)();
+        return _this;
     }
-    _this.state.name = template.name;
-    _this.state.x = 0;
-    _this.state.y = 0;
-    _this.state.mapId = 0;
-    _this.state.id = (0, _util.uniqueId)();
-    return _this;
-  }
 
-  _createClass(Entity, [{
-    key: 'getId',
-    value: function getId() {
-      return this.state.id;
-    }
-  }, {
-    key: 'setId',
-    value: function setId(newId) {
-      this.state.id = newId;
-    }
-  }, {
-    key: 'getName',
-    value: function getName() {
-      return this.state.name;
-    }
-  }, {
-    key: 'setName',
-    value: function setName(newName) {
-      this.state.name = newName;
-    }
-  }, {
-    key: 'getX',
-    value: function getX() {
-      return this.state.x;
-    }
-  }, {
-    key: 'setX',
-    value: function setX(newX) {
-      this.state.x = newX;
-    }
-  }, {
-    key: 'getY',
-    value: function getY() {
-      return this.state.y;
-    }
-  }, {
-    key: 'setY',
-    value: function setY(newY) {
-      this.state.y = newY;
-    }
-  }, {
-    key: 'getPos',
-    value: function getPos() {
-      return this.state.x + ',' + this.state.y;
-    }
-  }, {
-    key: 'getMapId',
-    value: function getMapId() {
-      return this.state.mapId;
-    }
-  }, {
-    key: 'setMapId',
-    value: function setMapId(newInfo) {
-      this.state.mapId = newInfo;
-    }
-  }, {
-    key: 'getMap',
-    value: function getMap() {
-      return _datastore.DATASTORE.MAPS[this.state.mapId];
-    }
-  }, {
-    key: 'destroy',
-    value: function destroy() {
-      this.getMap().extractEntity(this);
-      console.log("Removing from datastore");
-      delete _datastore.DATASTORE.ENTITIES[this.getId()];
-      _timing.SCHEDULER.remove(this);
-    }
-  }, {
-    key: 'toJSON',
-    value: function toJSON() {
-      return JSON.stringify(this.state);
-    }
-  }, {
-    key: 'fromJSON',
-    value: function fromJSON(s) {
-      this.state = JSON.parse(s);
-    }
-  }]);
+    _createClass(Entity, [{
+        key: 'getId',
+        value: function getId() {
+            return this.state.id;
+        }
+    }, {
+        key: 'setId',
+        value: function setId(newId) {
+            this.state.id = newId;
+        }
+    }, {
+        key: 'getName',
+        value: function getName() {
+            return this.state.name;
+        }
+    }, {
+        key: 'setName',
+        value: function setName(newName) {
+            this.state.name = newName;
+        }
+    }, {
+        key: 'getX',
+        value: function getX() {
+            return this.state.x;
+        }
+    }, {
+        key: 'setX',
+        value: function setX(newX) {
+            this.state.x = newX;
+        }
+    }, {
+        key: 'getY',
+        value: function getY() {
+            return this.state.y;
+        }
+    }, {
+        key: 'setY',
+        value: function setY(newY) {
+            this.state.y = newY;
+        }
+    }, {
+        key: 'getPos',
+        value: function getPos() {
+            return this.state.x + ',' + this.state.y;
+        }
+    }, {
+        key: 'getMapId',
+        value: function getMapId() {
+            return this.state.mapId;
+        }
+    }, {
+        key: 'setMapId',
+        value: function setMapId(newInfo) {
+            this.state.mapId = newInfo;
+        }
+    }, {
+        key: 'getMap',
+        value: function getMap() {
+            return _datastore.DATASTORE.MAPS[this.state.mapId];
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this.getMap().extractEntity(this);
+            console.log("Removing from datastore");
+            delete _datastore.DATASTORE.ENTITIES[this.getId()];
+            _timing.SCHEDULER.remove(this);
+        }
+    }, {
+        key: 'toJSON',
+        value: function toJSON() {
+            return JSON.stringify(this.state);
+        }
+    }, {
+        key: 'fromJSON',
+        value: function fromJSON(s) {
+            this.state = JSON.parse(s);
+        }
+    }]);
 
-  return Entity;
+    return Entity;
 }(_mixable_symbol.MixableSymbol);
 
 /***/ }),
@@ -9823,11 +9824,6 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
     value: function enter() {
       if (!this.state.mapId) {
         this.game.setupNewGame();
-        // let m = MapMaker({xdim:300, ydim:160, mapType:'basic caves'});
-        // this.state.mapId = m.getId();
-        // m.build();
-        // this.state.cameramapx = 0;
-        // this.state.cameramapy = 0;
       }
       _timing.TIME_ENGINE.unlock();
       (0, _commands.setKeyBinding)(['play', 'movement_wasd', 'universal']);
@@ -9876,7 +9872,55 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       for (var herbCount = 0; herbCount < 5; herbCount++) {
         m.addEntityAtRandomPosition(_entity_templates.EntityFactory.create('herb'));
       }
+
+      for (var xCount = 0; xCount < 2; xCount++) {
+        m.addEntityAtRandomPosition(_entity_templates.EntityFactory.create('X-Ray'));
+      }
+
+      for (var uvCount = 0; uvCount < 2; uvCount++) {
+        m.addEntityAtRandomPosition(_entity_templates.EntityFactory.create('UV Radiation'));
+      }
+      for (var gammaCount = 0; gammaCount < 2; gammaCount++) {
+        m.addEntityAtRandomPosition(_entity_templates.EntityFactory.create('Gamma Radiation'));
+      }
     }
+
+    // startNewLevel(avatar, x, y, level) {
+    //   //initTiming();
+    //   //this._STATE = {};0
+    //   // x = 20 + x;
+    //   // y = 20 + y;
+    //   let m = MapMaker({xdim: x,ydim: y});
+    //   //m.build();
+    //   this._STATE.curMapId = m.getId();
+    //   this._STATE.cameraMapLoc = {
+    //     x: Math.round(m.getXDim()/2),
+    //     y: Math.round(m.getYDim()/2)
+    //   };
+    //   this._STATE.cameraDisplayLoc = {
+    //     x: Math.round(this.display.getOptions().width/2),
+    //     y: Math.round(this.display.getOptions().height/2)
+    //   };
+    //
+    //   //DisplaySymbol({'name': 'avatar', 'chr':'@', 'fg' '#eb4'});
+    //   //let a = EntityFactory.create('avatar');
+    //   this._STATE.avatarId = avatar.getId();
+    //   m.addEntityAtRandomPosition(avatar);
+    //   this.moveCameraToAvatar();
+    //
+    //   for(let mossCount = 0; mossCount< (5*level) ; mossCount++){
+    //     m.addEntityAtRandomPosition(EntityFactory.create('moss'));
+    //   }
+    //   for(let monsterCount = 0; monsterCount < (5*level);monsterCount++){
+    //     m.addEntityAtRandomPosition(EntityFactory.create('monster'));
+    //   }
+    //   if (level < 20){
+    //     m.addEntityAtRandomPosition(EntityFactory.create('portal'));
+    //   } else {
+    //     m.addEntityAtRandomPosition(EntityFactory.create('finish'));
+    //   }
+    // }
+
   }, {
     key: 'render',
     value: function render(display) {
@@ -9899,10 +9943,11 @@ var PlayMode = exports.PlayMode = function (_UIMode2) {
       display.drawText(1, 2, "Steps: " + a.getTime());
       display.drawText(1, 3, "Location: " + a.getX() + "," + a.getY());
       display.drawText(1, 4, "Kills: " + a.getKills());
-      display.drawText(1, 5, "HP: " + a.getHp() + "/" + a.getMaxHp());
-      display.drawText(1, 6, "Attack: " + a.getMeleeDamage());
-      display.drawText(1, 7, "Defense: " + a.getMeleeDefense());
-      display.drawText(1, 8, "Enemies Left: " + a.getEntities());
+      display.drawText(1, 6, "HP: " + a.getHp() + "/" + a.getMaxHp());
+      display.drawText(1, 7, "Attack: " + a.getMeleeDamage());
+      display.drawText(1, 8, "Defense: " + a.getMeleeDefense());
+      display.drawText(1, 9, "Rad. Resist : " + a.getRadResist());
+      display.drawText(1, 11, "Enemies Left: " + a.getEntities());
 
       if (a.getEntities() == 0) {
         this.game.switchModes('win');
@@ -10410,10 +10455,19 @@ var TILE_GRID_GENERATOR = {
     console.log("tile generation rng state is: ");
     console.dir(_rotJs2.default.RNG.getState());
     //ROT.RNG.setSeed(12);
-    gen.randomize(.5);
-    gen.create();
-    gen.create();
-    gen.create();
+    gen.randomize(.49);
+    for (var i = 3; i >= 0; i--) {
+      gen.create();
+      // set the boundary to all wall each pass
+      for (var x = 0; x < xdim; x++) {
+        for (var y = 0; y < ydim; y++) {
+          if (x <= 1 || y <= 1 || x >= xdim - 2 || y >= ydim - 2) {
+            gen.set(x, y, 1);
+          }
+        }
+      }
+    }
+
     gen.connect(function (x, y, isWall) {
       tg[x][y] = isWall || x == 0 || y == 0 || x == xdim - 1 || y == ydim - 1 ? _tile.TILES.WALL : _tile.TILES.FLOOR;
     });
@@ -10526,8 +10580,8 @@ var Tile = exports.Tile = function (_DisplaySymbol) {
 
 var TILES = exports.TILES = {
   NULLTILE: new Tile({ name: 'nulltile', chr: '!', fg: '#f0f', transparent: false, passable: false }),
-  WALL: new Tile({ name: 'wall', chr: '\u074F', fg: '#00f', transparent: false, passable: false }),
-  FLOOR: new Tile({ name: 'floor', chr: ' ', transparent: true, passable: true })
+  WALL: new Tile({ name: 'wall', chr: '!', fg: '#0f0', transparent: false, passable: false }),
+  FLOOR: new Tile({ name: 'floor', chr: '.', fg: '#0f0', transparent: true, passable: true })
 };
 
 /***/ }),
@@ -16229,7 +16283,7 @@ var Game = exports.Game = {
 
   curMode: '',
 
-  _PERSISTANCE_NAMESPACE: 'roguelikegame',
+  _PERSISTANCE_NAMESPACE: 'laststandgame',
 
   isPlaying: false,
   hasSaved: false,
@@ -16423,6 +16477,7 @@ EntityFactory.learn({
   'maxHp': 20,
   'meleeDamage': 3,
   'meleeDefense': 5,
+  'radResist': 1,
   'mixInNames': ['ActorPlayer', 'PlayerMessages', 'TimeTracker', 'EntityTracker', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker']
 });
 
@@ -16443,6 +16498,7 @@ EntityFactory.learn({
   'healingPower': 2,
   'meleeDamage': 7,
   'meleeDefense': 2,
+  'radResist': 1,
   'mixInNames': ['ActorWanderer', 'WalkerCorporeal', 'HitPoints', 'MeleeAttacker', 'PlayerMessages', 'EntityTracker']
 
 });
@@ -16450,14 +16506,54 @@ EntityFactory.learn({
 EntityFactory.learn({
   'name': 'herb',
   'chr': '^',
-  'fg': '#0f0',
+  'fg': '#660',
   'maxHp': 10,
   'healingPower': 3,
   'meleeDamage': 0,
   'meleeDefense': 4.5,
+  'radResist': 1,
   'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'HealingMixin', 'MeleeAttacker']
 
 });
+
+EntityFactory.learn({
+  'name': 'UV Radiation',
+  'chr': 'U',
+  'fg': '#5a0',
+  'maxHp': 15,
+  'meleeDamage': 8,
+  'meleeDefense': 2,
+  'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'MeleeAttacker']
+
+});
+
+EntityFactory.learn({
+  'name': 'X-Ray',
+  'chr': 'X',
+  'fg': '#ff0',
+  'maxHp': 20,
+  'meleeDamage': 12,
+  'meleeDefense': 4,
+  'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'MeleeAttacker', 'ActorWanderer', 'WalkerCorporeal']
+
+});
+
+EntityFactory.learn({
+  'name': 'Gamma Radiation',
+  'chr': 'G',
+  'fg': '#f00',
+  'maxHp': 25,
+  'meleeDamage': 16,
+  'meleeDefense': 8,
+  'mixInNames': ['HitPoints', 'PlayerMessages', 'EntityTracker', 'HealingMixin', 'MeleeAttacker']
+
+});
+// EntityFactory.learn({
+//   'name': 'gate',
+//   'chr': '{}',
+//   'fg': '#000',
+//   'mixinNames'
+// });
 
 /***/ }),
 /* 343 */
@@ -16759,23 +16855,72 @@ var HitPoints = exports.HitPoints = {
       if (this.getName() == evtData.src.getName()) {
         return;
       }
-      if (evtData.damageAmount < 0) {
-        this.loseHp(0);
-      }
-      if (evtData.damageAmount >= 0) {
-        this.loseHp(Math.round(evtData.damageAmount * 10) / 10);
-      }
+      if (evtData.src.getName() == 'X-Ray') {
+        var resistedDamage = evtData.damageAmount * 0.5 * this.getRadResist();
+        var rounded = Math.round(resistedDamage * 10) / 10;
+        console.log("rounded");
+        console.log(rounded);
+        this.loseHp(rounded); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: rounded });
 
-      console.log(evtData.src);
-      evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
-      //console.log(this);
-      if (this.getHp() <= 0) {
-        evtData.src.raiseMixinEvent('kills', { target: this });
-        console.log("destroying");
-        console.log(this);
-        this.raiseMixinEvent('killedBy', { src: evtData.src });
-        this.destroy();
-        //SCHEDULER.remove(this);
+        if (this.getHp() <= 0) {
+          evtData.src.raiseMixinEvent('kills', { target: this });
+          console.log("destroying");
+          console.log(this);
+          this.raiseMixinEvent('killedBy', { src: evtData.src });
+          this.destroy();
+          //SCHEDULER.remove(this);
+        }
+      } else if (evtData.src.getName() == 'UV Radiation') {
+        var resistedUVdamage = evtData.damageAmount * 0.25 * this.getRadResist();
+        var uvRounded = Math.round(resistedUVdamage * 10) / 10;
+        console.log("uvRounded");
+        console.log(uvRounded);
+        this.loseHp(uvRounded); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: uvRounded });
+
+        if (this.getHp() <= 0) {
+          evtData.src.raiseMixinEvent('kills', { target: this });
+          console.log("destroying");
+          console.log(this);
+          this.raiseMixinEvent('killedBy', { src: evtData.src });
+          this.destroy();
+          //SCHEDULER.remove(this);
+        }
+      } else if (evtData.src.getName() == 'Gamma Radiation') {
+        var resistedGammaDamage = evtData.damageAmount * (0.85 * this.getRadResist());
+        var gammaRounded = Math.round(resistedGammaDamage * 10) / 10;
+        console.log("gammaRounded");
+        console.log(gammaRounded);
+        this.loseHp(gammaRounded); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: gammaRounded });
+
+        if (this.getHp() <= 0) {
+          evtData.src.raiseMixinEvent('kills', { target: this });
+          console.log("destroying");
+          console.log(this);
+          this.raiseMixinEvent('killedBy', { src: evtData.src });
+          this.destroy();
+          //SCHEDULER.remove(this);
+        }
+      } else {
+        if (evtData.damageAmount < 0) {
+          this.loseHp(0);
+        }
+
+        if (evtData.damageAmount >= 0 || evtData.src.getName != 'X-Ray' || evtData.src.getName != 'UV Radiation' || evtData.src.getName != 'Gamma Radiation') {
+          this.loseHp(Math.round(evtData.damageAmount * 10) / 10);
+          evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: Math.round(evtData.damageAmount * 10) / 10 });
+        }
+        //console.log(this);
+        if (this.getHp() <= 0) {
+          evtData.src.raiseMixinEvent('kills', { target: this });
+          console.log("destroying");
+          console.log(this);
+          this.raiseMixinEvent('killedBy', { src: evtData.src });
+          this.destroy();
+          //SCHEDULER.remove(this);
+        }
       }
     },
     //{src:entity,damageAmount:entity.getMeleeDamage()}
@@ -16789,7 +16934,12 @@ var HitPoints = exports.HitPoints = {
     'heals': function heals(evtData) {
       // console.log(this.getName() + "being healed");
       // console.dir(evtData);
-      this.gainHp(evtData.healAmount);
+      if (this.getHp() > this.getMaxHp()) {
+        this.gainHp(0);
+        this.loseHp(this.getHp() - this.getMaxHp());
+      } else {
+        this.gainHp(evtData.healAmount);
+      }
     }
   }
 };
@@ -16826,7 +16976,7 @@ var PlayerMessages = exports.PlayerMessages = {
     'attacks': function attacks(evtData) {
       console.log("attacking");
       _message.Message.send(evtData.target.getName().toUpperCase() + " attacked.");
-      //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+      _message.Message.send("Entity detected, Type: " + " " + this.getName().toUpperCase() + ", " + " " + "HP: " + this.getHp() + "/" + this.getMaxHp());
     },
 
     'heals': function heals(evtData) {
@@ -16834,14 +16984,19 @@ var PlayerMessages = exports.PlayerMessages = {
     },
 
     'damages': function damages(evtData) {
-      console.log("evtData:");
-      console.dir(evtData);
-      _message.Message.send(this.getName() + " deals " + evtData.damageAmount + " damage to " + evtData.target.getName());
-      //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+      if (evtData.target.getName() == 'X-Ray' || evtData.target.getName() == 'Gamma Radiation' || evtData.target.getName() == 'UV Radiation') {
+        _message.Message.send(this.getName().toUpperCase() + " deals " + evtData.damageAmount + " damage to " + evtData.target.getName().toUpperCase());
+      } //Message.send("Entity detected, Type: " + " " + evtData.target.getName().toUpperCase() + ", " + " " + "HP: " + evtData.target.getHp() + "/" + evtData.target.getMaxHp());
+      else {
+          _message.Message.send(evtData.target.getName().toUpperCase() + " deals " + evtData.damageAmount / 2 + " damage to " + this.getName().toUpperCase());
+        }
     },
 
     'damaged': function damaged(evtData) {
-      _message.Message.send(evtData.src.getName() + " deals " + evtData.damageAmount + " damage to " + this.getName());
+      //Message.send(evtData.src.getName().toUpperCase( )+ " deals " + evtData.damageAmount + " damage to " + this.getName().toUpperCase());
+      // if(evtData.src.getName() == "X-Ray"){
+      //     Message.send(evtData.src.getName().toUpperCase( )+ " deals " + evtData.damageAmount + " damage to " + this.getName().toUpperCase());
+      // }
       //Message.send("Entity detected, Type: " + " " + evtData.src.getName().toUpperCase() + ", " + " " + "HP: " + evtData.src.getHp() + "/" + evtData.src.getMaxHp());
     },
 
@@ -16868,12 +17023,14 @@ var MeleeAttacker = exports.MeleeAttacker = {
     stateModel: {
       meleeDamage: 0,
       meleeDefense: 0,
+      radResist: 0,
       kills: 0
     },
 
     initialize: function initialize(template) {
       this.state._MeleeAttacker.meleeDamage = template.meleeDamage || this.state._MeleeAttacker.meleeDamage;
       this.state._MeleeAttacker.meleeDefense = template.meleeDefense || this.state._MeleeAttacker.meleeDefense;
+      this.state._MeleeAttacker.radResist = template.radResist || this.state._MeleeAttacker.radResist;
     }
   },
   METHODS: {
@@ -16889,6 +17046,12 @@ var MeleeAttacker = exports.MeleeAttacker = {
     },
     setMeleeDefense: function setMeleeDefense(newVal) {
       this.state._MeleeAttacker.meleeDefense = newVal;
+    },
+    getRadResist: function getRadResist() {
+      return this.state._MeleeAttacker.radResist;
+    },
+    setRadResist: function setRadResist(newVal) {
+      this.state._MeleeAttacker.radResist = newVal;
     },
     getKills: function getKills() {
       return this.state._MeleeAttacker.kills;
@@ -16910,10 +17073,13 @@ var MeleeAttacker = exports.MeleeAttacker = {
     },
 
     'bumpedBy': function bumpedBy(evtData) {
-
+      console.log("evtData:");
+      console.dir(evtData);
       this.raiseMixinEvent('attacks', { target: evtData.bumper });
       var totalDamage = Math.round((this.getMeleeDamage() - evtData.bumper.getMeleeDefense() * 0.75) * 10) / 10;
       evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: totalDamage });
+      console.log(this.getName());
+
       if (totalDamage < 0) {
         evtData.bumper.raiseMixinEvent('damaged', { src: this, damageAmount: 0 });
       }

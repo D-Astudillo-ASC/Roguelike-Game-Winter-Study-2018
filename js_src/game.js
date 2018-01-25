@@ -42,7 +42,7 @@ export let Game = {
 
    curMode:'',
 
-   _PERSISTANCE_NAMESPACE: 'roguelikegame',
+   _PERSISTANCE_NAMESPACE: 'laststandgame',
 
    isPlaying: false,
    hasSaved: false,

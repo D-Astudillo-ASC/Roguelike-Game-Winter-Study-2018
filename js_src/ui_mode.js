@@ -130,7 +130,56 @@ export class PlayMode extends UIMode {
     for(let herbCount = 0; herbCount < 5;herbCount++){
       m.addEntityAtRandomPosition(EntityFactory.create('herb'));
     }
+
+    for(let xCount = 0; xCount < 2; xCount++){
+      m.addEntityAtRandomPosition(EntityFactory.create('X-Ray'));
+    }
+
+    for(let uvCount = 0; uvCount < 2; uvCount++){
+      m.addEntityAtRandomPosition(EntityFactory.create('UV Radiation'));
+    }
+    for(let gammaCount = 0; gammaCount < 2; gammaCount++){
+      m.addEntityAtRandomPosition(EntityFactory.create('Gamma Radiation'));
+    }
+
   }
+
+  // startNewLevel(avatar, x, y, level) {
+  //   //initTiming();
+  //   //this._STATE = {};0
+  //   // x = 20 + x;
+  //   // y = 20 + y;
+  //   let m = MapMaker({xdim: x,ydim: y});
+  //   //m.build();
+  //   this._STATE.curMapId = m.getId();
+  //   this._STATE.cameraMapLoc = {
+  //     x: Math.round(m.getXDim()/2),
+  //     y: Math.round(m.getYDim()/2)
+  //   };
+  //   this._STATE.cameraDisplayLoc = {
+  //     x: Math.round(this.display.getOptions().width/2),
+  //     y: Math.round(this.display.getOptions().height/2)
+  //   };
+  //
+  //   //DisplaySymbol({'name': 'avatar', 'chr':'@', 'fg' '#eb4'});
+  //   //let a = EntityFactory.create('avatar');
+  //   this._STATE.avatarId = avatar.getId();
+  //   m.addEntityAtRandomPosition(avatar);
+  //   this.moveCameraToAvatar();
+  //
+  //   for(let mossCount = 0; mossCount< (5*level) ; mossCount++){
+  //     m.addEntityAtRandomPosition(EntityFactory.create('moss'));
+  //   }
+  //   for(let monsterCount = 0; monsterCount < (5*level);monsterCount++){
+  //     m.addEntityAtRandomPosition(EntityFactory.create('monster'));
+  //   }
+  //   if (level < 20){
+  //     m.addEntityAtRandomPosition(EntityFactory.create('portal'));
+  //   } else {
+  //     m.addEntityAtRandomPosition(EntityFactory.create('finish'));
+  //   }
+  // }
+
   render(display){
     // console.dir(DATASTORE);
     // console.dir(this);
@@ -150,10 +199,11 @@ export class PlayMode extends UIMode {
     display.drawText(1,2,"Steps: "+ a.getTime());
     display.drawText(1,3,"Location: "+ a.getX() + "," + a.getY());
     display.drawText(1,4,"Kills: "+ a.getKills());
-    display.drawText(1,5,"HP: "+ a.getHp() + "/" + a.getMaxHp());
-    display.drawText(1,6,"Attack: "+ a.getMeleeDamage());
-    display.drawText(1,7,"Defense: "+ a.getMeleeDefense());
-    display.drawText(1,8,"Enemies Left: " +a.getEntities());
+    display.drawText(1,6,"HP: "+ a.getHp() + "/" + a.getMaxHp());
+    display.drawText(1,7,"Attack: "+ a.getMeleeDamage());
+    display.drawText(1,8,"Defense: "+ a.getMeleeDefense());
+    display.drawText(1,9,"Rad. Resist : "+ a.getRadResist());
+    display.drawText(1,11,"Enemies Left: " +a.getEntities());
 
     if(a.getEntities() == 0){
       this.game.switchModes('win');
