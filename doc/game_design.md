@@ -1,8 +1,8 @@
-# Design Doc for Weed Strike
+# Design Doc for The Last Stand
 
 ### Goals
 
-Weed Strike is a fairly standard, simple roguelike. As such, the player gets
+The Last Stand is a fairly standard, simple roguelike. As such, the player gets
 * character advancement/progression (on the mechanics side of things, not necessarily the story side)
   * some opponents that are too challenging to fight in the early stages of the game are easy to beat by the later stages of the game
 * inventory management
@@ -13,22 +13,16 @@ Weed Strike is a fairly standard, simple roguelike. As such, the player gets
 * a simple framing story to engage the player and justify the avatar actions, but nothing to deep and little in the way of narrative progression
 * a final battle/goal
 * other standard roguelike experiences (permadeath, turn-based action, etc.)
-  
+
 ### Story
 
-The national arboretum has been enspelled by a particularly mischievous fairy. The plants have come alive and taken over the entire area, the creatures have gone strange and dangerous, and generally everything is a mess. The head gardener went in two months ago. The assistant gardener 6 weeks ago. The assistant to the assistant 3 weeks ago. The royal court has since issued a proclamation calling for any landscaper/adventurer to come set things aright, and of course be suitably rewarded upon success. Hearing this, you leave behind your little kitchen garden in the small village where you grew up and leave with nothing but the clothes on your back, and bit of travel food, and your trusty trowel to seek your fortune.
+Decades of nuclear conflict have rendered the surface uninhabitable, mostly condemned to permanent desolation. There were a few brave souls, determined to endure their irradiated surroundings and resist the Underground, who continued to lead their lives on the surface, until they could bear no longer; the effects of several years worth of exposure to fatal levels of radiation were unexpectedly brought upon the population. Within days, the bodies of the most stubborn survivors disintegrated; they dissolved away, along with their "protective" gear, and were lost forever. Meanwhile, the Underground has started to sustain considerable damage from corrosive radiation seeping down from the surface, rapidly approaching a state of chaos that resembles the surfaces. Within weeks, you lose your immediate family, your home, and are forced to venture beyond the walls of the Bunker. From here, your journey takes off, and you hear of a hidden location on the surface that is considered a haven for survivors; you become determined to search for the map all throughout the Underground, encountering mutants, disease, and radiation, dodging death with every step. At the moment, the only thing on your mind is survival......       
 
-1. find and rescue the missing people
-  * head gardener
-  * assistant gardener
-  * assistant to the assistant gardener
-  * anyone else encountered that needs it
-1. find the fairy
-1. get the fairy to put things back to normal
-  * defeat it in combat
-  * convince it
-  * bribe it / trade it
-  * solve its problems
 
+### Main Objectives
+
+1. Find the hidden map in the Underground
+2. Fight all adversaries, overcome all obstacles to complete your objective.
+3. Follow the Map to freedom and a clearer future.
+4. SURVIVE!
 ### Mechanics
-
