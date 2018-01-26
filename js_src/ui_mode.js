@@ -100,11 +100,13 @@ export class PlayMode extends UIMode {
   }
 
   setupNewGame(){
+    //SCHEDULER.clear();
     console.log("play mode set up new game");
     initTiming();
     initDataStore();
     DATASTORE.GAME = this.game;
-    let m = MapMaker({xdim:25, ydim:25});
+    //DATASTORE.LEVEL = this.state.level;
+    let m = MapMaker({xdim:70, ydim:70});
     this.state.mapId = m.getId();
     Message.send("Building map....");
     this.game.renderMessage();
@@ -116,7 +118,6 @@ export class PlayMode extends UIMode {
     console.log('about to call add entity');
     m.addEntityAtRandomPosition(a);
     this.moveCameraToAvatar();
-
     console.log("datastore post game setup");
     console.dir(DATASTORE);
 
@@ -242,8 +243,6 @@ export class PlayMode extends UIMode {
     if(this.getAvatar().tryWalk(dx,dy))
     {
       this.moveCameraToAvatar();
-      //this.getAvatar().addTime(1);
-      // return true;
     }
 
     else if(!this.getAvatar()){
@@ -252,10 +251,6 @@ export class PlayMode extends UIMode {
 
     this.game.render();
     return true;
-    //this.state.cameramapx += dx;
-    //this.state.cameramapy += dy;
-    // DATASTORE.CAMERA_X = this.state.cameramapx;
-    // DATASTORE.CAMERA_Y = this.state.cameramapy;
   }
 
   moveCameraToAvatar(){

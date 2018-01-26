@@ -7,6 +7,7 @@ export function initDataStore(){
     GAME: {},
     ID_SEQ: 0,
     MAPS: {},
-    ENTITIES: {}
+    ENTITIES: {},
+    //LEVEL: {}
   }
 }

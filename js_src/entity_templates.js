@@ -33,7 +33,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'healingPower': 2,
     'meleeDamage': 7,
     'meleeDefense': 2,
-    'radResist': 1,
+    'radResist': 5,
     'mixInNames':['ActorWanderer','WalkerCorporeal','HitPoints','MeleeAttacker','PlayerMessages','EntityTracker']
 
   });
@@ -45,8 +45,8 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'maxHp': 10,
     'healingPower': 3,
     'meleeDamage': 0,
-    'meleeDefense': 4.5,
-    'radResist': 1,
+    'meleeDefense': 6.5,
+    'radResist': 10,
     'mixInNames': ['HitPoints','PlayerMessages','EntityTracker','HealingMixin','MeleeAttacker']
 
   });
@@ -56,7 +56,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'chr': 'U',
     'fg': '#5a0',
     'maxHp': 15,
-    'meleeDamage': 8,
+    'meleeDamage': 6,
     'meleeDefense': 2,
     'mixInNames': ['HitPoints','PlayerMessages','EntityTracker','MeleeAttacker']
 
@@ -66,7 +66,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'name': 'X-Ray',
     'chr': 'X',
     'fg': '#ff0',
-    'maxHp':20,
+    'maxHp':15,
     'meleeDamage': 12,
     'meleeDefense': 2,
     'mixInNames': ['HitPoints','PlayerMessages','EntityTracker','MeleeAttacker','ActorWanderer','WalkerCorporeal']
@@ -80,7 +80,7 @@ export let EntityFactory = new Factory(Entity,'ENTITIES');
     'maxHp': 25,
     'meleeDamage': 16,
     'meleeDefense': 8,
-    'mixInNames': ['HitPoints','PlayerMessages','EntityTracker','HealingMixin','MeleeAttacker']
+    'mixInNames': ['HitPoints','PlayerMessages','EntityTracker','MeleeAttacker']
 
   });
   // EntityFactory.learn({
