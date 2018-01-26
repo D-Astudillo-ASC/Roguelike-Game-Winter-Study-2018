@@ -53,8 +53,10 @@ export class StartupMode extends UIMode {
   }
 
   render(){
-  this.display.drawText(2,2, "Welcome!");
-  this.display.drawText(2,4,"Press any key to continue");
+  this.display.drawText(30,4,"The");
+  this.display.drawText(30,5,"Last");
+  this.display.drawText(30,6,"Stand!!");
+  this.display.drawText(24,13,"Press any key to continue");
   }
 
   handleInput(inputType, inputData){
@@ -274,7 +276,12 @@ export class WinMode extends UIMode {
 
   render(display){
     display.clear();
-    display.drawText(2,2,"Victory!!!");
+    display.drawText(4,4,"Well done, you've managed to survive....");
+    display.drawText(4,7,"For now at least........");
+
+    display.drawText(4,9,"Additional levels and other features will be added in the future");
+    display.drawText(4,10,"Thanks for playing! Refresh to play again!");
+
   }
 
   handleInput(eventType,evt)
@@ -290,7 +297,11 @@ export class WinMode extends UIMode {
 export class LoseMode extends UIMode {
   render(display){
     display.clear();
-    display.drawText(2,2,"You lose!");
+    display.drawText(4,4,"You have died....");
+    display.drawText(4,7,"The Human Race is in peril........");
+
+    display.drawText(4,10,"Additional levels and other features will be added in the near future.");
+    display.drawText(4,11,"Thanks for playing! Refresh to play again!");
   }
 
   handleInput(eventType,evt)
@@ -313,14 +324,22 @@ export class PersistenceMode extends UIMode {
   }
   render(){
     this.display.clear();
-    this.display.drawText(2,3,"N for New Game");
+    this.display.drawText(4,2,"It's the year 2050. Nuclear annihilation has claimed most of the");
+    this.display.drawText(4,3,"human population on Earth. 97% of the surface has been irradiated");
+    this.display.drawText(4,4,"and rendered uninhabitable. Remnants of civilization barely persist.");
+    this.display.drawText(4,5,"A new world has emerged in the Underground, known as the Bunker.");
+    this.display.drawText(4,6,"The remaining members of the human race are contained within.");
+    this.display.drawText(4,7,"However, radiation from the surface has started to seep through.");
+    this.display.drawText(4,8,"Mutants have infiltrated the Bunker, but you must survive!");
+
+    this.display.drawText(8,13,"N for New Game");
     if(this.game.isPlaying){
-      this.display.drawText(2,4,"S to Save Game");
-      this.display.drawText(2,6,"Escape to return to game")
+      this.display.drawText(8,14,"S to Save Game");
+      this.display.drawText(8,16,"Escape to return to game")
     }
 
     if(this.game.hasSaved){
-      this.display.drawText(2,5,"L to Load Game");
+      this.display.drawText(8,15,"L to Load Game");
     }
   }
 

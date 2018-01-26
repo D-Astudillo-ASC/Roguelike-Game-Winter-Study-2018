@@ -9782,8 +9782,10 @@ var StartupMode = exports.StartupMode = function (_UIMode) {
   }, {
     key: 'render',
     value: function render() {
-      this.display.drawText(2, 2, "Welcome!");
-      this.display.drawText(2, 4, "Press any key to continue");
+      this.display.drawText(30, 4, "The");
+      this.display.drawText(30, 5, "Last");
+      this.display.drawText(30, 6, "Stand!!");
+      this.display.drawText(24, 13, "Press any key to continue");
     }
   }, {
     key: 'handleInput',
@@ -10018,7 +10020,11 @@ var WinMode = exports.WinMode = function (_UIMode3) {
     key: 'render',
     value: function render(display) {
       display.clear();
-      display.drawText(2, 2, "Victory!!!");
+      display.drawText(4, 4, "Well done, you've managed to survive....");
+      display.drawText(4, 7, "For now at least........");
+
+      display.drawText(4, 9, "Additional levels and other features will be added in the future");
+      display.drawText(4, 10, "Thanks for playing! Refresh to play again!");
     }
   }, {
     key: 'handleInput',
@@ -10046,7 +10052,11 @@ var LoseMode = exports.LoseMode = function (_UIMode4) {
     key: 'render',
     value: function render(display) {
       display.clear();
-      display.drawText(2, 2, "You lose!");
+      display.drawText(4, 4, "You have died....");
+      display.drawText(4, 7, "The Human Race is in peril........");
+
+      display.drawText(4, 10, "Additional levels and other features will be added in the near future.");
+      display.drawText(4, 11, "Thanks for playing! Refresh to play again!");
     }
   }, {
     key: 'handleInput',
@@ -10083,14 +10093,22 @@ var PersistenceMode = exports.PersistenceMode = function (_UIMode5) {
     key: 'render',
     value: function render() {
       this.display.clear();
-      this.display.drawText(2, 3, "N for New Game");
+      this.display.drawText(4, 2, "It's the year 2050. Nuclear annihilation has claimed most of the");
+      this.display.drawText(4, 3, "human population on Earth. 97% of the surface has been irradiated");
+      this.display.drawText(4, 4, "and rendered uninhabitable. Remnants of civilization barely persist.");
+      this.display.drawText(4, 5, "A new world has emerged in the Underground, known as the Bunker.");
+      this.display.drawText(4, 6, "The remaining members of the human race are contained within.");
+      this.display.drawText(4, 7, "However, radiation from the surface has started to seep through.");
+      this.display.drawText(4, 8, "Mutants have infiltrated the Bunker, but you must survive!");
+
+      this.display.drawText(8, 13, "N for New Game");
       if (this.game.isPlaying) {
-        this.display.drawText(2, 4, "S to Save Game");
-        this.display.drawText(2, 6, "Escape to return to game");
+        this.display.drawText(8, 14, "S to Save Game");
+        this.display.drawText(8, 16, "Escape to return to game");
       }
 
       if (this.game.hasSaved) {
-        this.display.drawText(2, 5, "L to Load Game");
+        this.display.drawText(8, 15, "L to Load Game");
       }
     }
   }, {
@@ -16719,16 +16737,8 @@ var EntityTracker = exports.EntityTracker = {
       var newY = this.state.y * 1 + dy * 1;
       var targetPositionInfo = this.getMap().getTargetPositionInfo(newX, newY);
       if (targetPositionInfo.entity) {
-        // console.log(targetPositionInfo.entity);
         this.raiseMixinEvent('bumpEntity', { target: targetPositionInfo.entity });
         targetPositionInfo.entity.raiseMixinEvent('bumpedBy', { bumper: this });
-        //   if(target == "^"){
-        //   //      console.log("Hitting herb");
-        //   //      console.log(this.getName());
-        //   this.raiseMixinEvent('heals',{target:this,healAmount:5});
-        //   this.raiseMixinEvent('damaged',{src:targetPositionInfo.entity,damageAmount:9});
-        //
-        // }
         return false;
       } else if (targetPositionInfo.tile.isImpassable()) {
         this.raiseMixinEvent('walkBlocked', { reason: "there's a wall in the way" });
@@ -16848,14 +16858,23 @@ var HitPoints = exports.HitPoints = {
         return;
       }
       if (evtData.src.getName() == "X-Ray") {
-        console.log("evtData.damageAmount for X-Ray:");
-
-        console.log(evtData.damageAmount);
-        console.log("evtData.src: ");
-        console.log(evtData.src);
 
         this.loseHp(evtData.damageAmount); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
         evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
+
+        if (this.getHp() <= 0) {
+          evtData.src.raiseMixinEvent('kills', { target: this });
+          this.raiseMixinEvent('killedBy', { src: evtData.src });
+          this.destroy();
+          //SCHEDULER.remove(this);
+        }
+      }
+
+      if (evtData.src.getName() == "UV Radiation") {
+        this.loseHp(evtData.damageAmount); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
+        //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        //evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: gammaRounded});
 
         if (this.getHp() <= 0) {
           evtData.src.raiseMixinEvent('kills', { target: this });
@@ -16866,60 +16885,41 @@ var HitPoints = exports.HitPoints = {
           //SCHEDULER.remove(this);
         }
       }
-      //
-      // if(evtData.src.getName() == "UV Radiation"){
-      //   this.loseHp(evtData.damageAmount);     //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
-      //   evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: evtData.damageAmount});
-      //   //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
-      //   //evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: gammaRounded});
-      //
-      //   if(this.getHp() <= 0){
-      //     evtData.src.raiseMixinEvent('kills',{target:this});
-      //     console.log("destroying");
-      //     console.log(this);
-      //     this.raiseMixinEvent('killedBy',{src:evtData.src});
-      //     this.destroy();
-      //    //SCHEDULER.remove(this);
-      //    }
-      //  }
-      //
-      //  if(evtData.src.getName() == "Gamma Radiation"){
-      //    this.loseHp(evtData.damageAmount);     //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
-      //    evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: evtData.damageAmount});
-      //    //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
-      //    //evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: gammaRounded});
-      //
-      //    if(this.getHp() <= 0){
-      //      evtData.src.raiseMixinEvent('kills',{target:this});
-      //      console.log("destroying");
-      //      console.log(this);
-      //      this.raiseMixinEvent('killedBy',{src:evtData.src});
-      //      this.destroy();
-      //    //SCHEDULER.remove(this);
-      //    }
-      // }
 
+      if (evtData.src.getName() == "Gamma Radiation") {
+        this.loseHp(evtData.damageAmount); //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        evtData.src.raiseMixinEvent('damages', { target: this, damageAmount: evtData.damageAmount });
+        //(Math.round(evtData.damageAmount * 10)/10) *(0.5 * this.getRadResist()));
+        //evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: gammaRounded});
 
-      else {
-          if (evtData.damageAmount < 0) {
-            this.loseHp(0);
-          } else {
-            if (evtData.src.getName() != "X-Ray" || evtData.src.getName() != "UV Radiation" || evtData.src.getName() != "Gamma Radiation") {
-              console.log("this is happening");
-              this.loseHp(Math.round(evtData.damageAmount * 10) / 10);
-              //evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: Math.round(evtData.damageAmount * 10)/10});
-            }
-          }
-          //console.log(this);
-          if (this.getHp() <= 0) {
-            evtData.src.raiseMixinEvent('kills', { target: this });
-            console.log("destroying");
-            console.log(this);
-            this.raiseMixinEvent('killedBy', { src: evtData.src });
-            this.destroy();
-            //SCHEDULER.remove(this);
+        if (this.getHp() <= 0) {
+          evtData.src.raiseMixinEvent('kills', { target: this });
+          console.log("destroying");
+          console.log(this);
+          this.raiseMixinEvent('killedBy', { src: evtData.src });
+          this.destroy();
+          //SCHEDULER.remove(this);
+        }
+      } else {
+        if (evtData.damageAmount < 0) {
+          this.loseHp(0);
+        } else {
+          if (evtData.src.getName() != "X-Ray" || evtData.src.getName() != "UV Radiation" || evtData.src.getName() != "Gamma Radiation") {
+            console.log("this is happening");
+            this.loseHp(Math.round(evtData.damageAmount * 10) / 10);
+            //evtData.src.raiseMixinEvent('damages',{target:this,damageAmount: Math.round(evtData.damageAmount * 10)/10});
           }
         }
+        //console.log(this);
+        if (this.getHp() <= 0) {
+          evtData.src.raiseMixinEvent('kills', { target: this });
+          console.log("destroying");
+          console.log(this);
+          this.raiseMixinEvent('killedBy', { src: evtData.src });
+          this.destroy();
+          //SCHEDULER.remove(this);
+        }
+      }
     },
     //{src:entity,damageAmount:entity.getMeleeDamage()}
     // 'damages':function(evtData){
