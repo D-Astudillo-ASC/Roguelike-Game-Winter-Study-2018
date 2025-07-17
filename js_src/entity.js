@@ -50,7 +50,7 @@ export class Entity extends MixableSymbol {
   getX() {
     // Additional debugging for monsters
     if (this.name === "monster") {
-      console.log(`MONSTER getX: ${this.name} (${this.getId()}) returning: ${this.state.x}`);
+      // console.log(`MONSTER getX: ${this.name} (${this.getId()}) returning: ${this.state.x}`);
     }
     return this.state.x;
   }
