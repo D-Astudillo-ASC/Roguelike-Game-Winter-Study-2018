@@ -11,7 +11,7 @@ class Map {
     this.state.ydim = ydim || 1;
     this.state.mapType = mapType || "basic caves";
     this.state.setupRngState = RNG.getState();
-    this.state.id = uniqueId("map- " + this.state.mapType);
+    this.state.id = uniqueId("map-" + this.state.mapType.replace(/\s+/g, "-"));
     this.state.entityIdToMapPos = {};
     this.state.mapPosToEntityId = {};
           // console.dir(this);
@@ -471,7 +471,7 @@ export function MapMaker(mapData) {
   }
 
   if (mapData.setupRngState) {
-    m.setId(mapData.setupRngState);
+    m.setRngState(mapData.setupRngState);
   }
 
   DATASTORE.MAPS[m.getId()] = m;

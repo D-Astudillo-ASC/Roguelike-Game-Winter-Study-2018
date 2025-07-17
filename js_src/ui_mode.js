@@ -131,15 +131,18 @@ export class PlayMode extends BaseUIMode {
     this.movementDelay = 100;
   }
   enter() {
+    console.log("PlayMode.enter() called");
     // Clear any pressed keys when entering play mode
     this.pressedKeys.clear();
     
     if (!this.state.avatarId || !DATASTORE.ENTITIES[this.state.avatarId]) {
-      this.showMessage("Invalid save data - missing avatar. Please start a new game.");
+      console.log("No avatar found in enter(), switching to persistence");
+      this.showMessage("No game in progress. Please start a new game.");
       this.game.switchModes("persistence");
       return;
     }
     if (!this.state.mapId || !DATASTORE.MAPS[this.state.mapId]) {
+      console.log("No map found in enter(), switching to persistence");
       this.showMessage("Invalid save data - missing map. Please start a new game.");
       this.game.switchModes("persistence");
       return;
@@ -157,12 +160,22 @@ export class PlayMode extends BaseUIMode {
     TIME_ENGINE.unlock();
     this.cameraSymbol = new DisplaySymbol("@", "#eb4");
     this.startMovementTimer();
+    
+    // Set up player death listener
+    console.log("About to call setupPlayerDeathListener in enter()");
+    this.setupPlayerDeathListener();
   }
   exit() {
     this.stopMovementTimer();
     this.pressedKeys.clear();
   }
   startMovementTimer() {
+    // Don't start multiple timers
+    if (this.movementTimer) {
+      console.log("Movement timer already running, not starting another");
+      return;
+    }
+    console.log("Starting movement timer with delay:", this.movementDelay);
     this.movementTimer = setInterval(() => {
       this.processContinuousMovement();
     }, this.movementDelay);
@@ -187,6 +200,16 @@ export class PlayMode extends BaseUIMode {
   toJSON() { return JSON.stringify(this.state); }
   restoreFromState(stateData) { this.state = JSON.parse(stateData); }
   setupNewGame() {
+    console.log("setupNewGame() called");
+    
+    // Clear any existing game data first
+    console.log("Clearing existing game data before starting new game");
+    clearDataStore();
+    
+    // Reset the game state
+    this.state = { mapId: "", cameramapx: 0, cameramapy: 0 };
+    this.state.avatarId = null;
+    
     // Use the same dimensions as the main display to fill the whole screen
     const mapWidth = Math.floor(window.innerWidth / 8);
     const mapHeight = Math.floor(window.innerHeight / 16);
@@ -199,6 +222,7 @@ export class PlayMode extends BaseUIMode {
     // Create and place the avatar first
     const a = EntityFactory.create("avatar");
     this.state.avatarId = a.getId();
+    console.log("Avatar created with ID:", this.state.avatarId);
     m.addEntityAtRandomPosition(a);
     
     // Position camera on the avatar immediately
@@ -209,10 +233,15 @@ export class PlayMode extends BaseUIMode {
       m.addEntityAtRandomPosition(EntityFactory.create("moss"));
     }
     for (let monsterCount = 0; monsterCount < 1; monsterCount++) {
-      m.addEntityAtRandomPosition(EntityFactory.create("monster"));
+      const monster = EntityFactory.create("monster");
+      console.log("Created monster with ID:", monster.getId());
+      m.addEntityAtRandomPosition(monster);
+      console.log("Monster assigned to map:", monster.getMapId());
+      console.log("Available maps:", Object.keys(DATASTORE.MAPS));
     }
     
     setTimeout(() => {
+      console.log("setupNewGame timeout - switching to play mode");
       Message.clear();
       this.game.renderMessage();
       this.game.switchModes("play");
@@ -277,7 +306,10 @@ export class PlayMode extends BaseUIMode {
     return false;
   }
   moveAvatar(dx, dy) {
-    if (this.getAvatar().tryWalk(dx, dy)) {
+    const avatar = this.getAvatar();
+    if (!avatar) return false;
+    
+    if (avatar.tryWalk(dx, dy)) {
       this.moveCameraToAvatar();
       return true;
     }
@@ -296,9 +328,43 @@ export class PlayMode extends BaseUIMode {
   }
   getAvatar() {
     if (!this.state.avatarId || !DATASTORE.ENTITIES[this.state.avatarId]) {
+      console.log("getAvatar() called but no valid avatar found. avatarId:", this.state.avatarId, "entities:", Object.keys(DATASTORE.ENTITIES));
       return null;
     }
     return DATASTORE.ENTITIES[this.state.avatarId];
+  }
+  
+  setupPlayerDeathListener() {
+    const avatar = this.getAvatar();
+    console.log("setupPlayerDeathListener called, avatar:", avatar ? avatar.name : "null");
+    if (avatar) {
+      // Add a listener for the playerKilled event
+      avatar.playerKilledListener = this.handlePlayerKilled.bind(this);
+      console.log("Player death listener set up for avatar:", avatar.name);
+    } else {
+      console.log("No avatar found for death listener setup - this is normal when starting fresh");
+    }
+  }
+  
+  handlePlayerKilled() {
+    console.log("handlePlayerKilled called - switching to lose mode");
+    
+    // Stop movement timer to prevent further input
+    this.stopMovementTimer();
+    
+    // Small delay to ensure all current operations complete
+    setTimeout(() => {
+      // Clear all game data
+      console.log("Clearing all game data after player death");
+      clearDataStore();
+      
+      // Reset the game state
+      this.state = { mapId: "", cameramapx: 0, cameramapy: 0 };
+      this.state.avatarId = null;
+      
+      // Switch to lose mode
+      this.game.switchModes("lose");
+    }, 10);
   }
 }
 
@@ -405,10 +471,11 @@ export class LoseMode extends BaseUIMode {
   render(display) {
     display.clear();
     display.drawText(2, 2, "Game Over");
+    display.drawText(2, 4, "Press Escape to return to start screen");
   }
   handleInput(eventType, evt) {
     if (evt.key == "Escape") {
-      this.game.switchModes("play");
+      this.game.switchModes("startup");
       return true;
     }
   }

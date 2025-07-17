@@ -8,6 +8,7 @@ EntityFactory.learn({
   chr: "@",
   fg: "#eb4",
   maxHp: 10,
+  meleeDamage: 3,
   mixInNames: [
     "ActorPlayer",
     "PlayerMessages",
@@ -23,6 +24,7 @@ EntityFactory.learn({
   chr: "*",
   fg: "#3d5",
   maxHp: 5,
+  meleeDamage: 1,
   mixInNames: ["MeleeAttacker", "HitPoints"],
 });
 
@@ -31,5 +33,15 @@ EntityFactory.learn({
   chr: "&",
   fg: "#d63",
   maxHp: 50,
-  mixInNames: ["ActorWanderer", "WalkerCorporeal", "HitPoints", "SmartMonsterAI"],
+  meleeDamage: 5,
+  mixInNames: ["ActorWanderer", "WalkerCorporeal", "HitPoints", "SmartMonsterAI", "MeleeAttacker", "PlayerMessages"],
+});
+
+EntityFactory.learn({
+  name: "balanced_monster",
+  chr: "M",
+  fg: "#d63",
+  maxHp: 30,
+  meleeDamage: 3,
+  mixInNames: ["ActorWanderer", "WalkerCorporeal", "HitPoints", "BalancedMonsterAI", "MeleeAttacker", "PlayerMessages"],
 });

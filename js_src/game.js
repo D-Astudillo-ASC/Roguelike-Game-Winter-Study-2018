@@ -85,11 +85,12 @@ export const Game = {
   },
 
   setupNewGame: function () {
-    // console.log("game.setupNewGame has been called");
+    console.log("Game.setupNewGame() called");
     this._randomSeed = 5 + Math.floor(Math.random() * 100000);
     //this._randomSeed = 76250;
-    // console.log("using random seed " + this._randomSeed);
+    console.log("Using random seed " + this._randomSeed);
     RNG.setSeed(this._randomSeed);
+    console.log("About to call PlayMode.setupNewGame()");
     this.modes.play.setupNewGame();
   },
 
@@ -111,15 +112,18 @@ export const Game = {
   },
 
   switchModes: function (newModeName) {
+    console.log("Game.switchModes() called: switching from", this.curModeName, "to", newModeName);
     // Stop movement timer if leaving play mode
     if (this.curModeName === "play" && this.curMode && this.curMode.stopMovementTimer) {
       this.curMode.stopMovementTimer();
     }
     this.curMode = this.modes[newModeName];
     this.curModeName = newModeName;
-    // Start movement timer if entering play mode
-    if (newModeName === "play" && this.curMode.startMovementTimer) {
-      this.curMode.startMovementTimer();
+    
+    // Call enter() method if it exists
+    if (this.curMode && this.curMode.enter) {
+      console.log("Calling enter() method for", newModeName, "mode");
+      this.curMode.enter();
     }
     this.render();
   },

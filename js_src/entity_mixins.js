@@ -80,7 +80,8 @@ export const WalkerCorporeal = {
       );
       // console.log(targetPositionInfo.entity);
       if (targetPositionInfo.entity) {
-        // console.log(targetPositionInfo.entity);
+        console.log("WalkerCorporeal: Entity detected at target position:", targetPositionInfo.entity.name);
+        console.log("Raising bumpEntity event from:", this.name, "to:", targetPositionInfo.entity.name);
         this.raiseMixinEvent("bumpEntity", {
           actor: this,
           target: targetPositionInfo.entity,
@@ -107,6 +108,8 @@ export const WalkerCorporeal = {
 
       return false;
     },
+
+
   },
 
   LISTENERS: {
@@ -129,13 +132,16 @@ export const HitPoints = {
       this.state._HitPoints.maxHp = template.maxHp || 1;
       this.state._HitPoints.curHp =
         template.curHp || this.state._HitPoints.maxHp;
+      console.log("HitPoints initialized for:", this.name, "maxHp:", this.state._HitPoints.maxHp, "curHp:", this.state._HitPoints.curHp);
     },
   },
 
   METHODS: {
     loseHp: function (amt) {
+      console.log("loseHp called for:", this.name, "amount:", amt, "current HP before:", this.state._HitPoints.curHp);
       this.state._HitPoints.curHp -= amt;
       this.state._HitPoints.curHp = Math.max(0, this.state._HitPoints.curHp);
+      console.log("loseHp completed for:", this.name, "current HP after:", this.state._HitPoints.curHp);
     },
 
     gainHp: function (amt) {
@@ -147,6 +153,7 @@ export const HitPoints = {
     },
 
     getHp: function () {
+      console.log("getHp called for:", this.name, "returning:", this.state._HitPoints.curHp);
       return this.state._HitPoints.curHp;
     },
 
@@ -159,6 +166,7 @@ export const HitPoints = {
     },
 
     getMaxHp: function () {
+      console.log("getMaxHp called for:", this.name, "returning:", this.state._HitPoints.maxHp);
       return this.state._HitPoints.maxHp;
     },
 
@@ -172,18 +180,36 @@ export const HitPoints = {
   },
   LISTENERS: {
     damaged: function (evtData) {
+      console.log("HitPoints damaged event triggered for:", this.name);
+      console.log("Damage amount:", evtData.damageAmount);
+      console.log("Current HP before damage:", this.getHp());
       const amount = evtData.damageAmount;
       this.loseHp(amount);
+      console.log("Current HP after damage:", this.getHp());
       evtData.src.raiseMixinEvent("damages", {
         target: this,
         damageAmount: amount,
       });
 
-      if (this.getHp() == 0) {
+      if (this.getHp() <= 0) {
+        console.log("Entity HP reached 0 or below, destroying:", this.name);
+        console.log("Current HP:", this.getHp(), "Max HP:", this.getMaxHp());
         this.raiseMixinEvent("killedBy", { src: evtData.src });
+        if (this.name === "avatar"){
+          console.log("Avatar killed, raising playerKilled event");
+          this.raiseMixinEvent("playerKilled");
+          // Don't destroy the avatar immediately - let the game handle it
+          return;
+        }
+        
+        
         evtData.src.raiseMixinEvent("kills", { target: this });
         // console.log("destroying");
-        this.destroy();
+        
+        // Only destroy non-avatar entities immediately
+        setTimeout(() => {
+          this.destroy();
+        }, 0);
       }
     },
   },
@@ -206,7 +232,7 @@ export const PlayerMessages = {
       Message.send(
         "Entity detected, Type: " +
           " " +
-          evtData.target.name.toUpperCase() +
+          evtData.target.getName().toUpperCase() +
           ", " +
           " " +
           "HP: " +
@@ -221,28 +247,41 @@ export const PlayerMessages = {
     },
 
     walkClear: function (evtData) {
-      Message.send("Keep walking, it's" + " " + evtData.status);
+      Message.send("Keep walking, it's " + evtData.status);
     },
     attacks: function (evtData) {
-      Message.send("You've attacked" + evtData.target.getName());
+      Message.send("You've attacked " + evtData.target.getName());
     },
 
     damages: function (evtData) {
       Message.send(
         this.getName() +
-          "deals" +
+          " deals " +
           evtData.damageAmount +
-          "damage to" +
+          " damage to " +
           evtData.target.getName(),
       );
     },
 
     kills: function (evtData) {
-      Message.send(this.getName() + "kills the" + evtData.target.getName());
+      Message.send(this.getName() + " kills the " + evtData.target.getName());
     },
 
     killedBy: function (evtData) {
-      Message.send(this.getName() + "killed by" + evtData.target.getName());
+      Message.send(this.getName() + " killed by " + evtData.src.getName());
+    },
+
+    playerKilled: function (evtData) {
+      console.log("PlayerMessages playerKilled event triggered");
+      Message.send("GAME OVER - You have been killed!");
+      
+      // Call the PlayMode listener if it exists
+      if (this.playerKilledListener) {
+        console.log("Calling playerKilledListener");
+        this.playerKilledListener();
+      } else {
+        console.log("No playerKilledListener found");
+      }
     },
   },
 };
@@ -259,23 +298,25 @@ export const MeleeAttacker = {
     initialize: function (template) {
       this.state._MeleeAttacker.meleeDamage = template.meleeDamage || 1;
     },
-    METHODS: {
-      getMeleeDamage: function () {
-        return this.state._MeleeAttacker.meleeDamage;
-      },
-      setMeleeDamage: function (newVal) {
-        this.state._MeleeAttacker.meleeDamage = newVal;
-      },
+  },
+  METHODS: {
+    getMeleeDamage: function () {
+      return this.state._MeleeAttacker.meleeDamage;
     },
-    LISTENERS: {
-      bumpEntity: function (evtData) {
-        // console.log("bumping entity");
-        this.raiseMixinEvent("attacks", { src: this, target: evtData.target });
-        evtData.target.raiseMixinEvent("damaged", {
-          src: this,
-          damageAmount: this.getMeleeDamage(),
-        });
-      },
+    setMeleeDamage: function (newVal) {
+      this.state._MeleeAttacker.meleeDamage = newVal;
+    },
+  },
+  LISTENERS: {
+    bumpEntity: function (evtData) {
+      console.log("MeleeAttacker bumpEntity triggered for:", this.name);
+      console.log("Attacking target:", evtData.target.getName());
+      console.log("My melee damage:", this.getMeleeDamage());
+      this.raiseMixinEvent("attacks", { src: this, target: evtData.target });
+      evtData.target.raiseMixinEvent("damaged", {
+        src: this,
+        damageAmount: this.getMeleeDamage(),
+      });
     },
   },
 };
@@ -575,6 +616,34 @@ export const SmartMonsterAI = {
       // console.log("Monster completely trapped - no movement possible");
     },
 
+    checkAdjacencyAndDamage: function () {
+      const map = this.getMap();
+      if (!map) return;
+      
+      const entities = Object.values(DATASTORE.ENTITIES);
+      const player = entities.find(e => e.name === "avatar" && e.getMapId() === this.getMapId());
+      if (!player) return;
+      
+      const monsterX = parseInt(this.getX());
+      const monsterY = parseInt(this.getY());
+      const playerX = parseInt(player.getX());
+      const playerY = parseInt(player.getY());
+      
+      // Check if monster is adjacent to player (including diagonals)
+      const dx = Math.abs(monsterX - playerX);
+      const dy = Math.abs(monsterY - playerY);
+      
+      if (dx <= 1 && dy <= 1 && (dx > 0 || dy > 0)) {
+        // Monster is adjacent to player, deal damage
+        console.log("Monster adjacent to player, dealing damage:", this.name, "to player");
+        this.raiseMixinEvent("attacks", { src: this, target: player });
+        player.raiseMixinEvent("damaged", {
+          src: this,
+          damageAmount: this.getMeleeDamage(),
+        });
+      }
+    },
+
     findPathToOpenSpace: function () {
       const map = this.getMap();
       if (!map) return;
@@ -652,6 +721,9 @@ export const SmartMonsterAI = {
       // console.log("SmartMonsterAI act called for:", this.name);
       const distance = this.getDistanceToPlayer();
       // console.log("Distance to player:", distance);
+
+      // Check if monster is adjacent to player and deal damage
+      this.checkAdjacencyAndDamage();
 
       // Always try to move toward the player, regardless of distance
       this.moveTowardsPlayer();
@@ -852,6 +924,34 @@ export const BalancedMonsterAI = {
         // console.log("Balanced monster: no path found, moving randomly");
         this.moveRandomly();
       }
+    },
+
+    checkAdjacencyAndDamage: function () {
+      const map = this.getMap();
+      if (!map) return;
+      
+      const entities = Object.values(DATASTORE.ENTITIES);
+      const player = entities.find(e => e.name === "avatar" && e.getMapId() === this.getMapId());
+      if (!player) return;
+      
+      const monsterX = parseInt(this.getX());
+      const monsterY = parseInt(this.getY());
+      const playerX = parseInt(player.getX());
+      const playerY = parseInt(player.getY());
+      
+      // Check if monster is adjacent to player (including diagonals)
+      const dx = Math.abs(monsterX - playerX);
+      const dy = Math.abs(monsterY - playerY);
+      
+      if (dx <= 1 && dy <= 1 && (dx > 0 || dy > 0)) {
+        // Monster is adjacent to player, deal damage
+        console.log("Balanced monster adjacent to player, dealing damage:", this.name, "to player");
+        this.raiseMixinEvent("attacks", { src: this, target: player });
+        player.raiseMixinEvent("damaged", {
+          src: this,
+          damageAmount: this.getMeleeDamage(),
+        });
+      }
     }
   },
   LISTENERS: {
@@ -859,6 +959,9 @@ export const BalancedMonsterAI = {
       // console.log("BalancedMonsterAI act called for:", this.name);
       const distance = this.getDistanceToPlayer();
       // console.log("Distance to player:", distance);
+
+      // Check if monster is adjacent to player and deal damage
+      this.checkAdjacencyAndDamage();
 
       // Use different strategies based on distance and line of sight
       if (distance <= this.state._BalancedMonsterAI.chaseDistance) {

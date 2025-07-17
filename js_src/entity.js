@@ -24,7 +24,7 @@ export class Entity extends MixableSymbol {
   }
 
   getName() {
-    return this.state.name;
+    return this.name;
   }
 
   setName(newName) {
@@ -67,9 +67,15 @@ export class Entity extends MixableSymbol {
   }
 
   destroy() {
-    this.getMap().extractEntity(this);
-
-    delete DATASTORE[this.getId()];
+    const map = this.getMap();
+    if (map) {
+      map.extractEntity(this);
+    }
+    
+    // Remove from DATASTORE.ENTITIES
+    if (DATASTORE.ENTITIES && DATASTORE.ENTITIES[this.getId()]) {
+      delete DATASTORE.ENTITIES[this.getId()];
+    }
   }
 
   toJSON() {
