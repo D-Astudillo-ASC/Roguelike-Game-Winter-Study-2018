@@ -6,7 +6,7 @@ import {TILES} from './tile.js';
 import {DATASTORE,clearDataStore} from './datastore.js';
 import {EntityFactory} from './entity_templates.js';
 import {Entity} from './entity.js';
-import {SCHEDULER,TIME_ENGINE,initTiming} from './timing.js';
+import {SCHEDULER,TIME_ENGINE} from './timing.js';
 
 class UIMode {
   constructor(thegame){
@@ -83,7 +83,6 @@ export class PlayMode extends UIMode {
   }
 
   setupNewGame(){
-    initTiming();
     let m = MapMaker({xdim:30, ydim:20});
     this.state.mapId = m.getId();
     Message.send("Building map....");

@@ -1,9 +1,6 @@
-import ROT from 'rot-js';
+import { Scheduler, Engine } from 'rot-js';
 
-export let SCHEDULER;
-export let TIME_ENGINE;
+let SCHEDULER = new Scheduler.Action();
+let TIME_ENGINE = new Engine(SCHEDULER);
 
-export function initTiming(){
-  SCHEDULER = new ROT.Scheduler.Action();
-  TIME_ENGINE = new ROT.Engine(SCHEDULER);
-}
+export { SCHEDULER, TIME_ENGINE };

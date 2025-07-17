@@ -1,9 +1,9 @@
 //defines mixins that can be added to ENTITIES
 import {Message} from './message.js';
-import {SCHEDULER,TIME_ENGINE,initTiming} from'./timing.js';
+import {SCHEDULER,TIME_ENGINE} from'./timing.js';
 import {DATASTORE} from './datastore.js';
 import {Map} from './map.js';
-import {randomInt} from './util.js';
+import {getRandomOffset} from './util.js';
 import {Entity} from './entity.js';
 export let TimeTracker = {
     META:{
@@ -294,7 +294,7 @@ export let ActorPlayer = {
   LISTENERS: {
     'actionDone': function(evtData){
       SCHEDULER.setDuration(this.getCurrentActionDuration());
-      this.setCurrentActionDuration(this.getBaseActionDuration()+randomInt(-5,5));
+      this.setCurrentActionDuration(this.getBaseActionDuration()+getRandomOffset(-5,5));
       setTimeout(function(){ TIME_ENGINE.unlock();},1);
       console.log("Player still working");
     }
@@ -314,7 +314,7 @@ export let ActorWanderer = {
     },
 
     initialize: function(template){
-      SCHEDULER.add(this,true,randomInt(2,this.getBaseActionDuration()));
+      SCHEDULER.add(this,true,getRandomOffset(2,this.getBaseActionDuration()));
       this.state._ActorWanderer.baseActionDuration = template.wanderActionDuration || 1000;
       this.state._ActorWanderer.currentActionDuration = this.state._ActorWanderer.baseActionDuration;
     }
@@ -335,8 +335,8 @@ export let ActorWanderer = {
     },
     act: function(){
       TIME_ENGINE.lock();
-      let dx = randomInt(-1,1);
-      let dy = randomInt(-1,1);
+      let dx = getRandomOffset(-1,1);
+      let dy = getRandomOffset(-1,1);
       this.raiseMixinEvent('walkAttempt',{'dx':dx, 'dy':dy});
       SCHEDULER.setDuration(1000);
       TIME_ENGINE.unlock();
@@ -346,7 +346,7 @@ export let ActorWanderer = {
   LISTENERS: {
     'actionDone': function(evtData){
       SCHEDULER.setDuration(this.getCurrentActionDuration());
-      this.setCurrentActionDuration(this.getBaseActionDuration()+randomInt(-5,5));
+      this.setCurrentActionDuration(this.getBaseActionDuration()+getRandomOffset(-5,5));
       setTimeout(function(){ TIME_ENGINE.unlock();},1);
       console.log("Player still working");
     }

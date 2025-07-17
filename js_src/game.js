@@ -1,6 +1,6 @@
 
 import * as U from './util.js';
-import ROT from 'rot-js';
+import { Display, RNG } from 'rot-js';
 import {StartupMode} from './ui_mode.js';
 import {WinMode} from './ui_mode.js';
 import {PlayMode} from './ui_mode.js';
@@ -8,7 +8,6 @@ import {LoseMode} from'./ui_mode.js';
 import {Message} from './message.js';
 import {PersistenceMode} from './ui_mode.js';
 import {DATASTORE} from './datastore.js';
-import {initTiming} from './timing.js';
 export let Game = {
   display: {
       SPACING: 1.1,
@@ -46,17 +45,17 @@ export let Game = {
    //this. refers to game object
    init: function() {
 
-     this.display.main.o = new ROT.Display({
+     this.display.main.o = new Display({
        width: this.display.main.w,
        height: this.display.main.h,
        spacing: this.display.SPACING});
 
-     this.display.avatar.o = new ROT.Display({
+     this.display.avatar.o = new Display({
          width: this.display.avatar.w,
          height: this.display.avatar.h,
          spacing: this.display.SPACING});
 
-     this.display.message.o = new ROT.Display({
+     this.display.message.o = new Display({
         width: this.display.message.w,
         height: this.display.message.h,
         spacing: this.display.SPACING});
@@ -84,7 +83,7 @@ export let Game = {
     this._randomSeed = 5 + Math.floor(Math.random()*100000);
     //this._randomSeed = 76250;
     console.log("using random seed "+this._randomSeed);
-    ROT.RNG.setSeed(this._randomSeed);
+    RNG.setSeed(this._randomSeed);
     this.modes.play.setupNewGame();
   },
 
@@ -136,7 +135,7 @@ export let Game = {
       console.log(json);
       let state = JSON.parse(json);
       this._randomSeed = state.rseed;
-      ROT.RNG.setSeed(this.randomSeed);
+      RNG.setSeed(this.randomSeed);
 
       this.modes.play.restoreFromState(state.playModeState);
    },

@@ -1,38 +1,39 @@
 {
-  "name": "weedstrikeroguelike",
-  "version": "1.0.0",
-  "description": "A demo roguelike game using rot.js",
+  "name": "Roguelike-Game-Winter-Study-2018",
+  "version": "2.0.0",
+  "description": "A modern roguelike game using updated dependencies",
   "main": "index.js",
-  "directories": {
-    "doc": "doc"
-  },
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --progress",
-    "watch": "webpack --progress --watch"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint js_src --ext .js",
+    "format": "prettier --write js_src/**/*.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cwarren/weedstrikeroguelike.git"
+    "url": "git+https://github.com/D-Astudillo-ASC/Roguelike-Game-Winter-Study-2018.git"
   },
   "keywords": [
     "game",
-    "roguelike"
+    "roguelike",
+    "modern"
   ],
-  "author": "Chris Warren",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/cwarren/weedstrikeroguelike/issues"
-  },
-  "homepage": "https://github.com/cwarren/weedstrikeroguelike#readme",
+  "author": "Daniel Astudillo",
+  "license": "MIT",
   "dependencies": {
-    "rot-js": "^0.6.5",
-    "babel-polyfill": "^6.26.0"
+    "rot-js": "^2.2.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.1",
-    "webpack": "^3.10.0"
+    "@vitejs/plugin-legacy": "^7.0.0",
+    "eslint": "^9.31.0",
+    "prettier": "^3.2.5",
+    "vite": "^7.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
