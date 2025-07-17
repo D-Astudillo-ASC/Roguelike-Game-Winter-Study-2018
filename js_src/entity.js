@@ -59,6 +59,10 @@ export class Entity extends MixableSymbol {
     this.state.mapId = newInfo;
   }
   getMap() {
+    if (!this.state.mapId || !DATASTORE.MAPS[this.state.mapId]) {
+      console.warn(`Entity ${this.name} (${this.getId()}) has invalid mapId: ${this.state.mapId}`);
+      return null;
+    }
     return DATASTORE.MAPS[this.state.mapId];
   }
 
@@ -69,10 +73,17 @@ export class Entity extends MixableSymbol {
   }
 
   toJSON() {
-    return JSON.stringify(this.state);
+    // Include the entity name in the saved state
+    const saveState = { ...this.state };
+    saveState.name = this.name;
+    return JSON.stringify(saveState);
   }
 
   fromJSON(s) {
     this.state = JSON.parse(s);
+    // Restore the entity name if it was saved
+    if (this.state.name) {
+      this.name = this.state.name;
+    }
   }
 }

@@ -31,5 +31,5 @@ EntityFactory.learn({
   chr: "&",
   fg: "#d63",
   maxHp: 50,
-  mixInNames: ["ActorWanderer", "WalkerCorporeal", "HitPoints"],
+  mixInNames: ["ActorWanderer", "WalkerCorporeal", "HitPoints", "SmartMonsterAI"],
 });

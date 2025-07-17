@@ -1,28 +1,34 @@
 import { Display, RNG } from "rot-js";
-import { StartupMode } from "./ui_mode.js";
-import { WinMode } from "./ui_mode.js";
-import { PlayMode } from "./ui_mode.js";
-import { LoseMode } from "./ui_mode.js";
+import { StartupMode, PlayMode, WinMode, LoseMode, PersistenceMode, PauseMode } from "./ui_mode.js";
 import { Message } from "./message.js";
-import { PersistenceMode } from "./ui_mode.js";
 import { DATASTORE } from "./datastore.js";
+
+// Centralized mode transition handler
+const modeTransitions = {
+  play: {
+    enter: (mode) => mode.startMovementTimer && mode.startMovementTimer(),
+    exit: (mode) => mode.stopMovementTimer && mode.stopMovementTimer(),
+  },
+  // Add more mode-specific transitions if needed
+};
+
 export const Game = {
   display: {
     SPACING: 1.1,
     main: {
-      w: 80,
-      h: 24,
+      w: Math.floor(window.innerWidth / 8),
+      h: Math.floor(window.innerHeight / 16),
       o: null,
     },
 
     avatar: {
-      w: 20,
-      h: 24,
+      w: Math.floor(window.innerWidth /8),
+      h: Math.floor(window.innerHeight / 16),
       o: null,
     },
 
     message: {
-      w: 100,
+      w: Math.floor(window.innerWidth /8),
       h: 6,
       o: null,
     },
@@ -34,9 +40,11 @@ export const Game = {
     play: "",
     win: "",
     lose: "",
+    pause: "",
   },
 
   curMode: "",
+  curModeName: "",
 
   //this. refers to game object
   init: function () {
@@ -62,9 +70,9 @@ export const Game = {
     DATASTORE.GAME = this;
     this.switchModes("startup");
     Message.send("Greetings!");
-    console.dir(this);
-    console.log("datastore");
-    console.dir(DATASTORE);
+          // console.dir(this);
+    // console.log("datastore");
+          // console.dir(DATASTORE);
   },
 
   setupModes: function () {
@@ -73,13 +81,14 @@ export const Game = {
     this.modes.win = new WinMode(this);
     this.modes.lose = new LoseMode(this);
     this.modes.persistence = new PersistenceMode(this);
+    this.modes.pause = new PauseMode(this);
   },
 
   setupNewGame: function () {
-    console.log("game.setupNewGame has been called");
+    // console.log("game.setupNewGame has been called");
     this._randomSeed = 5 + Math.floor(Math.random() * 100000);
     //this._randomSeed = 76250;
-    console.log("using random seed " + this._randomSeed);
+    // console.log("using random seed " + this._randomSeed);
     RNG.setSeed(this._randomSeed);
     this.modes.play.setupNewGame();
   },
@@ -91,6 +100,7 @@ export const Game = {
   },
 
   eventHandler: function (eventType, evt) {
+    // Only allow pause key in PlayMode
     // When an event is received have the current ui handle it
     if (this.curMode !== null && this.curMode != "") {
       if (this.curMode.handleInput(eventType, evt)) {
@@ -101,14 +111,15 @@ export const Game = {
   },
 
   switchModes: function (newModeName) {
-    if (this.curMode) {
-      this.curMode.exit();
+    // Stop movement timer if leaving play mode
+    if (this.curModeName === "play" && this.curMode && this.curMode.stopMovementTimer) {
+      this.curMode.stopMovementTimer();
     }
-    Message.send(newModeName + " " + "mode");
     this.curMode = this.modes[newModeName];
-
-    if (this.curMode) {
-      this.curMode.enter();
+    this.curModeName = newModeName;
+    // Start movement timer if entering play mode
+    if (newModeName === "play" && this.curMode.startMovementTimer) {
+      this.curMode.startMovementTimer();
     }
     this.render();
   },
@@ -123,12 +134,12 @@ export const Game = {
   },
 
   restoreFromState(stateData) {
-    console.log(stateData);
+    // console.log(stateData);
     this.state = stateData;
   },
 
   fromJSON: function (json) {
-    console.log(json);
+    // console.log(json);
     const state = JSON.parse(json);
     this._randomSeed = state.rseed;
     RNG.setSeed(this.randomSeed);
@@ -150,17 +161,41 @@ export const Game = {
   },
 
   renderMain: function () {
-    console.log("renderMain");
-    this.curMode.render(this.display.main.o);
+    // console.log("renderMain");
+    // Ensure display is initialized
+    if (!this.display.main.o) {
+      // console.warn("Main display is null, reinitializing...");
+      this.display.main.o = new Display({
+        width: this.display.main.w,
+        height: this.display.main.h,
+        spacing: this.display.SPACING,
+      });
+    }
+    
+    if (this.curMode && this.display.main.o) {
+      this.curMode.render(this.display.main.o);
+    }
     //if(this.curMode.hasOwnProperty('render')){
     //this.curMode.render(this.display.main.o);
     //}
   },
 
   renderAvatar: function () {
+    // Ensure display is initialized
+    if (!this.display.avatar.o) {
+      // console.warn("Avatar display is null, reinitializing...");
+      this.display.avatar.o = new Display({
+        width: this.display.avatar.w,
+        height: this.display.avatar.h,
+        spacing: this.display.SPACING,
+      });
+    }
+    
     const a = this.display.avatar.o;
     //a.drawText(0,2,"Avatar Space");
-    this.curMode.renderAvatar(a);
+    if (this.curMode && a) {
+      this.curMode.renderAvatar(a);
+    }
 
     //this.curMode.render(a);
     //a.drawText(0,2,"Avatar Space");
@@ -171,10 +206,22 @@ export const Game = {
     //}
   },
   renderMessage: function () {
+    // Ensure display is initialized
+    if (!this.display.message.o) {
+      console.warn("Message display is null, reinitializing...");
+      this.display.message.o = new Display({
+        width: this.display.message.w,
+        height: this.display.message.h,
+        spacing: this.display.SPACING,
+      });
+    }
+    
     const d = this.display.message.o;
-    Message.render(d);
+    if (d) {
+      Message.render(d);
+    }
 
-    console.log("renderMessage");
+    // console.log("renderMessage");
     // this.curMode.render(this.display.main.o);
     //if(this.curMode.hasOwnProperty('render')){
     //this.curMode.render(this.display.main.o);

@@ -20,7 +20,7 @@ export class MixableSymbol extends DisplaySymbol {
 
     for (let mi = 0; mi < this.mixins.length; mi++) {
       const m = this.mixins[mi];
-      console.log(m);
+      // console.log(m);
       if (m.META.stateNamespace) {
         this.state[m.META.stateNamespace] = {};
       }
@@ -41,7 +41,7 @@ export class MixableSymbol extends DisplaySymbol {
     for (let mi = 0; mi < this.mixins.length; mi++) {
       const m = this.mixins[mi];
       if (m.META.initialize) {
-        console.log("call initializer for" + m.META.mixInName);
+        // console.log("call initializer for" + m.META.mixInName);
         m.META.initialize.call(this, template);
       }
     }

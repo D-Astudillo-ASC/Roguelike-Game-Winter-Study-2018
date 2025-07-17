@@ -5,7 +5,7 @@ import { DATASTORE } from "./datastore.js";
 
 class Map {
   constructor(xdim, ydim, mapType) {
-    console.dir(TILES);
+    // console.dir(TILES);
     this.state = {};
     this.state.xdim = xdim || 1;
     this.state.ydim = ydim || 1;
@@ -14,7 +14,7 @@ class Map {
     this.state.id = uniqueId("map- " + this.state.mapType);
     this.state.entityIdToMapPos = {};
     this.state.mapPosToEntityId = {};
-    console.dir(this);
+          // console.dir(this);
   }
 
   build() {
@@ -64,7 +64,7 @@ class Map {
 
   updateEntityPosition(ent, newMapX, newMapY) {
     const oldPos = this.state.entityIdToMapPos[ent.getId()];
-    console.log(this.state.mapPosToEntityId);
+    // console.log(this.state.mapPosToEntityId);
     delete this.state.mapPosToEntityId[oldPos];
 
     this.state.mapPosToEntityId[`${newMapX},${newMapY}`] = ent.getId();
@@ -88,6 +88,17 @@ class Map {
     ent.setMapId(this.getId());
     ent.setX(mapx);
     ent.setY(mapy);
+  }
+
+  moveEntityTo(ent, newX, newY) {
+    // Remove from old position
+    const oldPos = this.state.entityIdToMapPos[ent.getId()];
+    if (oldPos) {
+      delete this.state.mapPosToEntityId[oldPos];
+      delete this.state.entityIdToMapPos[ent.getId()];
+    }
+    // Add to new position
+    this.addEntityAt(ent, newX, newY);
   }
 
   isPositionOpen(x, y) {
@@ -119,8 +130,8 @@ class Map {
   getRandomOpenPosition() {
     const x = Math.trunc(RNG.getUniform() * this.state.xdim);
     const y = Math.trunc(RNG.getUniform() * this.state.ydim);
-    console.log(x);
-    console.log(y);
+    // console.log(x);
+    // console.log(y);
     if (this.isPositionOpen(x, y)) {
       return `${x},${y}`;
     }
@@ -129,36 +140,33 @@ class Map {
   }
 
   render(display, camera_map_x, camera_map_y) {
-    let cx = 0;
-    let cy = 0;
-    const xstart = camera_map_x - Math.trunc(display.getOptions().width / 2);
-    const xend = xstart + display.getOptions().width;
-    const ystart = camera_map_y - Math.trunc(display.getOptions().height / 2);
-    const yend = ystart + display.getOptions().height;
-    for (let x1 = xstart; x1 < xend; x1++) {
-      for (let y1 = ystart; y1 < yend; y1++) {
-        const pos = `${x1},${y1}`;
-        // console.log(pos);
-        if (this.state.mapPosToEntityId[pos]) {
-          console.log("found entity:");
-          console.dir(DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]]);
-          console.dir(display);
-          console.log(cx);
-          console.log(cy);
-          DATASTORE.ENTITIES[this.state.mapPosToEntityId[pos]].render(
-            display,
-            cx,
-            cy,
-          );
+    if (!display || !display.getOptions) {
+      // console.warn("Map.render called with invalid display object");
+      return;
+    }
+    
+    const width = display.getOptions().width;
+    const height = display.getOptions().height;
+    const xstart = camera_map_x - Math.trunc(width / 2);
+    const ystart = camera_map_y - Math.trunc(height / 2);
+    
+    for (let cx =0; cx < width; cx++) {
+      for (let cy = 0; cy < height; cy++) {
+        const mapX = xstart + cx;
+        const mapY = ystart + cy;
+        const pos = `${mapX},${mapY}`;
+        
+        const entityId = this.state.mapPosToEntityId[pos];
+        if (entityId && DATASTORE.ENTITIES[entityId]) {
+          DATASTORE.ENTITIES[entityId].render(display, cx, cy);
         } else {
-          this.getTile(x1, y1).render(display, cx, cy);
+          // Clean up invalid entity references
+          if (entityId && !DATASTORE.ENTITIES[entityId]) {
+            delete this.state.mapPosToEntityId[pos];
+          }
+          this.getTile(mapX, mapY).render(display, cx, cy);
         }
-
-        cy++;
       }
-
-      cx++;
-      cy = 0;
     }
   }
 
@@ -167,6 +175,12 @@ class Map {
   }
 
   getTile(mapx, mapy) {
+    // Add debugging to catch coordinate issues
+    if (typeof mapx !== 'number' || typeof mapy !== 'number') {
+      // console.warn("getTile called with invalid coordinates:", mapx, mapy, typeof mapx, typeof mapy);
+      return TILES.NULLTILE;
+    }
+    
     if (
       mapx < 0 ||
       mapx > this.state.xdim - 1 ||
@@ -175,6 +189,13 @@ class Map {
     ) {
       return TILES.NULLTILE;
     }
+    
+    // Check if tileGrid exists and has the required dimensions
+    if (!this.tileGrid || !this.tileGrid[mapx] || !this.tileGrid[mapx][mapy]) {
+      console.warn("tileGrid access failed for coordinates:", mapx, mapy, "tileGrid dimensions:", this.tileGrid?.length, this.tileGrid?.[mapx]?.length);
+      return TILES.NULLTILE;
+    }
+    
     return this.tileGrid[mapx][mapy];
   }
 }
@@ -196,9 +217,252 @@ const TILE_GRID_GENERATOR = {
           : TILES.FLOOR;
     });
     RNG.setState(origRngState);
+    
+    // Post-process to ensure no entities can get trapped
+    postProcessCaves(tg, xdim, ydim);
+    
     return tg;
   },
+  
+  // "safe caves": function (xdim, ydim, rngState) {
+  //   const tg = init2DArray(xdim, ydim, TILES.NULLTILE);
+  //   const gen = new ROTMap.Cellular(xdim, ydim, { connected: true });
+  //   const origRngState = RNG.getState();
+  //   RNG.setState(rngState);
+  //   gen.randomize(0.4); // Slightly lower density for more open areas
+  //   gen.create();
+  //   gen.create();
+  //   gen.create();
+  //   gen.connect(function (x, y, isWall) {
+  //     tg[x][y] =
+  //       isWall || x == 0 || y == 0 || x == xdim - 1 || y == ydim - 1
+  //         ? TILES.WALL
+  //         : TILES.FLOOR;
+  //   });
+  //   RNG.setState(origRngState);
+    
+  //   // Aggressive post-processing to ensure no traps
+  //   postProcessCaves(tg, xdim, ydim);
+  //   removeNarrowPassages(tg, xdim, ydim);
+  //   ensureMinimumOpenAreas(tg, xdim, ydim);
+    
+  //   return tg;
+  // },
+  
+  "open connected": function (xdim, ydim, rngState) {
+    const tg = init2DArray(xdim, ydim, TILES.FLOOR);
+    const origRngState = RNG.getState();
+    RNG.setState(rngState);
+    
+    // Create border walls
+    for (let x = 0; x < xdim; x++) {
+      tg[x][0] = TILES.WALL;
+      tg[x][ydim - 1] = TILES.WALL;
+    }
+    for (let y = 0; y < ydim; y++) {
+      tg[0][y] = TILES.WALL;
+      tg[xdim - 1][y] = TILES.WALL;
+    }
+    
+    // Add some random walls but ensure connectivity
+    const numWalls = Math.floor((xdim * ydim) * 0.1); // 10% walls
+    for (let i = 0; i < numWalls; i++) {
+      const x = Math.floor(RNG.getUniform() * (xdim - 2)) + 1;
+      const y = Math.floor(RNG.getUniform() * (ydim - 2)) + 1;
+      
+      // Only place walls if they don't create isolated areas
+      if (canPlaceWall(tg, x, y, xdim, ydim)) {
+        tg[x][y] = TILES.WALL;
+      }
+    }
+    
+    RNG.setState(origRngState);
+    return tg;
+  },
+  
+  "maze like": function (xdim, ydim, rngState) {
+    const tg = init2DArray(xdim, ydim, TILES.WALL);
+    const origRngState = RNG.getState();
+    RNG.setState(rngState);
+    
+    // Use ROT.js maze generator for guaranteed connectivity
+    const maze = new ROTMap.EllerMaze(xdim, ydim);
+    maze.create(function(x, y, wall) {
+      if (x >= 0 && x < xdim && y >= 0 && y < ydim) {
+        tg[x][y] = wall ? TILES.WALL : TILES.FLOOR;
+      }
+    });
+    
+    RNG.setState(origRngState);
+    return tg;
+  }
 };
+
+// Helper function to check if placing a wall would create isolated areas
+function canPlaceWall(tg, x, y, xdim, ydim) {
+  // Don't place walls on edges
+  if (x <= 0 || x >= xdim - 1 || y <= 0 || y >= ydim - 1) {
+    return false;
+  }
+  
+  // Check if this would create a 2x2 wall block (which could trap entities)
+  let wallCount = 0;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      if (tg[x + dx][y + dy] === TILES.WALL) {
+        wallCount++;
+      }
+    }
+  }
+  
+  // Don't place walls if they would create too many adjacent walls
+  return wallCount < 6;
+}
+
+// Post-process caves to remove potential traps
+function postProcessCaves(tg, xdim, ydim) {
+  let changed = true;
+  let iterations = 0;
+  const maxIterations = 5;
+  
+  while (changed && iterations < maxIterations) {
+    changed = false;
+    iterations++;
+    
+    for (let x = 1; x < xdim - 1; x++) {
+      for (let y = 1; y < ydim - 1; y++) {
+        if (tg[x][y] === TILES.WALL) {
+          // Check if this wall creates a potential trap
+          if (isTrapWall(tg, x, y, xdim, ydim)) {
+            tg[x][y] = TILES.FLOOR;
+            changed = true;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Check if a wall creates a potential trap
+function isTrapWall(tg, x, y, xdim, ydim) {
+  // Count floor tiles in 3x3 area around this wall
+  let floorCount = 0;
+  let wallCount = 0;
+  
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      if (x + dx >= 0 && x + dx < xdim && y + dy >= 0 && y + dy < ydim) {
+        if (tg[x + dx][y + dy] === TILES.FLOOR) {
+          floorCount++;
+        } else if (tg[x + dx][y + dy] === TILES.WALL) {
+          wallCount++;
+        }
+      }
+    }
+  }
+  
+  // If this wall is surrounded by mostly walls, it might create a trap
+  if (wallCount >= 6) {
+    return true;
+  }
+  
+  // Check for 2x2 wall blocks that could trap entities
+  const directions = [[0,0], [1,0], [0,1], [1,1]];
+  for (let startX = x - 1; startX <= x; startX++) {
+    for (let startY = y - 1; startY <= y; startY++) {
+      if (startX >= 0 && startX + 1 < xdim && startY >= 0 && startY + 1 < ydim) {
+        let wallBlock = 0;
+        for (const [dx, dy] of directions) {
+          if (tg[startX + dx][startY + dy] === TILES.WALL) {
+            wallBlock++;
+          }
+        }
+        if (wallBlock >= 3) {
+          return true;
+        }
+      }
+    }
+  }
+  
+  return false;
+}
+
+// Remove narrow passages that could trap entities
+// function removeNarrowPassages(tg, xdim, ydim) {
+//   for (let x = 1; x < xdim - 1; x++) {
+//     for (let y = 1; y < ydim - 1; y++) {
+//       if (tg[x][y] === TILES.WALL) {
+//         // Check for narrow passages (1-tile wide corridors)
+//         const horizontal = (tg[x-1][y] === TILES.WALL && tg[x+1][y] === TILES.WALL);
+//         const vertical = (tg[x][y-1] === TILES.WALL && tg[x][y+1] === TILES.WALL);
+        
+//         if (horizontal && vertical) {
+//           // This creates a narrow passage, remove it
+//           tg[x][y] = TILES.FLOOR;
+//         }
+//       }
+//     }
+//   }
+// }
+
+// Ensure minimum open areas for entities to move around
+// function ensureMinimumOpenAreas(tg, xdim, ydim) {
+//   const minOpenSize = 3; // Minimum 3x3 open area
+  
+//   for (let x = 1; x < xdim - minOpenSize; x++) {
+//     for (let y = 1; y < ydim - minOpenSize; y++) {
+//       // Check if there's a 3x3 open area
+//       let hasOpenArea = true;
+//       for (let dx = 0; dx < minOpenSize; dx++) {
+//         for (let dy = 0; dy < minOpenSize; dy++) {
+//           if (tg[x + dx][y + dy] !== TILES.FLOOR) {
+//             hasOpenArea = false;
+//             break;
+//           }
+//         }
+//         if (!hasOpenArea) break;
+//       }
+      
+//       // If no open area found, create one by removing some walls
+//       if (!hasOpenArea) {
+//         for (let dx = 0; dx < minOpenSize; dx++) {
+//           for (let dy = 0; dy < minOpenSize; dy++) {
+//             if (tg[x + dx][y + dy] === TILES.WALL) {
+//               // Only remove walls that don't break connectivity
+//               if (canRemoveWall(tg, x + dx, y + dy, xdim, ydim)) {
+//                 tg[x + dx][y + dy] = TILES.FLOOR;
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+
+// Check if a wall can be safely removed
+function canRemoveWall(tg, x, y, xdim, ydim) {
+  // Don't remove border walls
+  if (x <= 0 || x >= xdim - 1 || y <= 0 || y >= ydim - 1) {
+    return false;
+  }
+  
+  // Count adjacent walls
+  let adjacentWalls = 0;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      if (x + dx >= 0 && x + dx < xdim && y + dy >= 0 && y + dy < ydim) {
+        if (tg[x + dx][y + dy] === TILES.WALL) {
+          adjacentWalls++;
+        }
+      }
+    }
+  }
+  
+  // Can remove if it doesn't have too many adjacent walls
+  return adjacentWalls <= 4;
+}
 
 export function MapMaker(mapData) {
   const m = new Map(mapData.xdim, mapData.ydim, mapData.mapType);

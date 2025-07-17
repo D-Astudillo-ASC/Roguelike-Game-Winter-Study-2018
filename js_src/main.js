@@ -1,7 +1,7 @@
 import { Game } from "./game.js";
 
 window.onload = function () {
-  console.log("starting WSRL - window loaded");
+  // console.log("starting WSRL - window loaded");
   // ROT.isSupported() is not needed in modern browsers, so we remove this check
 
   Game.init();

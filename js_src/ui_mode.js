@@ -5,303 +5,17 @@ import { DATASTORE, clearDataStore } from "./datastore.js";
 import { EntityFactory } from "./entity_templates.js";
 import { TIME_ENGINE } from "./timing.js";
 
-class UIMode {
+class BaseUIMode {
   constructor(thegame) {
-    console.log("created" + this.constructor.name);
     this.game = thegame;
   }
 
-  enter() {
-    console.log("entering" + this.constructor.name);
-  }
-  exit() {
-    console.log("exiting" + this.constructor.name);
-  }
-  handleInput() {
-    console.log("handling input for" + this.constructor.name);
-  }
-  render(display) {
-    console.log("rendering" + this.constructor.name);
-    display.drawText(2, 2, "rendering" + this.constructor.name);
-  }
-
-  renderAvatar(display) {
-    display.clear();
-  }
-}
-
-export class StartupMode extends UIMode {
-  render(display) {
-    display.drawText(2, 2, "Welcome");
-    display.drawText(2, 3, "Press any key to continue");
-  }
-
-  handleInput(eventType, evt) {
-    if (eventType == "keyup") {
-      console.dir(evt);
-      this.game.switchModes("persistence");
-      return true;
-    }
-  }
-}
-
-export class PlayMode extends UIMode {
-  constructor(thegame) {
-    super(thegame);
-    this.state = {
-      mapId: "",
-      cameramapx: "",
-      cameramapy: "",
-    };
-  }
-
-  enter() {
-    if (!this.state.mapId) {
-      const m = MapMaker({ xdim: 300, ydim: 160, mapType: "basic caves" });
-      this.state.mapId = m.getId();
-      m.build();
-      this.state.cameramapx = 5;
-      this.state.cameramapy = 8;
-    }
-    TIME_ENGINE.unlock();
-    this.cameraSymbol = new DisplaySymbol("@", "#eb4");
-  }
-
-  toJSON() {
-    return JSON.stringify(this.state);
-  }
-
-  restoreFromState(stateData) {
-    this.state = JSON.parse(stateData);
-  }
-
-  setupNewGame() {
-    const m = MapMaker({ xdim: 30, ydim: 20 });
-    this.state.mapId = m.getId();
-    Message.send("Building map....");
-    this.game.renderMessage();
-    m.build();
-    this.state.cameramapx = 0;
-    this.state.cameramapy = 0;
-    const a = EntityFactory.create("avatar");
-    this.state.avatarId = a.getId();
-    console.log("about to call add entity");
-    m.addEntityAtRandomPosition(a);
-    this.moveCameraToAvatar();
-
-    for (let mossCount = 0; mossCount < 10; mossCount++) {
-      m.addEntityAtRandomPosition(EntityFactory.create("moss"));
-    }
-
-    for (let monsterCount = 0; monsterCount < 1; monsterCount++) {
-      m.addEntityAtRandomPosition(EntityFactory.create("monster"));
-    }
-  }
-  render(display) {
-    console.dir(DATASTORE);
-    console.dir(this);
-    display.clear();
-    DATASTORE.MAPS[this.state.mapId].render(
-      display,
-      this.state.cameramapx,
-      this.state.cameramapy,
-    );
-    // DATASTORE.MAPS[this.state.mapId].render(display, 15, 10);
-    // this.cameraSymbol.render(display,display.getOptions().width/2,display.getOptions().height/2);
-  }
-
-  renderAvatar(display) {
-    display.clear();
-    const a = this.getAvatar();
-    console.log(a.getTime());
-    console.log(a.getHp());
-    display.drawText(1, 0, "AVATAR: " + a.chr);
-    display.drawText(1, 2, "Time: " + a.getTime());
-    display.drawText(1, 3, "Location: " + a.getX() + "," + a.getY());
-    display.drawText(1, 4, "HP: " + a.getHp() + "/" + a.getMaxHp());
-  }
-  handleInput(eventType, evt) {
-    if (eventType == "keyup") {
-      console.dir(evt);
-      if (evt.key == "v") {
-        this.game.switchModes("win");
-        return true;
-      }
-
-      if (evt.key == "l") {
-        this.game.switchModes("lose");
-        return true;
-      }
-
-      if (evt.key == "p") {
-        this.game.switchModes("persistence");
-        return true;
-      }
-
-      if (evt.key === "a") {
-        console.log("move left");
-        this.moveAvatar(-1, 0);
-        return true;
-      }
-
-      if (evt.key === "d") {
-        this.moveAvatar(1, 0);
-        return true;
-      }
-
-      if (evt.key === "w") {
-        this.moveAvatar(0, -1);
-        return true;
-      }
-
-      if (evt.key === "s") {
-        this.moveAvatar(0, 1);
-        return true;
-      }
-    }
-  }
-  moveAvatar(dx, dy) {
-    console.log(this.getAvatar());
-    if (this.getAvatar().tryWalk(dx, dy)) {
-      this.moveCameraToAvatar();
-      //this.getAvatar().addTime(1);
-      return true;
-    }
-
-    return false;
-    //this.state.cameramapx += dx;
-    //this.state.cameramapy += dy;
-    // DATASTORE.CAMERA_X = this.state.cameramapx;
-    // DATASTORE.CAMERA_Y = this.state.cameramapy;
-  }
-
-  moveCameraToAvatar() {
-    this.state.cameramapx = this.getAvatar().getX();
-    this.state.cameramapy = this.getAvatar().getY();
-  }
-
-  getAvatar() {
-    //console.log('avatar created');
-    console.dir(this);
-    console.log(DATASTORE.ENTITIES[this.state.avatarId]);
-    return DATASTORE.ENTITIES[this.state.avatarId];
-  }
-}
-
-export class WinMode extends UIMode {
-  render(display) {
-    display.clear();
-    display.drawText(2, 2, "Victory!!!");
-  }
-
-  handleInput(eventType, evt) {
-    if (evt.key == "Escape") {
-      this.game.switchModes("play");
-      return true;
-    }
-  }
-}
-export class LoseMode extends UIMode {
-  render(display) {
-    display.clear();
-    display.drawText(2, 2, "You lose!");
-  }
-
-  handleInput(eventType, evt) {
-    if (evt.key == "Escape") {
-      this.game.switchModes("play");
-      return true;
-    }
-  }
-}
-
-export class PersistenceMode extends UIMode {
-  render(display) {
-    display.clear();
-    display.drawText(2, 3, "N for New Game");
-    display.drawText(2, 4, "S to Save Game");
-    display.drawText(2, 5, "L to Load Game");
-  }
-
-  handleInput(eventType, evt) {
-    if (eventType == "keyup") {
-      if (evt.key == "N" || evt.key == "n") {
-        console.log("new game");
-        this.game.setupNewGame();
-        this.game.switchModes("play");
-        return true;
-      }
-
-      if (evt.key == "S" || evt.key == "s") {
-        this.handleSave();
-        this.game.switchModes("play");
-        console.log("save game");
-        return true;
-      }
-
-      if (evt.key == "L" || evt.key == "l") {
-        this.handleRestore();
-        this.game.switchModes("play");
-        return true;
-      }
-
-      if (evt.key == "Escape") {
-        this.game.switchModes("play");
-        return true;
-      }
-    }
-    return false;
-  }
-
-  handleSave() {
-    console.log("save game");
-    if (!this.localStorageAvailable()) {
-      return false;
-    }
-    window.localStorage.setItem("roguelikegame", JSON.stringify(DATASTORE));
-  }
-
-  handleRestore() {
-    console.log("load game");
-    if (!this.localStorageAvailable()) {
-      return false;
-    }
-
-    const restorationString = window.localStorage.getItem("roguelikegame");
-    const state = JSON.parse(restorationString);
-
-    clearDataStore();
-    DATASTORE.ID_SEQ = state.ID_SEQ;
-    DATASTORE.GAME = this.game;
-
-    this.game.fromJSON(state.GAME);
-
-    for (const mapId in state.MAPS) {
-      const mapData = JSON.parse(state.MAPS[mapId]);
-      DATASTORE.MAPS[mapId] = MapMaker(mapData);
-      DATASTORE.MAPS[mapId].build();
-    }
-
-    for (const entId in state.ENTITIES) {
-      DATASTORE.ENTITIES[entId] = JSON.parse(state.ENTITIES[entId]);
-      const ent = EntityFactory.create(DATASTORE.ENTITIES[entId].name);
-      if (DATASTORE.ENTITIES[entId].name == "avatar") {
-        this.game.modes.play.state.avatarId = ent.getId();
-      }
-      DATASTORE.MAPS[Object.keys(DATASTORE.MAPS)[0]].addEntityAt(
-        ent,
-        DATASTORE.ENTITIES[entId].x,
-        DATASTORE.ENTITIES[entId].y,
-      );
-      delete DATASTORE.ENTITIES[entId];
-    }
-
-    console.log("post-save data store: ");
-    console.dir(DATASTORE);
+  showMessage(msg) {
+    Message.send(msg);
+    this.game.render();
   }
 
   localStorageAvailable() {
-    // see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
     try {
       const x = "__storage_test__";
       window.localStorage.setItem(x, x);
@@ -313,6 +27,389 @@ export class PersistenceMode extends UIMode {
       );
       console.error(e);
       return false;
+    }
+  }
+
+  saveGame() {
+    if (!this.localStorageAvailable()) return false;
+    if (!DATASTORE.MAPS || Object.keys(DATASTORE.MAPS).length === 0) {
+      this.showMessage("No game to save. Start a new game first!");
+      return false;
+    }
+    if (!DATASTORE.ENTITIES || Object.keys(DATASTORE.ENTITIES).length === 0) {
+      this.showMessage("No game to save. Start a new game first!");
+      return false;
+    }
+    window.localStorage.setItem("roguelikegame", JSON.stringify(DATASTORE));
+    this.showMessage("Game saved successfully!");
+    return true;
+  }
+
+  loadGame() {
+    if (!this.localStorageAvailable()) return false;
+    const restorationString = window.localStorage.getItem("roguelikegame");
+    if (!restorationString) {
+      this.showMessage("No saved game found. Start a new game!");
+      return false;
+    }
+    const state = JSON.parse(restorationString);
+    if (!state.GAME || !state.MAPS || !state.ENTITIES) {
+      this.showMessage("Invalid save data found. Starting new game.");
+      window.localStorage.removeItem("roguelikegame");
+      return false;
+    }
+    clearDataStore();
+    DATASTORE.ID_SEQ = state.ID_SEQ;
+    DATASTORE.GAME = this.game;
+    this.game.fromJSON(state.GAME);
+    const playState = this.game.modes.play.state;
+    if (!playState.mapId || !playState.avatarId) {
+      this.showMessage("Invalid save data - missing game state. Starting new game.");
+      window.localStorage.removeItem("roguelikegame");
+      return false;
+    }
+    for (const mapId in state.MAPS) {
+      const mapData = JSON.parse(state.MAPS[mapId]);
+      DATASTORE.MAPS[mapId] = MapMaker(mapData);
+      DATASTORE.MAPS[mapId].build();
+    }
+    for (const entId in state.ENTITIES) {
+      const entityData = JSON.parse(state.ENTITIES[entId]);
+      if (!entityData.name) {
+        console.warn("Entity missing name property:", entityData);
+        continue;
+      }
+      try {
+        const ent = EntityFactory.create(entityData.name);
+        if (entityData.name == "avatar") {
+          this.game.modes.play.state.avatarId = ent.getId();
+        }
+        DATASTORE.MAPS[Object.keys(DATASTORE.MAPS)[0]].addEntityAt(
+          ent,
+          entityData.x,
+          entityData.y,
+        );
+      } catch (error) {
+        console.error("Failed to create entity:", entityData.name, error);
+        Message.send(`Failed to restore entity: ${entityData.name}`);
+        continue;
+      }
+    }
+    
+    // Ensure camera is positioned correctly after loading
+    if (this.game.modes.play && this.game.modes.play.moveCameraToAvatar) {
+      this.game.modes.play.moveCameraToAvatar();
+    }
+    
+    return true;
+  }
+
+  renderAvatar(display) {
+    display.clear();
+  }
+}
+
+export class StartupMode extends BaseUIMode {
+  render(display) {
+    display.drawText(2, 2, "Welcome");
+    display.drawText(2, 3, "Press any key to continue");
+  }
+  handleInput(eventType, evt) {
+    if (eventType == "keyup") {
+      this.game.switchModes("persistence");
+      return true;
+    }
+  }
+}
+
+export class PlayMode extends BaseUIMode {
+  constructor(thegame) {
+    super(thegame);
+    this.state = { mapId: "", cameramapx: 0, cameramapy: 0 };
+    this.pressedKeys = new Set();
+    this.movementTimer = null;
+    this.movementDelay = 100;
+  }
+  enter() {
+    // Clear any pressed keys when entering play mode
+    this.pressedKeys.clear();
+    
+    if (!this.state.avatarId || !DATASTORE.ENTITIES[this.state.avatarId]) {
+      this.showMessage("Invalid save data - missing avatar. Please start a new game.");
+      this.game.switchModes("persistence");
+      return;
+    }
+    if (!this.state.mapId || !DATASTORE.MAPS[this.state.mapId]) {
+      this.showMessage("Invalid save data - missing map. Please start a new game.");
+      this.game.switchModes("persistence");
+      return;
+    }
+    if (!this.state.mapId) {
+      const m = MapMaker({ xdim: 300, ydim: 160, mapType: "basic caves" });
+      this.state.mapId = m.getId();
+      m.build();
+      // Don't set hardcoded camera coordinates - let moveCameraToAvatar handle it
+    }
+    
+    // Ensure camera is centered on the player when entering play mode
+    this.moveCameraToAvatar();
+    
+    TIME_ENGINE.unlock();
+    this.cameraSymbol = new DisplaySymbol("@", "#eb4");
+    this.startMovementTimer();
+  }
+  exit() {
+    this.stopMovementTimer();
+    this.pressedKeys.clear();
+  }
+  startMovementTimer() {
+    this.movementTimer = setInterval(() => {
+      this.processContinuousMovement();
+    }, this.movementDelay);
+  }
+  stopMovementTimer() {
+    if (this.movementTimer) {
+      clearInterval(this.movementTimer);
+      this.movementTimer = null;
+    }
+  }
+  processContinuousMovement() {
+    for (const key of this.pressedKeys) {
+      switch (key) {
+        case "a": this.moveAvatar(-1, 0); break;
+        case "d": this.moveAvatar(1, 0); break;
+        case "w": this.moveAvatar(0, -1); break;
+        case "s": this.moveAvatar(0, 1); break;
+      }
+    }
+    if (this.pressedKeys.size > 0) this.game.render();
+  }
+  toJSON() { return JSON.stringify(this.state); }
+  restoreFromState(stateData) { this.state = JSON.parse(stateData); }
+  setupNewGame() {
+    // Use the same dimensions as the main display to fill the whole screen
+    const mapWidth = Math.floor(window.innerWidth / 8);
+    const mapHeight = Math.floor(window.innerHeight / 16);
+    const m = MapMaker({ xdim: mapWidth, ydim: mapHeight, mapType: "basic caves" });
+    this.state.mapId = m.getId();
+    Message.send("Building map....");
+    this.game.renderMessage();
+    m.build();
+    
+    // Create and place the avatar first
+    const a = EntityFactory.create("avatar");
+    this.state.avatarId = a.getId();
+    m.addEntityAtRandomPosition(a);
+    
+    // Position camera on the avatar immediately
+    this.moveCameraToAvatar();
+    
+    // Add other entities
+    for (let mossCount = 0; mossCount < 10; mossCount++) {
+      m.addEntityAtRandomPosition(EntityFactory.create("moss"));
+    }
+    for (let monsterCount = 0; monsterCount < 1; monsterCount++) {
+      m.addEntityAtRandomPosition(EntityFactory.create("monster"));
+    }
+    
+    setTimeout(() => {
+      Message.clear();
+      this.game.renderMessage();
+      this.game.switchModes("play");
+    }, 2000);
+  }
+  render(display) {
+    if (!display) {
+      // console.warn("PlayMode.render called with invalid display");
+      return;
+    }
+    
+    display.clear();
+    if (!this.state.mapId || !DATASTORE.MAPS[this.state.mapId]) {
+      display.drawText(2, 2, "No map available");
+      return;
+    }
+    
+    // Ensure camera coordinates are valid numbers
+    const cameraX = typeof this.state.cameramapx === 'number' ? this.state.cameramapx : 0;
+    const cameraY = typeof this.state.cameramapy === 'number' ? this.state.cameramapy : 0;
+    
+    DATASTORE.MAPS[this.state.mapId].render(
+      display,
+      cameraX,
+      cameraY,
+    );
+  }
+  renderAvatar(display) {
+    if (!display) {
+      console.warn("PlayMode.renderAvatar called with invalid display");
+      return;
+    }
+    
+    display.clear();
+    const a = this.getAvatar();
+    if (!a) return;
+    display.drawText(1, 0, "AVATAR: " + a.chr);
+    display.drawText(1, 2, "Time: " + a.getTime());
+    display.drawText(1, 3, "Location: " + a.getX() + "," + a.getY());
+    display.drawText(1, 4, "HP: " + a.getHp() + "/" + a.getMaxHp());
+  }
+  handleInput(eventType, evt) {
+    if (eventType == "keydown") {
+      if (["a", "w", "s", "d"].includes(evt.key.toLowerCase())) {
+        this.pressedKeys.add(evt.key.toLowerCase());
+        return true;
+      }
+      if (evt.key == "p") {
+        // Prevent key repeat events from causing flickering
+        if (evt.repeat) return true;
+        this.game.switchModes("pause");
+        Message.send("Paused");
+        return true;
+      }
+    }
+    if (eventType == "keyup") {
+      if (["a", "w", "s", "d"].includes(evt.key.toLowerCase())) {
+        this.pressedKeys.delete(evt.key.toLowerCase());
+        return true;
+      }
+    }
+    return false;
+  }
+  moveAvatar(dx, dy) {
+    if (this.getAvatar().tryWalk(dx, dy)) {
+      this.moveCameraToAvatar();
+      return true;
+    }
+    return false;
+  }
+  moveCameraToAvatar() {
+    const avatar = this.getAvatar();
+    if (avatar) {
+      this.state.cameramapx = avatar.getX();
+      this.state.cameramapy = avatar.getY();
+    } else {
+      // Fallback to safe coordinates if avatar is not available
+      this.state.cameramapx = 0;
+      this.state.cameramapy = 0;
+    }
+  }
+  getAvatar() {
+    if (!this.state.avatarId || !DATASTORE.ENTITIES[this.state.avatarId]) {
+      return null;
+    }
+    return DATASTORE.ENTITIES[this.state.avatarId];
+  }
+}
+
+export class PauseMode extends BaseUIMode {
+  render(display) {
+    display.clear();
+    display.drawText(2, 2, "== PAUSED ==");
+    display.drawText(2, 4, "Press 'P' or 'Escape' to resume");
+    display.drawText(2, 5, "Press 'S' to save game");
+    display.drawText(2, 6, "Press 'L' to load game");
+  }
+  handleInput(eventType, evt) {
+    // Handle both keydown and keyup to prevent flickering
+    if (eventType === "keydown") {
+      // Prevent key repeat events from causing flickering
+      if (evt.repeat) {
+        return true;
+      }
+      
+      if (evt.key === "p" || evt.key === "Escape") {
+        this.game.switchModes("play");
+        return true;
+      }
+      if (evt.key === "s" || evt.key === "S") {
+        this.saveGame();
+        return true;
+      }
+      if (evt.key === "l" || evt.key === "L") {
+        if (this.loadGame()) {
+          this.game.switchModes("play");
+        }
+        return true;
+      }
+    }
+    
+    // Handle keyup events to prevent key repeat issues
+    if (eventType === "keyup") {
+      if (evt.key === "p" || evt.key === "Escape") {
+        // Don't switch modes on keyup, only on keydown
+        return true;
+      }
+      if (evt.key === "s" || evt.key === "S") {
+        return true;
+      }
+      if (evt.key === "l" || evt.key === "L") {
+        return true;
+      }
+    }
+    
+    // Return true for any key event to prevent them from bubbling up
+    return true;
+  }
+}
+
+export class PersistenceMode extends BaseUIMode {
+  render(display) {
+    display.clear();
+    display.drawText(2, 3, "N for New Game");
+    display.drawText(2, 4, "S to Save Game");
+    display.drawText(2, 5, "L to Load Game");
+  }
+  handleInput(eventType, evt) {
+    if (eventType == "keyup") {
+      if (evt.key == "N" || evt.key == "n") {
+        this.game.setupNewGame();
+        this.game.switchModes("play");
+        return true;
+      }
+      if (evt.key == "S" || evt.key == "s") {
+        if (this.saveGame()) {
+          this.game.switchModes("play");
+        }
+        return true;
+      }
+      if (evt.key == "L" || evt.key == "l") {
+        if (this.loadGame()) {
+          this.game.switchModes("play");
+        }
+        return true;
+      }
+      if (evt.key == "Escape") {
+        this.game.switchModes("play");
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+export class WinMode extends BaseUIMode {
+  render(display) {
+    display.clear();
+    display.drawText(2, 2, "Victory!!!");
+  }
+  handleInput(eventType, evt) {
+    if (evt.key == "Escape") {
+      this.game.switchModes("play");
+      return true;
+    }
+  }
+}
+
+export class LoseMode extends BaseUIMode {
+  render(display) {
+    display.clear();
+    display.drawText(2, 2, "Game Over");
+  }
+  handleInput(eventType, evt) {
+    if (evt.key == "Escape") {
+      this.game.switchModes("play");
+      return true;
     }
   }
 }

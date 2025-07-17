@@ -88,6 +88,7 @@ const KEY_BINDINGS = {
       "key:M,altKey:false,ctrlKey:false,shiftKey:true",
       "key:m,altKey:false,ctrlKey:false,shiftKey:false",
     ],
+    PAUSE: ["key:p,altKey:false,ctrlKey:false,shiftKey:false"],
   },
   movement_numpad: {
     MOVE_UL: ["key:7,altKey:false,ctrlKey:false,shiftKey:false"],
