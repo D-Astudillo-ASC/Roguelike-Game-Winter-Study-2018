@@ -1,29 +1,25 @@
 class Messager {
-  constructor(){
-    this.message = ' ';
+  constructor() {
+    this.message = " ";
   }
 
-
-
-  render(targetDisplay){
+  render(targetDisplay) {
     targetDisplay.clear();
-    targetDisplay.drawText(2,2,(this.message));
+    targetDisplay.drawText(2, 2, this.message);
   }
 
-  send(msg){
+  send(msg) {
     this.message = msg;
   }
 
-  delayedSend(msg){
+  delayedSend(msg) {
     this.message = msg;
-    setTimeout(msg,2000);
+    setTimeout(msg, 2000);
   }
 
-  clear(){
-    this.message = ' ';
+  clear() {
+    this.message = " ";
   }
-
-
 }
 
-export let Message = new Messager();
+export const Message = new Messager();

@@ -1,44 +1,58 @@
-
-import {DisplaySymbol} from './display_symbol.js';
+import { DisplaySymbol } from "./display_symbol.js";
 
 export class Tile extends DisplaySymbol {
-  constructor(template){
-    super(template)
+  constructor(template) {
+    super(template);
     this.name = template.name;
     this.transparent = template.transparent || false;
     this.passable = template.passable || false;
   }
 
-  isImpassable(){
+  isImpassable() {
     return !this.passable;
   }
 
-  isPassable(){
+  isPassable() {
     return this.passable;
   }
 
-  setPassable(newVal){
+  setPassable(newVal) {
     this.passable = newVal;
   }
-  isTransparent(){
+  isTransparent() {
     return this.transparent;
   }
 
-  setTransparent(newVal){
+  setTransparent(newVal) {
     this.transparent = newVal;
   }
 
-  isOpaque(){
+  isOpaque() {
     return !this.transparent;
   }
 
-  isA(name){
+  isA(name) {
     return this.name == name;
   }
 }
 
-export let TILES = {
-  NULLTILE: new Tile({name:'nulltile',chr: '!',transparent:false,passable:false}),
-  WALL: new Tile({name:'wall',chr:'|',transparent:false,passable:false}),
-  FLOOR: new Tile({name:'floor',chr:' ',transparent:true,passable:true})
-}
+export const TILES = {
+  NULLTILE: new Tile({
+    name: "nulltile",
+    chr: "!",
+    transparent: false,
+    passable: false,
+  }),
+  WALL: new Tile({
+    name: "wall",
+    chr: "|",
+    transparent: false,
+    passable: false,
+  }),
+  FLOOR: new Tile({
+    name: "floor",
+    chr: " ",
+    transparent: true,
+    passable: true,
+  }),
+};

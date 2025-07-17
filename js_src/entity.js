@@ -1,86 +1,78 @@
-import {uniqueId} from './util.js';
-import {MixableSymbol} from './mixable_symbol.js';
-import {DATASTORE} from './datastore.js';
+import { uniqueId } from "./util.js";
+import { MixableSymbol } from "./mixable_symbol.js";
+import { DATASTORE } from "./datastore.js";
 
-
-export class Entity extends MixableSymbol{
-    constructor(template){
-      super(template);
-      this.name = template.name;
-      if(!this.state){
-        this.state = {};
-      }
-      this.state.x = 0;
-      this.state.y= 0;
-      this.state.mapId = 0;
-      this.state.id = uniqueId();
+export class Entity extends MixableSymbol {
+  constructor(template) {
+    super(template);
+    this.name = template.name;
+    if (!this.state) {
+      this.state = {};
     }
+    this.state.x = 0;
+    this.state.y = 0;
+    this.state.mapId = 0;
+    this.state.id = uniqueId();
+  }
 
-    getId()
-    {
-      return this.state.id;
-    }
+  getId() {
+    return this.state.id;
+  }
 
-    setId(newId)
-    {
-      this.state.id = newId;
-    }
+  setId(newId) {
+    this.state.id = newId;
+  }
 
-    getName()
-    {
-      return this.state.name;
-    }
+  getName() {
+    return this.state.name;
+  }
 
-    setName(newName)
-    {
-      this.state.name = newName;
-    }
+  setName(newName) {
+    this.state.name = newName;
+  }
 
-    getX(){
-      return this.state.x;
-    }
+  getX() {
+    return this.state.x;
+  }
 
-    setX(newX){
-      this.state.x = newX;
-    }
+  setX(newX) {
+    this.state.x = newX;
+  }
 
+  getY() {
+    return this.state.y;
+  }
 
-    getY(){
-      return this.state.y;
-    }
+  setY(newY) {
+    this.state.y = newY;
+  }
 
-    setY(newY){
-      this.state.y = newY;
-    }
+  getPos() {
+    return `${this.state.x},${this.state.y}`;
+  }
 
-    getPos()
-    {
-        return `${this.state.x},${this.state.y}`;
-    }
+  getMapId() {
+    return this.state.mapId;
+  }
 
-    getMapId(){
-      return this.state.mapId;
-    }
+  setMapId(newInfo) {
+    this.state.mapId = newInfo;
+  }
+  getMap() {
+    return DATASTORE.MAPS[this.state.mapId];
+  }
 
-    setMapId(newInfo){
-      this.state.mapId = newInfo;
-    }
-    getMap(){
-      return DATASTORE.MAPS[this.state.mapId];
-    }
+  destroy() {
+    this.getMap().extractEntity(this);
 
-    destroy()
-    {
-      this.getMap().extractEntity(this);
+    delete DATASTORE[this.getId()];
+  }
 
-      delete DATASTORE[this.getId()];
-    }
+  toJSON() {
+    return JSON.stringify(this.state);
+  }
 
-    toJSON(){
-      return JSON.stringify(this.state);
-    }
-
-    fromJSON(s){
-      this.state = JSON.parse(s);
-    }
+  fromJSON(s) {
+    this.state = JSON.parse(s);
+  }
 }

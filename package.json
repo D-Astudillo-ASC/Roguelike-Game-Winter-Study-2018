@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint js_src --ext .js",
+    "lint": "eslint js_src --ext .js --fix",
     "format": "prettier --write js_src/**/*.js"
   },
   "repository": {
@@ -27,8 +27,10 @@
     "rot-js": "^2.2.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.31.0",
     "@vitejs/plugin-legacy": "^7.0.0",
     "eslint": "^9.31.0",
+    "globals": "^16.3.0",
     "prettier": "^3.2.5",
     "vite": "^7.0.4"
   },
