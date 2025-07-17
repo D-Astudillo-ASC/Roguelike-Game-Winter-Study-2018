@@ -1,5 +1,12 @@
 import { Display, RNG } from "rot-js";
-import { StartupMode, PlayMode, WinMode, LoseMode, PersistenceMode, PauseMode } from "./ui_mode.js";
+import {
+  StartupMode,
+  PlayMode,
+  WinMode,
+  LoseMode,
+  PersistenceMode,
+  PauseMode,
+} from "./ui_mode.js";
 import { Message } from "./message.js";
 import { DATASTORE } from "./datastore.js";
 
@@ -22,13 +29,13 @@ export const Game = {
     },
 
     avatar: {
-      w: Math.floor(window.innerWidth /8),
+      w: Math.floor(window.innerWidth / 8),
       h: Math.floor(window.innerHeight / 16),
       o: null,
     },
 
     message: {
-      w: Math.floor(window.innerWidth /8),
+      w: Math.floor(window.innerWidth / 8),
       h: 6,
       o: null,
     },
@@ -70,9 +77,9 @@ export const Game = {
     DATASTORE.GAME = this;
     this.switchModes("startup");
     Message.send("Greetings!");
-          // console.dir(this);
+    // console.dir(this);
     // console.log("datastore");
-          // console.dir(DATASTORE);
+    // console.dir(DATASTORE);
   },
 
   setupModes: function () {
@@ -85,12 +92,12 @@ export const Game = {
   },
 
   setupNewGame: function () {
-    console.log("Game.setupNewGame() called");
+    // console.log("Game.setupNewGame() called");
     this._randomSeed = 5 + Math.floor(Math.random() * 100000);
     //this._randomSeed = 76250;
-    console.log("Using random seed " + this._randomSeed);
+    // console.log("Using random seed " + this._randomSeed);
     RNG.setSeed(this._randomSeed);
-    console.log("About to call PlayMode.setupNewGame()");
+    // console.log("About to call PlayMode.setupNewGame()");
     this.modes.play.setupNewGame();
   },
 
@@ -112,17 +119,26 @@ export const Game = {
   },
 
   switchModes: function (newModeName) {
-    console.log("Game.switchModes() called: switching from", this.curModeName, "to", newModeName);
+    // console.log(
+    //   "Game.switchModes() called: switching from",
+    //   this.curModeName,
+    //   "to",
+    //   newModeName,
+    // );
     // Stop movement timer if leaving play mode
-    if (this.curModeName === "play" && this.curMode && this.curMode.stopMovementTimer) {
+    if (
+      this.curModeName === "play" &&
+      this.curMode &&
+      this.curMode.stopMovementTimer
+    ) {
       this.curMode.stopMovementTimer();
     }
     this.curMode = this.modes[newModeName];
     this.curModeName = newModeName;
-    
+
     // Call enter() method if it exists
     if (this.curMode && this.curMode.enter) {
-      console.log("Calling enter() method for", newModeName, "mode");
+      // console.log("Calling enter() method for", newModeName, "mode");
       this.curMode.enter();
     }
     this.render();
@@ -144,11 +160,17 @@ export const Game = {
 
   fromJSON: function (json) {
     // console.log(json);
-    const state = JSON.parse(json);
-    this._randomSeed = state.rseed;
-    RNG.setSeed(this.randomSeed);
+    try {
+      // json is already an object, not a JSON string
+      const state = json;
+      this._randomSeed = state.GAME_STATE.randomSeed;
+      RNG.setSeed(this._randomSeed);
 
-    this.modes.play.restoreFromState(state.playModeState);
+      this.modes.play.restoreFromState(state.GAME_STATE.playModeState);
+    } catch (error) {
+      console.error("Failed to parse game state JSON:", error);
+      throw new Error("Invalid game state data");
+    }
   },
 
   getDisplay: function (displayId) {
@@ -175,7 +197,7 @@ export const Game = {
         spacing: this.display.SPACING,
       });
     }
-    
+
     if (this.curMode && this.display.main.o) {
       this.curMode.render(this.display.main.o);
     }
@@ -194,7 +216,7 @@ export const Game = {
         spacing: this.display.SPACING,
       });
     }
-    
+
     const a = this.display.avatar.o;
     //a.drawText(0,2,"Avatar Space");
     if (this.curMode && a) {
@@ -219,7 +241,7 @@ export const Game = {
         spacing: this.display.SPACING,
       });
     }
-    
+
     const d = this.display.message.o;
     if (d) {
       Message.render(d);

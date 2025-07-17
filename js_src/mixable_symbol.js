@@ -4,6 +4,8 @@ import * as E from "./entity_mixins.js";
 export class MixableSymbol extends DisplaySymbol {
   constructor(template) {
     super(template);
+    // Set the name early so mixins can access it during initialization
+    this.name = template.name;
     if (!this.state) {
       this.state = {};
     }
@@ -20,7 +22,7 @@ export class MixableSymbol extends DisplaySymbol {
 
     for (let mi = 0; mi < this.mixins.length; mi++) {
       const m = this.mixins[mi];
-      console.log("Adding mixin:", m.META.mixInName, "to entity:", template.name);
+      // console.log("Adding mixin:", m.META.mixInName, "to entity:", this.name);
       if (m.META.stateNamespace) {
         this.state[m.META.stateNamespace] = {};
       }
@@ -48,13 +50,25 @@ export class MixableSymbol extends DisplaySymbol {
   }
 
   raiseMixinEvent(evtLabel, evtData) {
-    console.log("raiseMixinEvent called for:", this.name, "event:", evtLabel);
-    console.log("Number of mixins:", this.mixins.length);
+    // console.log("raiseMixinEvent called for:", this.name, "event:", evtLabel);
+    // console.log("Number of mixins:", this.mixins.length);
     for (let mi = 0; mi < this.mixins.length; mi++) {
       const m = this.mixins[mi];
-      console.log("Checking mixin:", m.META.mixInName, "has listeners:", !!m.LISTENERS, "has event:", !!m.LISTENERS?.[evtLabel]);
+      // console.log(
+      //   "Checking mixin:",
+      //   m.META.mixInName,
+      //   "has listeners:",
+      //   !!m.LISTENERS,
+      //   "has event:",
+      //   !!m.LISTENERS?.[evtLabel],
+      // );
       if (m.LISTENERS && m.LISTENERS[evtLabel]) {
-        console.log("Calling listener for:", m.META.mixInName, "event:", evtLabel);
+        // console.log(
+        //   "Calling listener for:",
+        //   m.META.mixInName,
+        //   "event:",
+        //   evtLabel,
+        // );
         m.LISTENERS[evtLabel].call(this, evtData);
       }
     }

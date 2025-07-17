@@ -34,7 +34,14 @@ EntityFactory.learn({
   fg: "#d63",
   maxHp: 50,
   meleeDamage: 5,
-  mixInNames: ["ActorWanderer", "WalkerCorporeal", "HitPoints", "SmartMonsterAI", "MeleeAttacker", "PlayerMessages"],
+  mixInNames: [
+    "ActorWanderer",
+    "WalkerCorporeal",
+    "HitPoints",
+    "SmartMonsterAI",
+    "MeleeAttacker",
+    "PlayerMessages",
+  ],
 });
 
 EntityFactory.learn({
@@ -43,5 +50,12 @@ EntityFactory.learn({
   fg: "#d63",
   maxHp: 30,
   meleeDamage: 3,
-  mixInNames: ["ActorWanderer", "WalkerCorporeal", "HitPoints", "BalancedMonsterAI", "MeleeAttacker", "PlayerMessages"],
+  mixInNames: [
+    "ActorWanderer",
+    "WalkerCorporeal",
+    "HitPoints",
+    "BalancedMonsterAI",
+    "MeleeAttacker",
+    "PlayerMessages",
+  ],
 });

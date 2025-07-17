@@ -82,23 +82,57 @@ class Map {
     return ent;
   }
   addEntityAt(ent, mapx, mapy) {
+    // console.log(`addEntityAt called for ${ent.name} (${ent.getId()}) to (${mapx},${mapy})`);
     const pos = `${mapx},${mapy}`;
     this.state.entityIdToMapPos[ent.getId()] = pos;
     this.state.mapPosToEntityId[pos] = ent.getId();
     ent.setMapId(this.getId());
     ent.setX(mapx);
     ent.setY(mapy);
+    // Debug: Log entity placement
+    // console.warn(`Entity ${ent.name} (${ent.getId()}) placed at (${mapx}, ${mapy}) on map ${this.getId()}`);
   }
 
   moveEntityTo(ent, newX, newY) {
+    // console.warn(`moveEntityTo called for ${ent.name} (${ent.getId()}) to (${newX},${newY})`);
     // Remove from old position
     const oldPos = this.state.entityIdToMapPos[ent.getId()];
     if (oldPos) {
       delete this.state.mapPosToEntityId[oldPos];
       delete this.state.entityIdToMapPos[ent.getId()];
     }
-    // Add to new position
+    // Add to new position (this already calls syncEntityPosition)
     this.addEntityAt(ent, newX, newY);
+  }
+
+  // --- FIX 11: Add comprehensive position synchronization function ---
+  syncEntityPosition(ent) {
+    const entId = ent.getId();
+    const currentMapPos = this.state.entityIdToMapPos[entId];
+    
+    if (!currentMapPos) {
+      console.warn(`No map position found for ${ent.name} (${entId})`);
+      return;
+    }
+    
+    const [mapX, mapY] = currentMapPos.split(",").map(Number);
+    const entX = ent.getX();
+    const entY = ent.getY();
+    
+    // If there's a mismatch, update the entity to match the map
+    if (entX !== mapX || entY !== mapY) {
+      console.warn(
+        `Position sync fix: ${ent.name} (${entId}) entity (${entX},${entY}) vs map (${mapX},${mapY})`,
+      );
+      
+      // Update entity position to match map position
+      ent.setX(mapX);
+      ent.setY(mapY);
+      
+      // console.log(
+      //   `Position sync fixed: ${ent.name} (${entId}) entity now at (${mapX},${mapY})`,
+      // );
+    }
   }
 
   isPositionOpen(x, y) {
@@ -124,7 +158,7 @@ class Map {
   addEntityAtRandomPosition(ent) {
     const openPos = this.getRandomOpenPosition();
     const p = openPos.split(",");
-    this.addEntityAt(ent, p[0], p[1]);
+    this.addEntityAt(ent, parseInt(p[0]), parseInt(p[1]));
   }
 
   getRandomOpenPosition() {

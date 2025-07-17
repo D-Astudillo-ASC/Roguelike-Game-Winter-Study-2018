@@ -26,8 +26,6 @@ export function setKeyBinding(bindingNameList) {
   if (bindingNameList[0] != "universal") {
     bindingNameList.unshift("universal");
   }
-  // console.log('bindingNameList:');
-  // console.dir(bindingNameList)
 
   let commandNumber = 1;
   COMMAND = {
@@ -53,10 +51,6 @@ export function setKeyBinding(bindingNameList) {
       }
     }
   }
-  // console.log('COMMAND');
-  // console.dir(COMMAND);
-  // console.log('BINDING_LOOKUPS');
-  // console.dir(BINDING_LOOKUPS);
 }
 
 // these define the key bindings for the various game commands, though the actual lookup uses different object that's generated from this one.
