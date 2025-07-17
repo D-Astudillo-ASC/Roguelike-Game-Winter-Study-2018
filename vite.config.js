@@ -8,6 +8,7 @@ export default defineConfig(({ command, mode }) => {
   const isStaging = mode === 'staging'
 
   return {
+    base: './',
     plugins: [
       legacy({
         targets: ['defaults', 'not IE 11']
