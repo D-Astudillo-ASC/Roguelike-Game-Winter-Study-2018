@@ -1,4 +1,4 @@
-import { Game } from "./game.js";
+import { Game } from "./systems/Game.js";
 
 window.onload = function () {
   Game.init();
