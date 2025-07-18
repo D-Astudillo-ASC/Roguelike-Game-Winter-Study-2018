@@ -1,14 +1,8 @@
 import { Display, RNG } from "rot-js";
-import {
-  StartupMode,
-  PlayMode,
-  WinMode,
-  LoseMode,
-  PersistenceMode,
-  PauseMode,
-} from "./ui_mode.js";
-import { Message } from "./message.js";
-import { DATASTORE } from "./datastore.js";
+import { ModeRegistry } from "../ui/modes/ModeRegistry.js";
+import { Message } from "../ui/components/MessageSystem.js";
+import { DATASTORE } from "../core/DataStore.js";
+import { clearAllMovementKeys } from "./Commands.js";
 
 // Centralized mode transition handler
 const modeTransitions = {
@@ -83,22 +77,40 @@ export const Game = {
   },
 
   setupModes: function () {
-    this.modes.startup = new StartupMode(this);
-    this.modes.play = new PlayMode(this);
-    this.modes.win = new WinMode(this);
-    this.modes.lose = new LoseMode(this);
-    this.modes.persistence = new PersistenceMode(this);
-    this.modes.pause = new PauseMode(this);
+    const modeRegistry = ModeRegistry.create(this);
+    this.modes = modeRegistry.getAllModes();
   },
 
-  setupNewGame: function () {
-    // console.log("Game.setupNewGame() called");
-    this._randomSeed = 5 + Math.floor(Math.random() * 100000);
-    //this._randomSeed = 76250;
-    // console.log("Using random seed " + this._randomSeed);
-    RNG.setSeed(this._randomSeed);
-    // console.log("About to call PlayMode.setupNewGame()");
+  // Centralized new game setup
+  startNewGame: function () {
+    // Clear DATASTORE and scheduler
+    if (typeof DATASTORE.clearDataStore === 'function') {
+      DATASTORE.clearDataStore();
+    } else {
+      // fallback: manual clear
+      if (typeof SCHEDULER !== 'undefined' && SCHEDULER.clear) SCHEDULER.clear();
+      DATASTORE.ID_SEQ = 1;
+      DATASTORE.MAPS = {};
+      DATASTORE.ENTITIES = {};
+      DATASTORE.PLAYER = undefined;
+      DATASTORE._isLoading = false;
+    }
+    
+    // Clear all movement keys and continuous movement state
+    if (typeof clearAllMovementKeys === 'function') {
+      clearAllMovementKeys();
+    }
+    // Also clear the continuous movement flag
+    if (typeof window !== 'undefined') {
+      window.continuousMovementRequested = false;
+    }
+    
+    // Re-link game object
+    DATASTORE.GAME = this;
+    // Setup new game state
     this.modes.play.setupNewGame();
+    // Switch to play mode
+    this.switchModes('play');
   },
 
   bindEvent: function (eventType) {
@@ -111,20 +123,20 @@ export const Game = {
     // Only allow pause key in PlayMode
     // When an event is received have the current ui handle it
     if (this.curMode !== null && this.curMode != "") {
-      if (this.curMode.handleInput(eventType, evt)) {
-        this.render();
-        //Message.ageMessages();
+      // Use a more robust approach - prevent processing during mode transitions
+      if (this._modeTransitioning) {
+        return;
       }
+      
+      this.curMode.handleInput(eventType, evt);
+      // Don't render here - let the mode handle its own rendering
     }
   },
 
   switchModes: function (newModeName) {
-    // console.log(
-    //   "Game.switchModes() called: switching from",
-    //   this.curModeName,
-    //   "to",
-    //   newModeName,
-    // );
+    // Set transition flag to prevent event processing during mode switch
+    this._modeTransitioning = true;
+    
     // Stop movement timer if leaving play mode
     if (
       this.curModeName === "play" &&
@@ -133,24 +145,34 @@ export const Game = {
     ) {
       this.curMode.stopMovementTimer();
     }
+    
+    // Clear avatar display when leaving play mode
+    if (this.curModeName === "play" && newModeName !== "play") {
+      if (this.display.avatar.o) {
+        this.display.avatar.o.clear();
+      }
+    }
+    
     this.curMode = this.modes[newModeName];
     this.curModeName = newModeName;
 
     // Call enter() method if it exists
     if (this.curMode && this.curMode.enter) {
-      // console.log("Calling enter() method for", newModeName, "mode");
       this.curMode.enter();
     }
     this.render();
+    
+    // Clear transition flag after a short delay
+    setTimeout(() => {
+      this._modeTransitioning = false;
+    }, 100);
   },
 
   toJSON: function () {
-    let json = "";
-    json = JSON.stringify({
-      rseed: this.randomSeed,
-      playModeState: this.modes.play,
-    });
-    return json;
+    return {
+      randomSeed: this._randomSeed,
+      playModeState: this.modes.play.toJSON(),
+    };
   },
 
   restoreFromState(stateData) {
@@ -158,11 +180,8 @@ export const Game = {
     this.state = stateData;
   },
 
-  fromJSON: function (json) {
-    // console.log(json);
+  fromJSON: function (state) {
     try {
-      // json is already an object, not a JSON string
-      const state = json;
       this._randomSeed = state.GAME_STATE.randomSeed;
       RNG.setSeed(this._randomSeed);
 
@@ -181,8 +200,9 @@ export const Game = {
   },
 
   render: function () {
-    this.renderAvatar();
+    // Render main display and avatar display
     this.renderMain();
+    this.renderAvatar();
     this.renderMessage();
   },
 
@@ -199,6 +219,7 @@ export const Game = {
     }
 
     if (this.curMode && this.display.main.o) {
+      this.display.main.o.clear();
       this.curMode.render(this.display.main.o);
     }
     //if(this.curMode.hasOwnProperty('render')){
@@ -207,6 +228,11 @@ export const Game = {
   },
 
   renderAvatar: function () {
+    // Only render avatar display in play mode when we have an avatar
+    if (this.curModeName !== "play") {
+      return;
+    }
+
     // Ensure display is initialized
     if (!this.display.avatar.o) {
       // console.warn("Avatar display is null, reinitializing...");
@@ -218,18 +244,10 @@ export const Game = {
     }
 
     const a = this.display.avatar.o;
-    //a.drawText(0,2,"Avatar Space");
     if (this.curMode && a) {
+      a.clear();
       this.curMode.renderAvatar(a);
     }
-
-    //this.curMode.render(a);
-    //a.drawText(0,2,"Avatar Space");
-
-    //  this.curMode.render(this.display.main.o);
-    //if(this.curMode.hasOwnProperty('render')){
-    //this.curMode.render(this.display.main.o);
-    //}
   },
   renderMessage: function () {
     // Ensure display is initialized
@@ -253,4 +271,4 @@ export const Game = {
     //this.curMode.render(this.display.main.o);
     //}
   },
-};
+}; 
