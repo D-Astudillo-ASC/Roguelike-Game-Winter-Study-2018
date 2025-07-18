@@ -37,20 +37,12 @@ export default defineConfig(({ command, mode }) => {
         },
       } : undefined,
       
-      // Optimize chunk splitting
+      // Let Vite handle chunk splitting automatically
       rollupOptions: {
         input: {
           main: 'index.html'
         },
         output: {
-          // Optimize chunk splitting for better caching
-          manualChunks: {
-            vendor: ['rot-js'],
-            game: ['./js_src/game.js'],
-            ui: ['./js_src/ui_mode.js'],
-            entities: ['./js_src/entity_mixins.js', './js_src/entity_templates.js'],
-            utils: ['./js_src/util.js', './js_src/message.js', './js_src/datastore.js'],
-          },
           // Optimize asset naming for better caching
           chunkFileNames: isProduction 
             ? 'assets/js/[name]-[hash].js'
