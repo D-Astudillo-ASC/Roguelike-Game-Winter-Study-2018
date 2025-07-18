@@ -1,4 +1,4 @@
-import { DisplaySymbol } from "./display_symbol.js";
+import { DisplaySymbol } from "./DisplaySymbol.js";
 
 export class Tile extends DisplaySymbol {
   constructor(template) {
@@ -19,6 +19,7 @@ export class Tile extends DisplaySymbol {
   setPassable(newVal) {
     this.passable = newVal;
   }
+
   isTransparent() {
     return this.transparent;
   }
@@ -36,6 +37,7 @@ export class Tile extends DisplaySymbol {
   }
 }
 
+// Tile definitions
 export const TILES = {
   NULLTILE: new Tile({
     name: "nulltile",
@@ -55,4 +57,4 @@ export const TILES = {
     transparent: true,
     passable: true,
   }),
-};
+}; 

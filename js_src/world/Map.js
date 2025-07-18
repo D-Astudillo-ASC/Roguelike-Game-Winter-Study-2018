@@ -1,7 +1,7 @@
-import { TILES } from "./tile.js";
+import { TILES } from "./Tile.js";
 import { RNG, Map as ROTMap } from "rot-js";
-import { init2DArray, uniqueId } from "./util.js";
-import { DATASTORE } from "./datastore.js";
+import { init2DArray, uniqueId } from "../utils/Helpers.js";
+import { DATASTORE } from "../core/DataStore.js";
 
 class Map {
   constructor(xdim, ydim, mapType) {
@@ -79,6 +79,16 @@ class Map {
 
     delete this.state.entityIdToMapPos[ent.getId()];
 
+    return ent;
+  }
+
+  removeEntity(ent) {
+    // Remove entity from map tracking
+    this.extractEntity(ent);
+    
+    // Clear entity's map reference
+    ent.setMapId(null);
+    
     return ent;
   }
   addEntityAt(ent, mapx, mapy) {
@@ -175,7 +185,6 @@ class Map {
 
   render(display, camera_map_x, camera_map_y) {
     if (!display || !display.getOptions) {
-      // console.warn("Map.render called with invalid display object");
       return;
     }
     
@@ -184,13 +193,34 @@ class Map {
     const xstart = camera_map_x - Math.trunc(width / 2);
     const ystart = camera_map_y - Math.trunc(height / 2);
     
-    for (let cx =0; cx < width; cx++) {
+    // Pre-calculate bounds to avoid repeated calculations
+    const xend = xstart + width;
+    const yend = ystart + height;
+    
+    for (let cx = 0; cx < width; cx++) {
+      const mapX = xstart + cx;
+      
+      // Skip if outside map bounds
+      if (mapX < 0 || mapX >= this.state.xdim) {
+        // Render NULLTILE for entire column
+        for (let cy = 0; cy < height; cy++) {
+          TILES.NULLTILE.render(display, cx, cy);
+        }
+        continue;
+      }
+      
       for (let cy = 0; cy < height; cy++) {
-        const mapX = xstart + cx;
         const mapY = ystart + cy;
-        const pos = `${mapX},${mapY}`;
         
+        // Skip if outside map bounds
+        if (mapY < 0 || mapY >= this.state.ydim) {
+          TILES.NULLTILE.render(display, cx, cy);
+          continue;
+        }
+        
+        const pos = `${mapX},${mapY}`;
         const entityId = this.state.mapPosToEntityId[pos];
+        
         if (entityId && DATASTORE.ENTITIES[entityId]) {
           DATASTORE.ENTITIES[entityId].render(display, cx, cy);
         } else {
@@ -198,14 +228,16 @@ class Map {
           if (entityId && !DATASTORE.ENTITIES[entityId]) {
             delete this.state.mapPosToEntityId[pos];
           }
-          this.getTile(mapX, mapY).render(display, cx, cy);
+          
+          // Render tile (guaranteed to exist since we're in bounds)
+          this.tileGrid[mapX][mapY].render(display, cx, cy);
         }
       }
     }
   }
 
   toJSON() {
-    return JSON.stringify(this.state);
+    return this.state;
   }
 
   getTile(mapx, mapy) {
@@ -257,31 +289,6 @@ const TILE_GRID_GENERATOR = {
     
     return tg;
   },
-  
-  // "safe caves": function (xdim, ydim, rngState) {
-  //   const tg = init2DArray(xdim, ydim, TILES.NULLTILE);
-  //   const gen = new ROTMap.Cellular(xdim, ydim, { connected: true });
-  //   const origRngState = RNG.getState();
-  //   RNG.setState(rngState);
-  //   gen.randomize(0.4); // Slightly lower density for more open areas
-  //   gen.create();
-  //   gen.create();
-  //   gen.create();
-  //   gen.connect(function (x, y, isWall) {
-  //     tg[x][y] =
-  //       isWall || x == 0 || y == 0 || x == xdim - 1 || y == ydim - 1
-  //         ? TILES.WALL
-  //         : TILES.FLOOR;
-  //   });
-  //   RNG.setState(origRngState);
-    
-  //   // Aggressive post-processing to ensure no traps
-  //   postProcessCaves(tg, xdim, ydim);
-  //   removeNarrowPassages(tg, xdim, ydim);
-  //   ensureMinimumOpenAreas(tg, xdim, ydim);
-    
-  //   return tg;
-  // },
   
   "open connected": function (xdim, ydim, rngState) {
     const tg = init2DArray(xdim, ydim, TILES.FLOOR);
@@ -421,59 +428,6 @@ function isTrapWall(tg, x, y, xdim, ydim) {
   return false;
 }
 
-// Remove narrow passages that could trap entities
-// function removeNarrowPassages(tg, xdim, ydim) {
-//   for (let x = 1; x < xdim - 1; x++) {
-//     for (let y = 1; y < ydim - 1; y++) {
-//       if (tg[x][y] === TILES.WALL) {
-//         // Check for narrow passages (1-tile wide corridors)
-//         const horizontal = (tg[x-1][y] === TILES.WALL && tg[x+1][y] === TILES.WALL);
-//         const vertical = (tg[x][y-1] === TILES.WALL && tg[x][y+1] === TILES.WALL);
-        
-//         if (horizontal && vertical) {
-//           // This creates a narrow passage, remove it
-//           tg[x][y] = TILES.FLOOR;
-//         }
-//       }
-//     }
-//   }
-// }
-
-// Ensure minimum open areas for entities to move around
-// function ensureMinimumOpenAreas(tg, xdim, ydim) {
-//   const minOpenSize = 3; // Minimum 3x3 open area
-  
-//   for (let x = 1; x < xdim - minOpenSize; x++) {
-//     for (let y = 1; y < ydim - minOpenSize; y++) {
-//       // Check if there's a 3x3 open area
-//       let hasOpenArea = true;
-//       for (let dx = 0; dx < minOpenSize; dx++) {
-//         for (let dy = 0; dy < minOpenSize; dy++) {
-//           if (tg[x + dx][y + dy] !== TILES.FLOOR) {
-//             hasOpenArea = false;
-//             break;
-//           }
-//         }
-//         if (!hasOpenArea) break;
-//       }
-      
-//       // If no open area found, create one by removing some walls
-//       if (!hasOpenArea) {
-//         for (let dx = 0; dx < minOpenSize; dx++) {
-//           for (let dy = 0; dy < minOpenSize; dy++) {
-//             if (tg[x + dx][y + dy] === TILES.WALL) {
-//               // Only remove walls that don't break connectivity
-//               if (canRemoveWall(tg, x + dx, y + dy, xdim, ydim)) {
-//                 tg[x + dx][y + dy] = TILES.FLOOR;
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-
 // Check if a wall can be safely removed
 function canRemoveWall(tg, x, y, xdim, ydim) {
   // Don't remove border walls
@@ -513,4 +467,4 @@ export function MapMaker(mapData) {
   return m;
 }
 
-export { Map };
+export { Map }; 
