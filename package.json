@@ -7,6 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite",
+    "dev:host": "vite --host",
     "build": "vite build",
     "build:analyze": "vite build --mode analyze",
     "build:prod": "vite build --mode production",
