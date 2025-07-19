@@ -1,4 +1,5 @@
 import { Game } from "./systems/Game.js";
+import { Display } from "rot-js";
 
 window.onload = function () {
   Game.init();
@@ -18,4 +19,20 @@ window.onload = function () {
   Game.bindEvent("keydown");
   Game.bindEvent("keyup");
   Game.render();
+
+  // Handle window resize
+  let resizeTimeout;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      Game.handleResize();
+    }, 250);
+  });
+
+  // Handle orientation changes
+  window.addEventListener('orientationchange', function() {
+    setTimeout(function() {
+      Game.handleResize();
+    }, 500);
+  });
 };

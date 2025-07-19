@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <link rel="stylesheet" type="text/css" href="./css/style.css" />
     <title>Weed Strike Roguelike - Modern Edition</title>
   </head>
@@ -10,6 +10,24 @@
     <div id="ws-avatar-display" class="ws-display"></div>
     <div id="ws-main-display" class="ws-display"></div>
     <div id="ws-message-display" class="ws-display"></div>
+    <button id="mobile-start-btn" style="display:none">Start</button>
+    <div id="mobile-persistence-btns" style="display:none">
+      <button id="mobile-newgame-btn">New Game</button>
+      <button id="mobile-loadgame-btn">Load Game</button>
+    </div>
+    <button id="mobile-pause-btn" style="display:none">Pause</button>
+    <div id="mobile-pause-btns" style="display:none">
+      <button id="mobile-resume-btn">Resume</button>
+      <button id="mobile-save-btn">Save Game</button>
+      <button id="mobile-load-btn">Load Game</button>
+      <button id="mobile-quit-btn">Quit</button>
+    </div>
+    <button id="mobile-restart-btn" style="display:none">Restart</button>
+    <div id="mobile-dpad" style="display:none">
+      <div class="circular-joystick" style="display:none">
+        <div class="joystick-stick" id="joystick-stick"></div>
+      </div>
+    </div>
     <script type="module" src="./js_src/main.js"></script>
   </body>
 </html> 

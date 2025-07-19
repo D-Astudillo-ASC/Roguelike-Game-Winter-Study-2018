@@ -6,6 +6,7 @@ import { MapMaker } from "../../world/Map.js";
 import { SCHEDULER, TIME_ENGINE } from "../../systems/Timing.js";
 import { GAME_CONFIG } from "../../utils/Constants.js";
 import { Message } from "../components/MessageSystem.js";
+import { isMobileUI } from '../../utils/isMobileUI.js';
 
 export class PlayMode extends BaseUIMode {
   constructor(thegame) {
@@ -22,10 +23,15 @@ export class PlayMode extends BaseUIMode {
     this.lastKeyPressTime = 0;
     this.lastPauseTime = 0;
     this.lastTurnTime = 0;
-    this.turnCooldown = 50; // Reduced for smoother movement
+    this.turnCooldown = 70; // Slightly faster movement
   }
 
   enter() {
+    const isMobile = isMobileUI();
+    if (isMobile) {
+      const btns = document.getElementById('mobile-persistence-btns');
+      if (btns) btns.style.display = 'none';
+    }
     setKeyBinding(["universal", "play", "movement_numpad"]);
     
     // Clear any leftover movement state
@@ -45,6 +51,10 @@ export class PlayMode extends BaseUIMode {
   }
 
   exit() {
+    // Always hide pause button when exiting, regardless of mobile state
+    const btn = document.getElementById('mobile-pause-btn');
+    if (btn) btn.style.display = 'none';
+    
     this.stopMovementTimer();
     // Stop the game engine when leaving play mode
     TIME_ENGINE.stop();
@@ -63,7 +73,7 @@ export class PlayMode extends BaseUIMode {
         window.continuousMovementRequested = false;
         this.processContinuousMovement();
       }
-    }, 25); // Faster check for smoother direction changes
+    }, 35); // Slightly faster movement
   }
 
   stopContinuousMovementCheck() {
@@ -200,6 +210,30 @@ export class PlayMode extends BaseUIMode {
     if (map) {
       map.render(display, this.state.cameraX, this.state.cameraY);
     }
+
+    const isMobile = isMobileUI();
+    const pauseBtn = document.getElementById('mobile-pause-btn');
+    if (isMobile) {
+      if (pauseBtn) pauseBtn.style.display = 'block';
+      if (pauseBtn && !pauseBtn._bound) {
+        pauseBtn._bound = true;
+        pauseBtn.onclick = () => {
+          pauseBtn.style.display = 'none';
+          this.game.switchModes('pause');
+        };
+      }
+    } else {
+      if (pauseBtn) pauseBtn.style.display = 'none';
+    }
+    // Ensure joystick is only shown after first render
+    // if (typeof this._joystickShown === 'undefined') {
+    //   this._joystickShown = true;
+    //   setTimeout(() => {
+    //     if (this.game && typeof this.game.updateJoystickVisibility === 'function') {
+    //       this.game.updateJoystickVisibility();
+    //     }
+    //   }, 0);
+    // }
   }
 
   renderAvatar(display) {
@@ -299,8 +333,16 @@ export class PlayMode extends BaseUIMode {
   moveCameraToAvatar() {
     const avatar = this.getAvatar();
     if (avatar) {
-      this.state.cameraX = avatar.getX();
-      this.state.cameraY = avatar.getY();
+      this.state.cameraX = Math.floor(avatar.getX());
+      this.state.cameraY = Math.floor(avatar.getY());
+    }
+  }
+
+  // Simple camera centering that always works
+  forceCenterCameraOnAvatar() {
+    this.moveCameraToAvatar();
+    if (this.game && this.game.render) {
+      this.game.render();
     }
   }
 
@@ -324,7 +366,6 @@ export class PlayMode extends BaseUIMode {
     // Clear messages and render
     Message.clear();
     this.game.render();
-    this.showMessage("You have been killed!");
     this.game.switchModes("lose");
   }
 } 
