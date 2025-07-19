@@ -5,15 +5,15 @@ import { DATASTORE } from "../../core/DataStore.js";
 import { SmartAI, BalancedAI, SimpleAI } from "../ai/index.js";
 
 // Helper function to safely render the game
-function safeGameRender() {
-  if (
-    typeof DATASTORE.GAME?.render === "function" &&
-    DATASTORE.GAME.curMode && 
-    DATASTORE.GAME.display?.main?.o
-  ) {
-    DATASTORE.GAME.render();
-  }
-}
+// function safeGameRender() {
+//   if (
+//     typeof DATASTORE.GAME?.render === "function" &&
+//     DATASTORE.GAME.curMode && 
+//     DATASTORE.GAME.display?.main?.o
+//   ) {
+//     DATASTORE.GAME.render();
+//   }
+// }
 
 export const WalkerCorporeal = {
   META: {

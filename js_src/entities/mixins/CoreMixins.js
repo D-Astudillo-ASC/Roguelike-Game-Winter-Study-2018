@@ -157,15 +157,21 @@ export const PlayerMessages = {
   },
   LISTENERS: {
     damaged: function (evtData) {
-      // Show damage message
-      if (typeof DATASTORE?.GAME?.curMode?.showMessage === "function") {
-        DATASTORE.GAME.curMode.showMessage(`You take ${evtData.damageAmount} damage!`);
+      // Only show messages if this entity is the player (target of damage)
+      if (this.name === "avatar") {
+        const attackerName = evtData.src ? evtData.src.name : "Something";
+        if (typeof DATASTORE?.GAME?.curMode?.showMessage === "function") {
+          DATASTORE.GAME.curMode.showMessage(`You take ${evtData.damageAmount} damage from ${attackerName}!`);
+        }
       }
     },
     attacks: function (evtData) {
-      // Show attack message
-      if (typeof DATASTORE?.GAME?.curMode?.showMessage === "function") {
-        DATASTORE.GAME.curMode.showMessage(`You attack the ${evtData.target.name}!`);
+      // Only show messages if this entity is the player (attacker)
+      if (this.name === "avatar") {
+        const targetName = evtData.target ? evtData.target.name : "something";
+        if (typeof DATASTORE?.GAME?.curMode?.showMessage === "function") {
+          DATASTORE.GAME.curMode.showMessage(`You attack the ${targetName} for ${this.getMeleeDamage()} damage!`);
+        }
       }
     },
   },

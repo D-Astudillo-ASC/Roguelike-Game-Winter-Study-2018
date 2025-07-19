@@ -9,12 +9,12 @@ class GameEngine {
     this.scheduler = scheduler;
     this.isRunning = false;
     this.processInterval = null;
-    this.turnDuration = 50; // Keep fast for player responsiveness
+    this.turnDuration = 70; // Slightly faster movement
     this.playerTurnTaken = false;
     this.monsterTurnsProcessed = 0;
     this.totalMonsters = 0;
     this.turnCooldown = 0; // Prevent rapid turns
-    this.monsterTurnDelay = 175; // Reduced delay for slightly faster monsters
+    this.monsterTurnDelay = 150; // Slightly faster monsters
     this.lastMonsterTurnTime = 0; // Track when monsters last moved
   }
 
