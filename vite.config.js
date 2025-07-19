@@ -9,8 +9,8 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     base: './',
-    plugins: [
-      legacy({
+  plugins: [
+    legacy({
         targets: ['defaults', 'not IE 11'],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
         renderLegacyChunks: true,
@@ -41,12 +41,12 @@ export default defineConfig(({ command, mode }) => {
         gzipSize: true,
         brotliSize: true,
         template: 'treemap', // or 'sunburst', 'network'
-      })
+    })
     ].filter(Boolean),
     
-    build: {
-      outDir: 'dist',
-      assetsDir: 'assets',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
       sourcemap: !isProduction, // Disable sourcemaps in production for security
       minify: isProduction ? 'terser' : false,
       terserOptions: isProduction ? {
@@ -73,9 +73,9 @@ export default defineConfig(({ command, mode }) => {
       } : undefined,
       
       // Optimize chunk splitting for better caching
-      rollupOptions: {
-        input: {
-          main: 'index.html'
+    rollupOptions: {
+      input: {
+        main: 'index.html'
         },
         output: {
           // Optimize asset naming for better caching
@@ -111,7 +111,7 @@ export default defineConfig(({ command, mode }) => {
     
     // Development server configuration
     server: {
-      port: 3000,
+    port: 3000,
       open: true,
       host: true,
       // Enable HMR for better development experience
