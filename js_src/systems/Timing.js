@@ -21,10 +21,10 @@ class GameEngine {
   start() {
     if (this.isRunning) return;
     this.isRunning = true;
-    
+
     // Count total monsters for turn management
     this.countMonsters();
-    
+
     // Start unified turn system
     this.processInterval = setInterval(() => {
       this.processUnifiedTurn();
@@ -84,12 +84,11 @@ class GameEngine {
           monstersProcessed++;
         }
       }
-      
+
       // Reset for next turn
       this.resetTurn();
       this.turnCooldown = now;
       this.lastMonsterTurnTime = now;
-      
     } catch (error) {
       console.error("Error processing turn:", error);
     }
@@ -115,4 +114,4 @@ class GameEngine {
 
 const TIME_ENGINE = new GameEngine(SCHEDULER);
 
-export { SCHEDULER, TIME_ENGINE }; 
+export { SCHEDULER, TIME_ENGINE };

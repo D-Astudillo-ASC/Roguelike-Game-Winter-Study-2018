@@ -57,4 +57,4 @@ export const TILES = {
     transparent: true,
     passable: true,
   }),
-}; 
+};

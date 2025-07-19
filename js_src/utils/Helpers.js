@@ -1,6 +1,6 @@
 // Utility functions for the game
-import { RNG } from 'rot-js';
-import { GAME_CONFIG } from './Constants.js';
+import { RNG } from "rot-js";
+import { GAME_CONFIG } from "./Constants.js";
 
 // Generate a unique ID (using the current working implementation)
 export function uniqueId(prefix = "") {
@@ -27,13 +27,16 @@ export function getRandomOffset(range) {
 
 // Generate random seed
 export function generateRandomSeed() {
-  return GAME_CONFIG.RANDOM_SEED_MIN + Math.floor(Math.random() * GAME_CONFIG.RANDOM_SEED_MAX);
+  return (
+    GAME_CONFIG.RANDOM_SEED_MIN +
+    Math.floor(Math.random() * GAME_CONFIG.RANDOM_SEED_MAX)
+  );
 }
 
 // Check if localStorage is available
 export function isLocalStorageAvailable() {
   try {
-    const test = '__localStorage_test__';
+    const test = "__localStorage_test__";
     localStorage.setItem(test, test);
     localStorage.removeItem(test);
     return true;
@@ -54,10 +57,10 @@ export function safeJSONParse(jsonString, defaultValue = null) {
 
 // Deep clone an object
 export function deepClone(obj) {
-  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj === null || typeof obj !== "object") return obj;
   if (obj instanceof Date) return new Date(obj.getTime());
-  if (obj instanceof Array) return obj.map(item => deepClone(item));
-  if (typeof obj === 'object') {
+  if (obj instanceof Array) return obj.map((item) => deepClone(item));
+  if (typeof obj === "object") {
     const clonedObj = {};
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
@@ -66,4 +69,4 @@ export function deepClone(obj) {
     }
     return clonedObj;
   }
-} 
+}

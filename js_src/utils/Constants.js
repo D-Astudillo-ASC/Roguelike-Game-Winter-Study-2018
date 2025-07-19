@@ -5,19 +5,19 @@ export const GAME_CONFIG = {
   MAIN_DISPLAY_WIDTH: Math.floor(window.innerWidth / 8),
   MAIN_DISPLAY_HEIGHT: Math.floor(window.innerHeight / 16),
   MESSAGE_DISPLAY_HEIGHT: 6,
-  
+
   // Game settings
   DEFAULT_ACTION_DURATION: 1000,
   RANDOM_SEED_MIN: 5,
   RANDOM_SEED_MAX: 100000,
-  
+
   // Entity settings
   DEFAULT_MONSTER_COUNT: 10,
   DEFAULT_MOSS_COUNT: 10,
-  
+
   // Map settings
   DEFAULT_MAP_TYPE: "basic caves",
-  
+
   // Storage keys
   SAVE_GAME_KEY: "roguelikegame",
 };
@@ -63,4 +63,4 @@ export const EVENTS = {
   ACTION_DONE: "actionDone",
   PLAYER_MOVED: "playerMoved",
   ACT: "act",
-}; 
+};

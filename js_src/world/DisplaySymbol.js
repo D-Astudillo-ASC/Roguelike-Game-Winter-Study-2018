@@ -1,5 +1,5 @@
 // Base class for displayable symbols
-import { Colors } from '../utils/Colors.js';
+import { Colors } from "../utils/Colors.js";
 
 export class DisplaySymbol {
   constructor(template = {}) {
@@ -10,7 +10,7 @@ export class DisplaySymbol {
 
   // Render this symbol to a display (maintains current API)
   render(display, console_x, console_y) {
-    if (display && typeof display.draw === 'function') {
+    if (display && typeof display.draw === "function") {
       display.draw(console_x, console_y, this.chr, this.fg, this.bg);
     }
   }
@@ -20,7 +20,7 @@ export class DisplaySymbol {
     return new DisplaySymbol({
       chr: this.chr,
       fg: this.fg,
-      bg: this.bg
+      bg: this.bg,
     });
   }
 
@@ -53,4 +53,4 @@ export class DisplaySymbol {
   getBackground() {
     return this.bg;
   }
-} 
+}

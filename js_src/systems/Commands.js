@@ -1,18 +1,18 @@
 import { DATASTORE } from "../core/DataStore.js";
 
 // Track pressed movement keys for diagonal movement
-let pressedMovementKeys = new Set();
+const pressedMovementKeys = new Set();
 let continuousMovementTimer = null;
 let lastMovementTime = 0;
-const MOVEMENT_INTERVAL = 50; // Reduced for smoother movement
+const MOVEMENT_INTERVAL = 70; // Slightly faster movement
 
 // Get current movement direction based on pressed keys
 export function getCurrentMovementDirection() {
-  const hasW = pressedMovementKeys.has('w');
-  const hasA = pressedMovementKeys.has('a');
-  const hasS = pressedMovementKeys.has('s');
-  const hasD = pressedMovementKeys.has('d');
-  
+  const hasW = pressedMovementKeys.has("w");
+  const hasA = pressedMovementKeys.has("a");
+  const hasS = pressedMovementKeys.has("s");
+  const hasD = pressedMovementKeys.has("d");
+
   // Diagonal movements (only when exactly 2 keys are pressed)
   if (pressedMovementKeys.size === 2) {
     if (hasW && hasA) return { dx: -1, dy: -1, command: COMMAND.MOVE_UL };
@@ -20,7 +20,7 @@ export function getCurrentMovementDirection() {
     if (hasS && hasA) return { dx: -1, dy: 1, command: COMMAND.MOVE_DL };
     if (hasS && hasD) return { dx: 1, dy: 1, command: COMMAND.MOVE_DR };
   }
-  
+
   // Single movements (only when exactly one key is pressed)
   if (pressedMovementKeys.size === 1) {
     if (hasW) return { dx: 0, dy: -1, command: COMMAND.MOVE_U };
@@ -28,7 +28,7 @@ export function getCurrentMovementDirection() {
     if (hasS) return { dx: 0, dy: 1, command: COMMAND.MOVE_D };
     if (hasD) return { dx: 1, dy: 0, command: COMMAND.MOVE_R };
   }
-  
+
   // No movement
   return { dx: 0, dy: 0, command: COMMAND.MOVE_WAIT };
 }
@@ -36,10 +36,13 @@ export function getCurrentMovementDirection() {
 // Start continuous movement timer - efficient implementation
 function startContinuousMovement() {
   if (continuousMovementTimer) return;
-  
+
   continuousMovementTimer = setInterval(() => {
     const now = Date.now();
-    if (now - lastMovementTime >= MOVEMENT_INTERVAL && pressedMovementKeys.size > 0) {
+    if (
+      now - lastMovementTime >= MOVEMENT_INTERVAL &&
+      pressedMovementKeys.size > 0
+    ) {
       const movement = getCurrentMovementDirection();
       if (movement.command !== COMMAND.MOVE_WAIT) {
         lastMovementTime = now;
@@ -68,15 +71,17 @@ export function getCommandFromInput(evtType, evtData) {
   if (evtType != "keyup" && evtType != "keydown") {
     return COMMAND.NULLCOMMAND;
   }
-  
+
   const key = evtData.key.toLowerCase();
-  
+
   // Only treat WASD as movement keys in play mode
-  const isInPlayMode = typeof DATASTORE?.GAME?.curModeName === 'string' && DATASTORE.GAME.curModeName === 'play';
-  const isMovementKey = isInPlayMode && ['w', 'a', 's', 'd'].includes(key);
-  
+  const isInPlayMode =
+    typeof DATASTORE?.GAME?.curModeName === "string" &&
+    DATASTORE.GAME.curModeName === "play";
+  const isMovementKey = isInPlayMode && ["w", "a", "s", "d"].includes(key);
+
   // console.log("getCommandFromInput - key:", key, "isMovementKey:", isMovementKey, "isInPlayMode:", isInPlayMode);
-  
+
   // Track key state changes (only in play mode)
   if (evtType === "keydown" && isMovementKey) {
     pressedMovementKeys.add(key);
@@ -87,18 +92,18 @@ export function getCommandFromInput(evtType, evtData) {
       stopContinuousMovement(); // Stop continuous movement when no keys are pressed
     }
   }
-  
+
   // Process movement immediately (no cooldown) - only in play mode
   if (isMovementKey && evtType === "keydown") {
     const movement = getCurrentMovementDirection();
-    
+
     // Return movement command if we have pressed keys
     if (pressedMovementKeys.size > 0) {
       lastMovementTime = Date.now();
       return movement.command;
     }
   }
-  
+
   // For non-movement keys, use the original binding system
   const bindingSet = `key:${evtData.key},altKey:${evtData.altKey},ctrlKey:${evtData.ctrlKey},shiftKey:${evtData.shiftKey}`;
   if (!BINDING_LOOKUPS[bindingSet]) {
@@ -115,9 +120,8 @@ export let COMMAND = {
 // This is used by the getCommandFromInput function to the value associated with a given key binding set. It's dynamically populated by the setKeyBinding function below.
 let BINDING_LOOKUPS = {};
 
-  // takes a list of key binding names and sets up the commands and binding lookups - later items in the list override earlier ones, which allows a kind of hierarchical binding system
-  export function setKeyBinding(bindingNameList) {
-  
+// takes a list of key binding names and sets up the commands and binding lookups - later items in the list override earlier ones, which allows a kind of hierarchical binding system
+export function setKeyBinding(bindingNameList) {
   // ensure that bindingNameList is an array which has a first element of 'universal'
   if (typeof bindingNameList === "string") {
     bindingNameList = [bindingNameList];
@@ -201,14 +205,41 @@ const KEY_BINDINGS = {
     ],
   },
   movement_numpad: {
-    MOVE_UL: ["key:7,altKey:false,ctrlKey:false,shiftKey:false", "key:Q,altKey:false,ctrlKey:false,shiftKey:false"],
-    MOVE_U: ["key:8,altKey:false,ctrlKey:false,shiftKey:false", "key:W,altKey:false,ctrlKey:false,shiftKey:false"],
-    MOVE_UR: ["key:9,altKey:false,ctrlKey:false,shiftKey:false", "key:E,altKey:false,ctrlKey:false,shiftKey:false"],
-    MOVE_L: ["key:4,altKey:false,ctrlKey:false,shiftKey:false", "key:A,altKey:false,ctrlKey:false,shiftKey:false"],
-    MOVE_WAIT: ["key:5,altKey:false,ctrlKey:false,shiftKey:false", "key:S,altKey:false,ctrlKey:false,shiftKey:false"],
-    MOVE_R: ["key:6,altKey:false,ctrlKey:false,shiftKey:false", "key:D,altKey:false,ctrlKey:false,shiftKey:false"],
-    MOVE_DL: ["key:1,altKey:false,ctrlKey:false,shiftKey:false", "key:Z,altKey:false,ctrlKey:false,shiftKey:false"],
-    MOVE_D: ["key:2,altKey:false,ctrlKey:false,shiftKey:false", "key:X,altKey:false,ctrlKey:false,shiftKey:false"],
-    MOVE_DR: ["key:3,altKey:false,ctrlKey:false,shiftKey:false", "key:C,altKey:false,ctrlKey:false,shiftKey:false"],
+    MOVE_UL: [
+      "key:7,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:Q,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
+    MOVE_U: [
+      "key:8,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:W,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
+    MOVE_UR: [
+      "key:9,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:E,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
+    MOVE_L: [
+      "key:4,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:A,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
+    MOVE_WAIT: [
+      "key:5,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:S,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
+    MOVE_R: [
+      "key:6,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:D,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
+    MOVE_DL: [
+      "key:1,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:Z,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
+    MOVE_D: [
+      "key:2,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:X,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
+    MOVE_DR: [
+      "key:3,altKey:false,ctrlKey:false,shiftKey:false",
+      "key:C,altKey:false,ctrlKey:false,shiftKey:false",
+    ],
   },
-}; 
+};
