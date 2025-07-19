@@ -1,8 +1,8 @@
 // Central data store for all game objects
-import { SCHEDULER } from '../systems/Timing.js';
+import { SCHEDULER } from "../systems/Timing.js";
 
 // Simple data store that maintains the current API
-export let DATASTORE = {
+export const DATASTORE = {
   GAME: {},
   ID_SEQ: 1,
   MAPS: {},
@@ -48,7 +48,7 @@ export function getAllEntities() {
 }
 
 export function getEntitiesByType(type) {
-  return getAllEntities().filter(entity => entity.name === type);
+  return getAllEntities().filter((entity) => entity.name === type);
 }
 
 // Helper functions for map management
@@ -70,4 +70,4 @@ export function getMap(mapId) {
 
 export function getAllMaps() {
   return Object.values(DATASTORE.MAPS);
-} 
+}

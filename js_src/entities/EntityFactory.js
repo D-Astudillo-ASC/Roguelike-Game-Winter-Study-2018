@@ -10,7 +10,9 @@ export class Factory {
 
   // Learn a new template
   learn(template) {
-    const templateName = template.templateName ? template.templateName : template.name;
+    const templateName = template.templateName
+      ? template.templateName
+      : template.name;
     this.knownTemplates[templateName] = template;
   }
 
@@ -23,7 +25,7 @@ export class Factory {
     }
 
     const product = new this.productClass(template);
-    
+
     // Add to datastore
     if (product && product.getId()) {
       DATASTORE[this.datastoreNamespace][product.getId()] = product;
@@ -46,4 +48,4 @@ export class Factory {
   hasTemplate(templateName) {
     return templateName in this.knownTemplates;
   }
-} 
+}

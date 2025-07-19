@@ -3,8 +3,19 @@ import { MixableSymbol } from "./MixableSymbol.js";
 import { DATASTORE } from "../core/DataStore.js";
 
 // Import mixins
-import { TimeTracker, HitPoints, MeleeAttacker, PlayerMessages } from "./mixins/CoreMixins.js";
-import { WalkerCorporeal, ActorPlayer, ActorWanderer, SmartMonsterAI, BalancedMonsterAI } from "./mixins/AdvancedMixins.js";
+import {
+  TimeTracker,
+  HitPoints,
+  MeleeAttacker,
+  PlayerMessages,
+} from "./mixins/CoreMixins.js";
+import {
+  WalkerCorporeal,
+  ActorPlayer,
+  ActorWanderer,
+  SmartMonsterAI,
+  BalancedMonsterAI,
+} from "./mixins/AdvancedMixins.js";
 
 // Create mixin map
 const MIXIN_MAP = {
@@ -23,7 +34,7 @@ export class Entity extends MixableSymbol {
   constructor(template) {
     // Use all mixins
     super(template, MIXIN_MAP);
-    
+
     if (!this.state) {
       this.state = {};
     }
@@ -31,14 +42,12 @@ export class Entity extends MixableSymbol {
     this.state.y = 0;
     this.state.mapId = 0;
     this.state.id = uniqueId();
-    
+
     // Copy template properties to the entity instance
     if (template.role) {
       this.role = template.role;
     }
   }
-
-
 
   getId() {
     return this.state.id;
@@ -124,4 +133,4 @@ export class Entity extends MixableSymbol {
     // Restore state including position data
     this.state = { ...parsedState };
   }
-} 
+}
